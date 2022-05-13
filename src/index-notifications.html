@@ -130,8 +130,7 @@
                   streamId: streamId,
                 },
                 callback: (notification) => {
-                  console.log('Stream id: ' + notification.streamId);
-                  console.log('Notification count: ' + notification.count);
+                  window.alert('Stream id: ' + notification.streamId +'\nNotification count: ' + notification.count);
                 },
               });
             }
@@ -144,8 +143,7 @@
                 streamId: streamId,
               },
               callback: (notification) => {
-                console.log('Stream id: ' + notification.streamId);
-                console.log('Notification count: ' + notification.count);
+                window.alert('Stream id: ' + notification.streamId +'\nNotification count: ' + notification.count);
               },
             });
           }
