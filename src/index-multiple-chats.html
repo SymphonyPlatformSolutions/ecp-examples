@@ -1,67 +1,97 @@
-<!doctype html>
 <html>
   <head>
     <title>ECP Demo</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app">
       <div class="description">
         <h1>ECP with multiple chats</h1>
         <p>
-          With this new version of ECP, you can now display multiple ECP chats on your page, without having to load ECP multiple times.
+          With this new version of ECP, you can now display multiple ECP chats
+          on your page, without having to load ECP multiple times.
         </p>
         <p>
-          For this usecase, we can completely hide the "main" ECP iframe container as shown below.
-          This one will never be displayed to the end user, we only use it to load ECP data and hold the logic in the background.
-          We will use other iframes to display the chat rooms.
+          For this usecase, we can completely hide the "main" ECP iframe
+          container as shown below. This one will never be displayed to the end
+          user, we only use it to load ECP data and hold the logic in the
+          background. We will use other iframes to display the chat rooms.
         </p>
-        <xmp>
-          <div class="ecp-main-hidden-frame symphony-ecm" id="symphony-ecm">
-          </div>
-        </xmp>
+        <pre>
+          <code>
+            &lt;div class="ecp-main-hidden-frame symphony-ecm" id="symphony-ecm"&gt;
+            &lt;/div&gt;
+          </code>
+        </pre>
         <p>As in previous examples, add the script and use explicit mode:</p>
-        <xmp>
-          <script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </xmp>
+        <pre>
+          <code>
+            &lt;script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"&gt;&lt;/script&gt;
+          </code>
+        </pre>
+        <p>Render the main (hidden) ecp iframe once the sdk is loaded.</p>
+        <pre>
+          <code>
+              window.sdkLoaded = () =&gt; {
+              window.symphony.render('symphony-ecm', {mode: 'light', ...EcpParamObject})
+            }
+          </code>
+        </pre>
         <p>
-          Render the main (hidden) ecp iframe once the sdk is loaded.
+          Now we will want to display the chats in two new containers - called
+          chat-1 and chat-2 for this example.
         </p>
-        <xmp>
-          window.sdkLoaded = () => {
-            window.symphony.render('symphony-ecm', {mode: 'light', ...EcpParamObject})
-          }
-        </xmp>
-        <p>Now we will want to display the chats in two new containers - called chat-1 and chat-2 for this example.</p>
-        <xmp>
-          <div class="ecp-frame hidden" id="chat-1"></div>
-          <div class="ecp-frame hidden" id="chat-2"></div>
-        </xmp>
-        <p>We will use the first chat to display the chat with the stream ID form and the second one to display the chat open from the user email address form and button.</p>
-        <xmp>
-          window.symphony.openStream(streamId, '#chat-1');
-          frameContainer.classList.remove('hidden');
-        </xmp>
-        <xmp>
-          window.symphony.startRoom([emails], '#chat-2');
-          frameContainer.classList.remove('hidden');
-        </xmp>
+        <pre>
+          <code>
+            &lt;div class="ecp-frame hidden" id="chat-1"&gt;&lt;/div&gt;
+            &lt;div class="ecp-frame hidden" id="chat-2"&gt;&lt;/div&gt;
+          </code>
+        </pre>
         <p>
-          Note that the SDK exposes two different functions to open a chat:
-          You can either open a chat from a streamId: <xmp>openStream(streamId, containerSelector)</xmp> 
-          or a list of userIds and emails: <xmp>startRoom([ArrayOfUsers], containerSelector)</xmp> 
+          We will use the first chat to display the chat with the stream ID form
+          and the second one to display the chat open from the user email
+          address form and button.
+        </p>
+        <pre>
+          <code>
+            window.symphony.openStream(streamId, '#chat-1');
+            frameContainer.classList.remove('hidden');
+          </code>
+        </pre>
+        <pre>
+          <code>
+            window.symphony.startRoom([emails], '#chat-2');
+            frameContainer.classList.remove('hidden');
+          </code>
+        </pre>
+        <p>
+          Note that the SDK exposes two different functions to open a chat: You
+          can either open a chat from a streamId:
+          <code>openStream(streamId, containerSelector)</code> or a list of
+          userIds and emails:
+          <code>startRoom([ArrayOfUsers], containerSelector)</code>
         </p>
         <form id="ecp-form-1">
           <div class="form-group">
             <label for="StreamId">Stream id:</label>
-            <input type="text" class="form-control" id="StreamId" placeholder="Stream ID">
+            <input
+              type="text"
+              class="form-control"
+              id="StreamId"
+              placeholder="Stream ID"
+            />
           </div>
           <button type="submit" class="btn">Open chat with streamID</button>
         </form>
         <form id="ecp-form-2">
           <div class="form-group">
             <label for="UserIds">Email:</label>
-            <input type="text" class="form-control" id="Email" placeholder="Email">
+            <input
+              type="text"
+              class="form-control"
+              id="Email"
+              placeholder="Email"
+            />
           </div>
           <button type="submit" class="btn">Open chat from email</button>
         </form>
@@ -72,41 +102,45 @@
     </div>
     <script type="text/javascript">
       window.onSdkLoaded = () => {
-        window.symphony.render('symphony-ecm')
-      }
+        window.symphony.render("symphony-ecm");
+      };
 
       const loadScript = () => {
-        const DEFAULT_ORIGIN = 'develop2.symphony.com';
+        const DEFAULT_ORIGIN = "develop2.symphony.com";
         const locationUrl = new URL(location.href);
-        const sdkOrigin = locationUrl.searchParams.get('origin');
-        const script = document.createElement('script');
-        script.id = 'symphony-ecm-sdk';
+        const sdkOrigin = locationUrl.searchParams.get("origin");
+        const script = document.createElement("script");
+        script.id = "symphony-ecm-sdk";
         script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
-        script.setAttribute('render', 'explicit');
-        script.setAttribute('data-onload', 'onSdkLoaded');
+        script.setAttribute("render", "explicit");
+        script.setAttribute("data-onload", "onSdkLoaded");
         document.body.appendChild(script);
-      }
+      };
 
       loadScript();
 
-      document.getElementById('ecp-form-1').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const streamId = document.getElementById('StreamId').value;
-        if (streamId) {
-          const frameContainer = document.getElementById('chat-1');
-          window.symphony.openStream(streamId, '#chat-1');
-          frameContainer.classList.remove('hidden');
-        }
-      });
-      document.getElementById('ecp-form-2').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const email = document.getElementById('Email').value;
-        if (email) {
-          const frameContainer = document.getElementById('chat-2');
-          window.symphony.startRoom(email.split(','), '#chat-2');
-          frameContainer.classList.remove('hidden');
-        }
-      });
+      document
+        .getElementById("ecp-form-1")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const streamId = document.getElementById("StreamId").value;
+          if (streamId) {
+            const frameContainer = document.getElementById("chat-1");
+            window.symphony.openStream(streamId, "#chat-1");
+            frameContainer.classList.remove("hidden");
+          }
+        });
+      document
+        .getElementById("ecp-form-2")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const email = document.getElementById("Email").value;
+          if (email) {
+            const frameContainer = document.getElementById("chat-2");
+            window.symphony.startRoom(email.split(","), "#chat-2");
+            frameContainer.classList.remove("hidden");
+          }
+        });
     </script>
   </body>
 </html>

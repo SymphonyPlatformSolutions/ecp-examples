@@ -1,64 +1,85 @@
-<!doctype html>
 <html>
   <head>
     <title>ECP Demo</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app">
       <div class="description">
         <h1>Integrate ECP in an iframe</h1>
-        <p>As with the previous ECP version, you can simply integrate it in an iframe:</p>
-        <xmp>
-          <iframe src="{ECP-INDEX-URL}?{ECP-PARAMS}"></iframe>
-        </xmp>
-        <p>You can find the full list of accepted parameters in the documentation. For this example, we only added the mode and condensed parameters.</p>
+        <p>
+          As with the previous ECP version, you can simply integrate it in an
+          iframe:
+        </p>
+        <pre>
+          <code>
+            &lt;iframe src="{ECP-INDEX-URL}?{ECP-PARAMS}"&gt;&lt;/iframe &gt;
+          </code>
+        </pre>
+        <p>
+          You can find the full list of accepted parameters in the
+          documentation. For this example, we only added the mode and condensed
+          parameters.
+        </p>
         <form id="ecp-form">
           <div class="form-group">
             <label for="StreamId">Stream id:</label>
-            <input type="text" class="form-control" id="StreamId" placeholder="Stream ID">
+            <input
+              type="text"
+              class="form-control"
+              id="StreamId"
+              placeholder="Stream ID"
+            />
           </div>
           <div class="form-group">
             <label for="UserIds">User ids:</label>
-            <input type="text" class="form-control" id="UserIds" placeholder="User IDs">
+            <input
+              type="text"
+              class="form-control"
+              id="UserIds"
+              placeholder="User IDs"
+            />
           </div>
           <button type="submit" class="btn">Open ECP</button>
         </form>
       </div>
-      <div class="ecp-frame" id="ecpFrame">
-      </div>
+      <div class="ecp-frame" id="ecpFrame"></div>
     </div>
     <script type="text/javascript">
-      const DEFAULT_ORIGIN = 'develop2.symphony.com';
+      const DEFAULT_ORIGIN = "develop2.symphony.com";
       function buildFrameUrl(streamId, userIds) {
         const locationUrl = new URL(location.href);
-        const sdkOrigin = locationUrl.searchParams.get('origin');
-        const BASE_URL = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/index.html`;
+        const sdkOrigin = locationUrl.searchParams.get("origin");
+        const BASE_URL = `https://${
+          sdkOrigin || DEFAULT_ORIGIN
+        }/embed/index.html`;
         const url = new URL(BASE_URL);
-        url.searchParams.append('mode', 'dark');
-        url.searchParams.append('condensed', 'true');
+        url.searchParams.append("mode", "dark");
+        url.searchParams.append("condensed", "true");
         if (streamId) {
-          url.searchParams.append('streamId', streamId);
-          url.searchParams.append('module', 'room');
+          url.searchParams.append("streamId", streamId);
+          url.searchParams.append("module", "room");
           return url;
         }
         if (userIds) {
-          url.searchParams.append('userIds', userIds);
-          url.searchParams.append('module', 'im');
+          url.searchParams.append("userIds", userIds);
+          url.searchParams.append("module", "im");
           return url;
         }
       }
-      document.getElementById('ecp-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const streamId = document.getElementById('StreamId').value;
-        const userIds = document.getElementById('UserIds').value;
-        if (streamId || userIds) {
-          const frame = document.createElement('iframe');
-          frame.src = buildFrameUrl(streamId, userIds);
-          document.getElementById('ecpFrame')
-          document.getElementById('ecpFrame').replaceChildren(frame);
-        }
-      })
+      document
+        .getElementById("ecp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const streamId = document.getElementById("StreamId").value;
+          const userIds = document.getElementById("UserIds").value;
+          if (streamId || userIds) {
+            const frame = document.createElement("iframe");
+            frame.src = buildFrameUrl(streamId, userIds);
+            document.getElementById("ecpFrame");
+            document.getElementById("ecpFrame").replaceChildren(frame);
+          }
+        });
     </script>
   </body>
 </html>

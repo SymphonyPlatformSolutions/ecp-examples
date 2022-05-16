@@ -1,90 +1,133 @@
-<!doctype html>
 <html>
   <head>
     <title>ECP Demo</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <div class="app">
       <div class="description">
         <h1>Integrate ECP using the sdk</h1>
-        <p>In explicit mode, the sdk will expose an API for you to better control ECP behaviour.</p>
-        <p>Same as in the previous example, you need to provide ECP with a div where the iframe will be appended:</p>
-        <xmp>
-          <div class="ecp-frame symphony-ecm">
-          </div>
-        </xmp>
         <p>
-          Note that this time, in explicit mode, you don't pass the parameters as <xmp>data-<sup>*</sup></xmp> attributes anymore. In explicit mode, you should pass the ECP parameters
-          directly in the <xmp>render</xmp> function exposed by the sdk as shown below.
+          In explicit mode, the sdk will expose an API for you to better control
+          ECP behaviour.
+        </p>
+        <p>
+          Same as in the previous example, you need to provide ECP with a div
+          where the iframe will be appended:
+        </p>
+        <pre>
+          <code>
+            &lt;div class="ecp-frame symphony-ecm"&gt;
+            &lt;/div&gt;
+          </code>
+        </pre>
+        <p>
+          Note that this time, in explicit mode, you don't pass the parameters
+          as <code>data-<sup>*</sup></code> attributes anymore. In explicit
+          mode, you should pass the ECP parameters directly in the
+          <code>render</code> function exposed by the sdk as shown below.
         </p>
         <p>Add the script:</p>
-        <xmp>
-          <script id="symphony-ecm-sdk" data-onload="onSdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </xmp>
-        <p>Notice the <xmp>data-onload</xmp> and <xmp>render="explicit"</xmp> attributes to tell the sdk you want to run ECP in explicit mode.</p>
-        <p>Optional: Once the script is loaded it will call your previously defined <xmp>onSdkLoaded</xmp> function passed in data-onload attribute.
-          Here we simply use it to call the sdk <xmp>render</xmp> function</p>
-        <xmp>
-          window.onload = () => {
-            window.symphony.render('symphony-ecm', {streamId, userIds, mode:'dark'})
-          }
-        </xmp>
+        <pre>
+          <code>
+            &lt;script id="symphony-ecm-sdk" data-onload="onSdkLoaded" render="explicit" src="{ECP-SDK-URL}"&gt;&lt;/script&gt;
+          </code>
+        </pre>
         <p>
-          Once ECP is rendered, you can easily switch chats without reloading the whole aplpication with the <xmp>setStream</xmp> and <xmp>startRoom</xmp> functions.
-          This is what we do below if the sdk is already initialized (ie the form has already been submitted once).
+          Notice the <code>data-onload</code> and
+          <code>render="explicit"</code> attributes to tell the sdk you want to
+          run ECP in explicit mode.
         </p>
         <p>
-          Note that the code of this page is slightly more complicated because here we use a form to set the streamId. It could really be as simple as the code snippets provied above.
+          Optional: Once the script is loaded it will call your previously
+          defined <code>onSdkLoaded</code> function passed in data-onload
+          attribute. Here we simply use it to call the sdk
+          <code>render</code> function
+        </p>
+        <pre>
+          <code>
+              window.onload = () =&gt; {
+                window.symphony.render('symphony-ecm', {streamId, userIds, mode:'dark'})
+              }
+          </code>
+        </pre>
+        <p>
+          Once ECP is rendered, you can easily switch chats without reloading
+          the whole aplpication with the
+          <code>setStream</code> and <code>startRoom</code> functions. This is
+          what we do below if the sdk is already initialized (ie the form has
+          already been submitted once).
+        </p>
+        <p>
+          Note that the code of this page is slightly more complicated because
+          here we use a form to set the streamId. It could really be as simple
+          as the code snippets provied above.
         </p>
         <form id="ecp-form">
           <div class="form-group">
             <label for="StreamId">Stream id:</label>
-            <input type="text" class="form-control" id="StreamId" placeholder="Stream ID">
+            <input
+              type="text"
+              class="form-control"
+              id="StreamId"
+              placeholder="Stream ID"
+            />
           </div>
           <div class="form-group">
             <label for="UserIds">User ids:</label>
-            <input type="text" class="form-control" id="UserIds" placeholder="User IDs">
+            <input
+              type="text"
+              class="form-control"
+              id="UserIds"
+              placeholder="User IDs"
+            />
           </div>
           <button type="submit" class="btn">Open ECP</button>
         </form>
       </div>
-      <div class="ecp-frame symphony-ecm" id="symphony-ecm">
-      </div> 
+      <div class="ecp-frame symphony-ecm" id="symphony-ecm"></div>
     </div>
     <script type="text/javascript">
-      const DEFAULT_ORIGIN = 'develop2.symphony.com';
+      const DEFAULT_ORIGIN = "develop2.symphony.com";
       const locationUrl = new URL(location.href);
-      const sdkOrigin = locationUrl.searchParams.get('origin');
+      const sdkOrigin = locationUrl.searchParams.get("origin");
 
-      document.getElementById('ecp-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const streamId = document.getElementById('StreamId').value;
-        const userIds = document.getElementById('UserIds').value;
-        if (streamId || userIds) {
-          const frameContainer = document.getElementById('symphony-ecm');
-          // The first time, we need to load the script and render the chat once the script is loaded.
-          if (!window.symphony) {
-            const script = document.createElement('script');
-            script.id = 'symphony-ecm-sdk';
-            script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
-            script.setAttribute('render', 'explicit');
-            script.setAttribute('data-onload', 'onSdkLoaded');
-            window.onSdkLoaded = () => {
-              window.symphony.render('symphony-ecm', {streamId, userIds, mode: 'dark'})
+      document
+        .getElementById("ecp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const streamId = document.getElementById("StreamId").value;
+          const userIds = document.getElementById("UserIds").value;
+          if (streamId || userIds) {
+            const frameContainer = document.getElementById("symphony-ecm");
+            // The first time, we need to load the script and render the chat once the script is loaded.
+            if (!window.symphony) {
+              const script = document.createElement("script");
+              script.id = "symphony-ecm-sdk";
+              script.src = `https://${
+                sdkOrigin || DEFAULT_ORIGIN
+              }/embed/sdk.js`;
+              script.setAttribute("render", "explicit");
+              script.setAttribute("data-onload", "onSdkLoaded");
+              window.onSdkLoaded = () => {
+                window.symphony.render("symphony-ecm", {
+                  streamId,
+                  userIds,
+                  mode: "dark",
+                });
+              };
+              document.body.appendChild(script);
+            } else {
+              // If the script is already loaded, we can just replace the chat
+              if (streamId) {
+                window.symphony.setStream(streamId);
+              } else if (userIds) {
+                window.symphony.startRoom(userIds.split(","));
+              }
             }
-            document.body.appendChild(script);
-          } else { // If the script is already loaded, we can just replace the chat
-            if (streamId) {
-              window.symphony.setStream(streamId);
-            }
-            else if (userIds) {
-              window.symphony.startRoom(userIds.split(','));
-            }
-            
           }
-        }
-      });
+        });
     </script>
   </body>
 </html>

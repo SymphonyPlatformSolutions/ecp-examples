@@ -1,122 +1,168 @@
-<!-- add something that does notifications + unread count -->
-<!doctype html>
 <html>
   <head>
     <title>ECP Demo</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app">
       <div class="description">
         <h1>Subscribe/listen to ECP notifications</h1>
         <p>
-          On ECP, it is possible to listen to some notifications through the listen method exposed by the SDK.
-          Thanks to this, you will be able to use all the notifications, including unread count
+          On ECP, it is possible to listen to some notifications through the
+          listen method exposed by the SDK. Thanks to this, you will be able to
+          use all the notifications, including unread count
         </p>
         <p>The first thing you need to do is integrate ECP using the sdk:</p>
-        <xmp>
-          <div class="ecp-frame symphony-ecm">
-          </div>
-        </xmp>
+        <pre>
+          <code>
+            &lt;div class="ecp-frame symphony-ecm"&gt;
+            &lt;/div&gt;
+          </code>
+        </pre>
         <p>and add the script:</p>
-        <xmp>
-          <script id="symphony-ecm-sdk" data-onload="onSdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </xmp>
-        <p>Then, the only thing you need is to put your listener on onSdkLoaded :</p>
-        <xmp>
-          symphony.listen({
-            type: 'UnreadCountNotifications', //put here the type of notifications wanted
-            params: {
-              streamId: streamId,
-            },
-            callback: (notification) => {
-              //put here what you want to do
-              console.log('Stream id: ' + notification.streamId);
-              console.log('Notification count: ' + notification.count);
-            },
-          });
-        </xmp>
-        <p>There are 2 types of notifications : </p>
+        <pre>
+          <code>
+            &lt;script id="symphony-ecm-sdk" data-onload="onSdkLoaded" render="explicit" src="{ECP-SDK-URL}"&gt;&lt;/script&gt;
+          </code>
+        </pre>
+        <p>
+          Then, the only thing you need is to put your listener on onSdkLoaded :
+        </p>
+        <pre>
+          <code>
+            symphony.listen({
+              type: 'UnreadCountNotifications', //put here the type of notifications wanted
+              params: {
+                streamId: streamId,
+              },
+              callback: (notification) =&gt; {
+                //put here what you want to do
+                console.log('Stream id: ' + notification.streamId);
+                console.log('Notification count: ' + notification.count);
+              },
+            });
+          </code>
+        </pre>
+        <p>There are 2 types of notifications :</p>
         <ul>
-          <li><xmp>UnreadCountNotifications</xmp> which provide the unread count of notifications. Its notification object contains those parameters :
+          <li>
+            <code>UnreadCountNotifications</code> which provide the unread count
+            of notifications. Its notification object contains those parameters
+            :
             <ul>
-              <li><xmp>streamId</xmp> : id of the stream</li>
-              <li><xmp>count</xmp> : number of unread messages</li>
+              <li><code>streamId</code> : id of the stream</li>
+              <li><code>count</code> : number of unread messages</li>
             </ul>
           </li>
-          <li><xmp>MessageNotifications</xmp> wich provide notifications for every received messages. Its notification object contain those parameters :
+          <li>
+            <code>MessageNotifications</code> wich provide notifications for
+            every received messages. Its notification object contain those
+            parameters :
             <ul>
-              <li><xmp>streamId</xmp> : id of the stream</li>
-              <li><xmp>fromWhomId</xmp> : UserId of the sender</li>
-              <li><xmp>isMention</xmp> : true if the user has been mentioned in the message</li>
-              <li><xmp>fromWhomName</xmp><sup>*</sup> : Name of the sender</li>
-              <li><xmp>streamName</xmp><sup>*</sup> : Title of the chat</li>
-              <li><xmp>message</xmp><sup>*</sup> : Content of the message</li>
+              <li><code>streamId</code> : id of the stream</li>
+              <li><code>fromWhomId</code> : UserId of the sender</li>
+              <li>
+                <code>isMention</code> : true if the user has been mentioned in
+                the message
+              </li>
+              <li>
+                <code>fromWhomName</code><sup>*</sup> : Name of the sender
+              </li>
+              <li><code>streamName</code><sup>*</sup> : Title of the chat</li>
+              <li><code>message</code><sup>*</sup> : Content of the message</li>
             </ul>
           </li>
         </ul>
-        <p><i>
-          Items with a <sup>*</sup> are only returned when allowApiContent is enabled on the pod's Client Configuration 
-          This will allow the ECP API to return sensitive information (such as user names, room names, message content).
-        </i></p>
         <p>
-          Note that the code of this page is slightly more complicated because here we use a form to set the streamId and a zone to show notifications. 
-          It could really be as simple as the code snippets provied above.
+          <i>
+            Items with a <sup>*</sup> are only returned when allowApiContent is
+            enabled on the pod's Client Configuration This will allow the ECP
+            API to return sensitive information (such as user names, room names,
+            message content).
+          </i>
+        </p>
+        <p>
+          Note that the code of this page is slightly more complicated because
+          here we use a form to set the streamId and a zone to show
+          notifications. It could really be as simple as the code snippets
+          provied above.
         </p>
         <form id="ecp-form">
           <div class="form-group">
             <label for="StreamId">Stream id:</label>
-            <input type="text" class="form-control" id="StreamId" placeholder="Stream ID">
+            <input
+              type="text"
+              class="form-control"
+              id="StreamId"
+              placeholder="Stream ID"
+            />
           </div>
           <button type="submit" class="btn">Open ECP</button>
         </form>
-        <div class="ecp-frame symphony-ecm" id="symphony-ecm">
-        </div> 
+        <div class="ecp-frame symphony-ecm" id="symphony-ecm"></div>
       </div>
     </div>
     <script type="text/javascript">
-      const DEFAULT_ORIGIN = 'develop2.symphony.com';
+      const DEFAULT_ORIGIN = "develop2.symphony.com";
       const locationUrl = new URL(location.href);
-      const sdkOrigin = locationUrl.searchParams.get('origin');
+      const sdkOrigin = locationUrl.searchParams.get("origin");
 
-      document.getElementById('ecp-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const streamId = document.getElementById('StreamId').value;
+      document
+        .getElementById("ecp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const streamId = document.getElementById("StreamId").value;
 
-        if (streamId) {
-          if (!window.symphony) {
-            const script = document.createElement('script');
-            script.id = 'symphony-ecm-sdk';
-            script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
-            script.setAttribute('render', 'explicit');
-            script.setAttribute('data-onload', 'onSdkLoaded');
-            window.onSdkLoaded = () => {
-              window.symphony.render('symphony-ecm', {streamId, mode: 'dark'})
+          if (streamId) {
+            if (!window.symphony) {
+              const script = document.createElement("script");
+              script.id = "symphony-ecm-sdk";
+              script.src = `https://${
+                sdkOrigin || DEFAULT_ORIGIN
+              }/embed/sdk.js`;
+              script.setAttribute("render", "explicit");
+              script.setAttribute("data-onload", "onSdkLoaded");
+              window.onSdkLoaded = () => {
+                window.symphony.render("symphony-ecm", {
+                  streamId,
+                  mode: "dark",
+                });
+                window.symphony.listen({
+                  type: "UnreadCountNotifications",
+                  params: {
+                    streamId: streamId,
+                  },
+                  callback: (notification) => {
+                    window.alert(
+                      "Stream id: " +
+                        notification.streamId +
+                        "\nNotification count: " +
+                        notification.count
+                    );
+                  },
+                });
+              };
+              document.body.appendChild(script);
+            } else {
+              // If the script is already loaded, we can just replace the chat
+              window.symphony.setStream(streamId);
               window.symphony.listen({
-                type: 'UnreadCountNotifications',
+                type: "UnreadCountNotifications",
                 params: {
                   streamId: streamId,
                 },
                 callback: (notification) => {
-                  window.alert('Stream id: ' + notification.streamId +'\nNotification count: ' + notification.count);
+                  window.alert(
+                    "Stream id: " +
+                      notification.streamId +
+                      "\nNotification count: " +
+                      notification.count
+                  );
                 },
               });
             }
-            document.body.appendChild(script);
-          } else { // If the script is already loaded, we can just replace the chat
-            window.symphony.setStream(streamId);
-            window.symphony.listen({
-              type: 'UnreadCountNotifications',
-              params: {
-                streamId: streamId,
-              },
-              callback: (notification) => {
-                window.alert('Stream id: ' + notification.streamId +'\nNotification count: ' + notification.count);
-              },
-            });
           }
-        }
-      });
+        });
     </script>
   </body>
 </html>

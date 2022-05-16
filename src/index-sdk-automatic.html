@@ -1,84 +1,108 @@
-<!doctype html>
 <html>
   <head>
     <title>ECP Demo</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app">
       <div class="description">
         <h1>Integrate ECP using the sdk</h1>
-        <p>Add the frame container that the script will use to inserst the iframe into:</p>
-        <xmp>
-          <div class="ecp-frame symphony-ecm" 
+        <p>
+          Add the frame container that the script will use to inserst the iframe
+          into:
+        </p>
+        <pre>
+          <code>
+            &lt;div class="ecp-frame symphony-ecm" 
             data-stream-id="{streamId}"
             data-mode="dark" 
-            data-condensed="true" >
-          </div>
-        </xmp>
+            data-condensed="true" &gt;
+            &lt;/div&gt;
+          </code>
+        </pre>
         <p>
-          When using the sdk in automatic mode (see the explicit mode in the next example) you need to pass the ECP parameters 
-          as <xmp>data-<sup>*</sup></xmp> attributes to the div that will contain ECP - note the kebab case (<xmp>data-stream-id</xmp>).
+          When using the sdk in automatic mode (see the explicit mode in the
+          next example) you need to pass the ECP parameters as
+          <code>data-<sup>*</sup></code> attributes to the div that will contain
+          ECP - note the kebab case (<code>data-stream-id</code>).
         </p>
         <p>
-          In automatic mode, the script will look for a container with the <xmp>symphony-ecm</xmp>, so make sur not to forget it.
+          In automatic mode, the script will look for a container with the
+          <code>symphony-ecm</code>, so make sur not to forget it.
         </p>
         <p>Add the script:</p>
-        <xmp>
-          <script id="symphony-ecm-sdk" src="{ECP-SDK-URL}"></script>
-        </xmp>
+        <pre>
+          <code>
+            &lt;script id="symphony-ecm-sdk" src="{ECP-SDK-URL}"&gt;&lt;/script&gt;
+          </code>
+        </pre>
         <p>
-          The code of this example is slightly more complex than that because we had to handle the query parameters, form submission and clean the DOM when a new value is submitted.
-          The automatic mode of the SDK, is very powerfull and convenient when you want to open only one chatroom and you already know its stream ID or members.
-          If you want to go for a more complex solution as this example, or need to preload ECP, you should have a look at the <xmp>explicit</xmp> mode of the sdk in the next examples.
+          The code of this example is slightly more complex than that because we
+          had to handle the query parameters, form submission and clean the DOM
+          when a new value is submitted. The automatic mode of the SDK, is very
+          powerfull and convenient when you want to open only one chatroom and
+          you already know its stream ID or members. If you want to go for a
+          more complex solution as this example, or need to preload ECP, you
+          should have a look at the
+          <code>explicit</code> mode of the sdk in the next examples.
         </p>
         <form id="ecp-form">
           <div class="form-group">
             <label for="StreamId">Stream id:</label>
-            <input type="text" class="form-control" id="StreamId" placeholder="Stream ID">
+            <input
+              type="text"
+              class="form-control"
+              id="StreamId"
+              placeholder="Stream ID"
+            />
           </div>
           <div class="form-group">
             <label for="UserIds">User ids:</label>
-            <input type="text" class="form-control" id="UserIds" placeholder="User IDs">
+            <input
+              type="text"
+              class="form-control"
+              id="UserIds"
+              placeholder="User IDs"
+            />
           </div>
           <button type="submit" class="btn">Open ECP</button>
         </form>
       </div>
-      <div class="ecp-frame symphony-ecm" id="symphony-ecm">
-      </div> 
+      <div class="ecp-frame symphony-ecm" id="symphony-ecm"></div>
     </div>
     <script type="text/javascript">
-      const DEFAULT_ORIGIN = 'develop2.symphony.com';
+      const DEFAULT_ORIGIN = "develop2.symphony.com";
       const locationUrl = new URL(location.href);
-      const sdkOrigin = locationUrl.searchParams.get('origin');
+      const sdkOrigin = locationUrl.searchParams.get("origin");
       function cleanDOM(frameContainer) {
-        frameContainer.removeAttribute('data-stream-id');
-        frameContainer.removeAttribute('data-user-ids');
+        frameContainer.removeAttribute("data-stream-id");
+        frameContainer.removeAttribute("data-user-ids");
         frameContainer.replaceChildren();
-        const script = document.getElementById('symphony-ecm-sdk');
+        const script = document.getElementById("symphony-ecm-sdk");
         if (script) {
           script.remove();
         }
       }
-      document.getElementById('ecp-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const streamId = document.getElementById('StreamId').value;
-        const userIds = document.getElementById('UserIds').value;
-        if (streamId || userIds) {
-          const frameContainer = document.getElementById('symphony-ecm');
-          cleanDOM(frameContainer);
-          if (streamId) {
-            frameContainer.setAttribute('data-stream-id', streamId);
+      document
+        .getElementById("ecp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const streamId = document.getElementById("StreamId").value;
+          const userIds = document.getElementById("UserIds").value;
+          if (streamId || userIds) {
+            const frameContainer = document.getElementById("symphony-ecm");
+            cleanDOM(frameContainer);
+            if (streamId) {
+              frameContainer.setAttribute("data-stream-id", streamId);
+            } else if (userIds) {
+              frameContainer.setAttribute("data-user-ids", userIds);
+            }
+            const script = document.createElement("script");
+            script.id = "symphony-ecm-sdk";
+            script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
+            document.body.appendChild(script);
           }
-          else if (userIds) {
-            frameContainer.setAttribute('data-user-ids', userIds);
-          }
-          const script = document.createElement('script');
-          script.id = 'symphony-ecm-sdk';
-          script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
-          document.body.appendChild(script);
-        }
-      })
+        });
     </script>
   </body>
 </html>

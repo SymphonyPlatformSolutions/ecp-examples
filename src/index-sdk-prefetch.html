@@ -1,108 +1,140 @@
-<!doctype html>
 <html>
   <head>
     <title>ECP Demo</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app">
       <div class="description">
         <h1>Integrate ECP using the sdk with prefetch</h1>
         <p>
-          This is one of the new features of ECP.
-          You can now start loading the application before you even open a room and display it so it feels much faster for the end user.
+          This is one of the new features of ECP. You can now start loading the
+          application before you even open a room and display it so it feels
+          much faster for the end user.
         </p>
         <p>
-          As usually, add the frame container that the script will use to insert the iframe into.
-          The only difference there this time is that you can hide the container while it loads. (see the <xmp>hidden</xmp> class).
+          As usually, add the frame container that the script will use to insert
+          the iframe into. The only difference there this time is that you can
+          hide the container while it loads. (see the
+          <code>hidden</code> class).
         </p>
-        <xmp>
-          <div class="ecp-frame symphony-ecm hidden">
-          </div>
-        </xmp>
+        <pre>
+          <code>
+            &lt;div class="ecp-frame symphony-ecm hidden"&gt;
+            &lt;/div&gt;
+          </code>
+        </pre>
         <p>Add the script and use explicit mode:</p>
-        <xmp>
-          <script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </xmp>
+        <pre>
+          <code>
+            &lt;script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"&gt;&lt;/script&gt;
+          </code>
+        </pre>
         <p>
-          Start rendering ECP as soon as the script is loaded thanks to the onload event 
-          (Note that we don't pass any stream parameter this time as we will open the room later on but we can still pass all the other optional ECP parameters):
+          Start rendering ECP as soon as the script is loaded thanks to the
+          onload event (Note that we don't pass any stream parameter this time
+          as we will open the room later on but we can still pass all the other
+          optional ECP parameters):
         </p>
-        <xmp>
-          window.sdkLoaded = () => {
-            window.symphony.render('symphony-ecm', {mode: 'dark', ...anyOtherEcpParams})
-          }
-        </xmp>
+        <pre>
+          <code>
+            window.sdkLoaded = () =&gt; {
+              window.symphony.render('symphony-ecm', {mode: 'dark', ...anyOtherEcpParams})
+            }
+          </code>
+        </pre>
         <p>
-          Now, when the user clicks on the open ECP button - we can start the room with the right parameters and display the container:
+          Now, when the user clicks on the open ECP button - we can start the
+          room with the right parameters and display the container:
         </p>
-        <xmp>
-          window.symphony.openStream(streamId);
-            frameContainer.classList.remove('hidden');
-        </xmp>
+        <pre>
+          <code>
+            window.symphony.openStream(streamId);
+              frameContainer.classList.remove('hidden');
+          </code>
+        </pre>
         <p>
-          If the user immediately enters a streamId and clicks on the button, he will have the normal loading screen as seen in the previous examples.
-          However, if he spends a few seconds looking at this doc before clicking the button, he will see the room immediately. 
+          If the user immediately enters a streamId and clicks on the button, he
+          will have the normal loading screen as seen in the previous examples.
+          However, if he spends a few seconds looking at this doc before
+          clicking the button, he will see the room immediately.
         </p>
         <p>
-          If you don't want your user to see the ECP loading at all or want to display your own loading,
-          you can even use the <xmp>Promise</xmp> returned by the sdk's <xmp>render</xmp> function:
+          If you don't want your user to see the ECP loading at all or want to
+          display your own loading, you can even use the
+          <code>Promise</code> returned by the sdk's
+          <code>render</code> function:
         </p>
-        <xmp>
-          showLoading();
-          window.onSdkLoaded = () => {
-            window.symphony.render('symphony-ecm', {mode: 'dark', condensed: true}).then(hideLoadingAndShowECP())
-          }
-        </xmp>
+        <pre>
+          <code>
+            showLoading();
+            window.onSdkLoaded = () =&gt; {
+              window.symphony.render('symphony-ecm', {mode: 'dark', condensed: true}).then(hideLoadingAndShowECP())
+            }
+          </code>
+        </pre>
         <form id="ecp-form">
           <div class="form-group">
             <label for="StreamId">Stream id:</label>
-            <input type="text" class="form-control" id="StreamId" placeholder="Stream ID">
+            <input
+              type="text"
+              class="form-control"
+              id="StreamId"
+              placeholder="Stream ID"
+            />
           </div>
           <div class="form-group">
             <label for="UserIds">User ids:</label>
-            <input type="text" class="form-control" id="UserIds" placeholder="User IDs">
+            <input
+              type="text"
+              class="form-control"
+              id="UserIds"
+              placeholder="User IDs"
+            />
           </div>
           <button type="submit" class="btn">Open ECP</button>
         </form>
       </div>
-      <div class="ecp-frame symphony-ecm hidden" id="symphony-ecm">
-      </div> 
+      <div class="ecp-frame symphony-ecm hidden" id="symphony-ecm"></div>
     </div>
     <script type="text/javascript">
       window.onSdkLoaded = () => {
-        window.symphony.render('symphony-ecm', {mode: 'dark', condensed: true})
-      }
+        window.symphony.render("symphony-ecm", {
+          mode: "dark",
+          condensed: true,
+        });
+      };
 
       const loadScript = () => {
-        const DEFAULT_ORIGIN = 'develop2.symphony.com';
+        const DEFAULT_ORIGIN = "develop2.symphony.com";
         const locationUrl = new URL(location.href);
-        const sdkOrigin = locationUrl.searchParams.get('origin');
-        const script = document.createElement('script');
-        script.id = 'symphony-ecm-sdk';
+        const sdkOrigin = locationUrl.searchParams.get("origin");
+        const script = document.createElement("script");
+        script.id = "symphony-ecm-sdk";
         script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
-        script.setAttribute('render', 'explicit');
-        script.setAttribute('data-onload', 'onSdkLoaded');
+        script.setAttribute("render", "explicit");
+        script.setAttribute("data-onload", "onSdkLoaded");
         document.body.appendChild(script);
-      }
+      };
 
       loadScript();
 
-      document.getElementById('ecp-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const streamId = document.getElementById('StreamId').value;
-        const userIds = document.getElementById('UserIds').value;
-        if (streamId || userIds) {
-          const frameContainer = document.getElementById('symphony-ecm');
-          if (streamId) {
-            window.symphony.openStream(streamId);
-            frameContainer.classList.remove('hidden');
+      document
+        .getElementById("ecp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const streamId = document.getElementById("StreamId").value;
+          const userIds = document.getElementById("UserIds").value;
+          if (streamId || userIds) {
+            const frameContainer = document.getElementById("symphony-ecm");
+            if (streamId) {
+              window.symphony.openStream(streamId);
+              frameContainer.classList.remove("hidden");
+            } else if (userIds) {
+              window.symphony.startRoom(userIds.split(","));
+            }
           }
-          else if (userIds) {
-            window.symphony.startRoom(userIds.split(','));
-          }
-        }
-      });
+        });
     </script>
   </body>
 </html>
