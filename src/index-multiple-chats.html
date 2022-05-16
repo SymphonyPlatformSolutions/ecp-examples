@@ -16,36 +16,36 @@
           This one will never be displayed to the end user, we only use it to load ECP data and hold the logic in the background.
           We will use other iframes to display the chat rooms.
         </p>
-        <xmp>
+        <code>
           <div class="ecp-main-hidden-frame symphony-ecm" id="symphony-ecm">
           </div>
-        </xmp>
+        </code>
         <p>As in previous examples, add the script and use explicit mode:</p>
-        <xmp>
+        <code>
           <script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </xmp>
+        </code>
         <p>
           Render the main (hidden) ecp iframe once the sdk is loaded.
         </p>
-        <xmp>
+        <code>
           window.sdkLoaded = () => {
             window.symphony.render('symphony-ecm', {mode: 'light', ...EcpParamObject})
           }
-        </xmp>
+        </code>
         <p>Now we will want to display the chats in two new containers - called chat-1 and chat-2 for this example.</p>
-        <xmp>
+        <code>
           <div class="ecp-frame hidden" id="chat-1"></div>
           <div class="ecp-frame hidden" id="chat-2"></div>
-        </xmp>
+        </code>
         <p>We will use the first chat to display the chat with the stream ID form and the second one to display the chat open from the user email address form and button.</p>
-        <xmp>
+        <code>
           window.symphony.openStream(streamId, '#chat-1');
           frameContainer.classList.remove('hidden');
-        </xmp>
-        <xmp>
+        </code>
+        <code>
           window.symphony.startRoom([emails], '#chat-2');
           frameContainer.classList.remove('hidden');
-        </xmp>
+        </code>
         <p>
           Note that the SDK exposes two different functions to open a chat:
           You can either open a chat from a streamId: <code>openStream(streamId, containerSelector)</code> 

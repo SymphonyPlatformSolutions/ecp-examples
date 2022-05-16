@@ -9,24 +9,24 @@
       <div class="description">
         <h1>Integrate ECP using the sdk</h1>
         <p>Add the frame container that the script will use to inserst the iframe into:</p>
-        <xmp>
+        <code>
           <div class="ecp-frame symphony-ecm" 
             data-stream-id="{streamId}"
             data-mode="dark" 
             data-condensed="true" >
           </div>
-        </xmp>
+        </code>
         <p>
           When using the sdk in automatic mode (see the explicit mode in the next example) you need to pass the ECP parameters 
-          as <code>data-*</code> attributes to the div that will contain ECP - note the kebab case (<code>data-stream-id</code>).
+          as <code>data-<sup>*</sup></code> attributes to the div that will contain ECP - note the kebab case (<code>data-stream-id</code>).
         </p>
         <p>
           In automatic mode, the script will look for a container with the <code>symphony-ecm</code>, so make sur not to forget it.
         </p>
         <p>Add the script:</p>
-        <xmp>
+        <code>
           <script id="symphony-ecm-sdk" src="{ECP-SDK-URL}"></script>
-        </xmp>
+        </code>
         <p>
           The code of this example is slightly more complex than that because we had to handle the query parameters, form submission and clean the DOM when a new value is submitted.
           The automatic mode of the SDK, is very powerfull and convenient when you want to open only one chatroom and you already know its stream ID or members.

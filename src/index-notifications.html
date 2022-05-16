@@ -8,22 +8,22 @@
   <body>
     <div class="app">
       <div class="description">
-        <h1>Knowing how to handle ECP notifications</h1>
+        <h1>Subscribe/listen to ECP notifications</h1>
         <p>
           On ECP, it is possible to listen to some notifications through the listen method exposed by the SDK.
           Thanks to this, you will be able to use all the notifications, including unread count
         </p>
         <p>The first thing you need to do is integrate ECP using the sdk:</p>
-        <xmp>
+        <code>
           <div class="ecp-frame symphony-ecm">
           </div>
-        </xmp>
+        </code>
         <p>and add the script:</p>
-        <xmp>
+        <code>
           <script id="symphony-ecm-sdk" data-onload="onSdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </xmp>
+        </code>
         <p>Then, the only thing you need is to put your listener on onSdkLoaded :</p>
-        <xmp>
+        <code>
           symphony.listen({
             type: 'UnreadCountNotifications', //put here the type of notifications wanted
             params: {
@@ -35,10 +35,10 @@
               console.log('Notification count: ' + notification.count);
             },
           });
-        </xmp>
-        <p>There is 2 types of notifications : </p>
+        </code>
+        <p>There are 2 types of notifications : </p>
         <ul>
-          <li><code>UnreadCountNotifications</code> wich provide the unread count of notifications. Its notification object contain those parameters :
+          <li><code>UnreadCountNotifications</code> which provide the unread count of notifications. Its notification object contains those parameters :
             <ul>
               <li><code>streamId</code> : id of the stream</li>
               <li><code>count</code> : number of unread messages</li>
@@ -49,14 +49,14 @@
               <li><code>streamId</code> : id of the stream</li>
               <li><code>fromWhomId</code> : UserId of the sender</li>
               <li><code>isMention</code> : true if the user has been mentioned in the message</li>
-              <li><code>fromWhomName*</code> : Name of the sender</li>
-              <li><code>streamName*</code> : Title of the chat</li>
-              <li><code>message*</code> : Content of the message</li>
+              <li><code>fromWhomName<sup>*</sup></code> : Name of the sender</li>
+              <li><code>streamName<sup>*</sup></code> : Title of the chat</li>
+              <li><code>message<sup>*</sup></code> : Content of the message</li>
             </ul>
           </li>
         </ul>
         <p><i>
-          *Items in italics are only returned when allowApiContent is enabled on the pod's Client Configuration 
+          Items with a <sup>*</sup> are only returned when allowApiContent is enabled on the pod's Client Configuration 
           This will allow the ECP API to return sensitive information (such as user names, room names, message content).
         </i></p>
         <p>
