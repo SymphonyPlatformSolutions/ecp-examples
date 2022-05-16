@@ -16,40 +16,40 @@
           This one will never be displayed to the end user, we only use it to load ECP data and hold the logic in the background.
           We will use other iframes to display the chat rooms.
         </p>
-        <code>
+        <xmp>
           <div class="ecp-main-hidden-frame symphony-ecm" id="symphony-ecm">
           </div>
-        </code>
+        </xmp>
         <p>As in previous examples, add the script and use explicit mode:</p>
-        <code>
+        <xmp>
           <script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </code>
+        </xmp>
         <p>
           Render the main (hidden) ecp iframe once the sdk is loaded.
         </p>
-        <code>
+        <xmp>
           window.sdkLoaded = () => {
             window.symphony.render('symphony-ecm', {mode: 'light', ...EcpParamObject})
           }
-        </code>
+        </xmp>
         <p>Now we will want to display the chats in two new containers - called chat-1 and chat-2 for this example.</p>
-        <code>
+        <xmp>
           <div class="ecp-frame hidden" id="chat-1"></div>
           <div class="ecp-frame hidden" id="chat-2"></div>
-        </code>
+        </xmp>
         <p>We will use the first chat to display the chat with the stream ID form and the second one to display the chat open from the user email address form and button.</p>
-        <code>
+        <xmp>
           window.symphony.openStream(streamId, '#chat-1');
           frameContainer.classList.remove('hidden');
-        </code>
-        <code>
+        </xmp>
+        <xmp>
           window.symphony.startRoom([emails], '#chat-2');
           frameContainer.classList.remove('hidden');
-        </code>
+        </xmp>
         <p>
           Note that the SDK exposes two different functions to open a chat:
-          You can either open a chat from a streamId: <code>openStream(streamId, containerSelector)</code> 
-          or a list of userIds and emails: startRoom([ArrayOfUsers], containerSelector)<code>
+          You can either open a chat from a streamId: <xmp>openStream(streamId, containerSelector)</xmp> 
+          or a list of userIds and emails: <xmp>startRoom([ArrayOfUsers], containerSelector)</xmp> 
         </p>
         <form id="ecp-form-1">
           <div class="form-group">

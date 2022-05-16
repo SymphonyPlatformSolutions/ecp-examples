@@ -14,46 +14,46 @@
         </p>
         <p>
           As usually, add the frame container that the script will use to insert the iframe into.
-          The only difference there this time is that you can hide the container while it loads. (see the <code>hidden</code> class).
+          The only difference there this time is that you can hide the container while it loads. (see the <xmp>hidden</xmp> class).
         </p>
-        <code>
+        <xmp>
           <div class="ecp-frame symphony-ecm hidden">
           </div>
-        </code>
+        </xmp>
         <p>Add the script and use explicit mode:</p>
-        <code>
+        <xmp>
           <script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </code>
+        </xmp>
         <p>
           Start rendering ECP as soon as the script is loaded thanks to the onload event 
           (Note that we don't pass any stream parameter this time as we will open the room later on but we can still pass all the other optional ECP parameters):
         </p>
-        <code>
+        <xmp>
           window.sdkLoaded = () => {
             window.symphony.render('symphony-ecm', {mode: 'dark', ...anyOtherEcpParams})
           }
-        </code>
+        </xmp>
         <p>
           Now, when the user clicks on the open ECP button - we can start the room with the right parameters and display the container:
         </p>
-        <code>
+        <xmp>
           window.symphony.openStream(streamId);
             frameContainer.classList.remove('hidden');
-        </code>
+        </xmp>
         <p>
           If the user immediately enters a streamId and clicks on the button, he will have the normal loading screen as seen in the previous examples.
           However, if he spends a few seconds looking at this doc before clicking the button, he will see the room immediately. 
         </p>
         <p>
           If you don't want your user to see the ECP loading at all or want to display your own loading,
-          you can even use the <code>Promise</code> returned by the sdk's <code>render</code> function:
+          you can even use the <xmp>Promise</xmp> returned by the sdk's <xmp>render</xmp> function:
         </p>
-        <code>
+        <xmp>
           showLoading();
           window.onSdkLoaded = () => {
             window.symphony.render('symphony-ecm', {mode: 'dark', condensed: true}).then(hideLoadingAndShowECP())
           }
-        </code>
+        </xmp>
         <form id="ecp-form">
           <div class="form-group">
             <label for="StreamId">Stream id:</label>

@@ -10,28 +10,28 @@
         <h1>Integrate ECP using the sdk</h1>
         <p>In explicit mode, the sdk will expose an API for you to better control ECP behaviour.</p>
         <p>Same as in the previous example, you need to provide ECP with a div where the iframe will be appended:</p>
-        <code>
+        <xmp>
           <div class="ecp-frame symphony-ecm">
           </div>
-        </code>
+        </xmp>
         <p>
-          Note that this time, in explicit mode, you don't pass the parameters as <code>data-<sup>*</sup></code> attributes anymore. In explicit mode, you should pass the ECP parameters
-          directly in the <code>render</code> function exposed by the sdk as shown below.
+          Note that this time, in explicit mode, you don't pass the parameters as <xmp>data-<sup>*</sup></xmp> attributes anymore. In explicit mode, you should pass the ECP parameters
+          directly in the <xmp>render</xmp> function exposed by the sdk as shown below.
         </p>
         <p>Add the script:</p>
-        <code>
+        <xmp>
           <script id="symphony-ecm-sdk" data-onload="onSdkLoaded" render="explicit" src="{ECP-SDK-URL}"></script>
-        </code>
-        <p>Notice the <code>data-onload</code> and <code>render="explicit"</code> attributes to tell the sdk you want to run ECP in explicit mode.</p>
-        <p>Optional: Once the script is loaded it will call your previously defined <code>onSdkLoaded</code> function passed in data-onload attribute.
-          Here we simply use it to call the sdk <code>render</code> function</p>
-        <code>
+        </xmp>
+        <p>Notice the <xmp>data-onload</xmp> and <xmp>render="explicit"</xmp> attributes to tell the sdk you want to run ECP in explicit mode.</p>
+        <p>Optional: Once the script is loaded it will call your previously defined <xmp>onSdkLoaded</xmp> function passed in data-onload attribute.
+          Here we simply use it to call the sdk <xmp>render</xmp> function</p>
+        <xmp>
           window.onload = () => {
             window.symphony.render('symphony-ecm', {streamId, userIds, mode:'dark'})
           }
-        </code>
+        </xmp>
         <p>
-          Once ECP is rendered, you can easily switch chats without reloading the whole aplpication with the <code>setStream</code> and <code>startRoom</code> functions.
+          Once ECP is rendered, you can easily switch chats without reloading the whole aplpication with the <xmp>setStream</xmp> and <xmp>startRoom</xmp> functions.
           This is what we do below if the sdk is already initialized (ie the form has already been submitted once).
         </p>
         <p>
