@@ -32,7 +32,7 @@
         <p>Render the main (hidden) ecp iframe once the sdk is loaded.</p>
         <pre>
           <code>
-              window.sdkLoaded = () =&gt; {
+            window.sdkLoaded = () =&gt; {
               window.symphony.render('symphony-ecm', {mode: 'light', ...EcpParamObject})
             }
           </code>
@@ -56,10 +56,7 @@
           <code>
             window.symphony.openStream(streamId, '#chat-1');
             frameContainer.classList.remove('hidden');
-          </code>
-        </pre>
-        <pre>
-          <code>
+            
             window.symphony.startRoom([emails], '#chat-2');
             frameContainer.classList.remove('hidden');
           </code>
@@ -72,28 +69,32 @@
           <code>startRoom([ArrayOfUsers], containerSelector)</code>
         </p>
         <form id="ecp-form-1">
-          <div class="form-group">
-            <label for="StreamId">Stream id:</label>
-            <input
-              type="text"
-              class="form-control"
-              id="StreamId"
-              placeholder="Stream ID"
-            />
+          <div>
+            <span class="form-group">
+              <label for="StreamId">Stream id:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="StreamId"
+                placeholder="Stream ID"
+              />
+            </span>
+            <button type="submit" class="btn">Open chat with streamID</button>
           </div>
-          <button type="submit" class="btn">Open chat with streamID</button>
         </form>
         <form id="ecp-form-2">
-          <div class="form-group">
-            <label for="UserIds">Email:</label>
-            <input
-              type="text"
-              class="form-control"
-              id="Email"
-              placeholder="Email"
-            />
+          <div>
+            <span class="form-group">
+              <label for="UserIds">Email:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="Email"
+                placeholder="Email"
+              />
+            </span>
+            <button type="submit" class="btn">Open chat from email</button>
           </div>
-          <button type="submit" class="btn">Open chat from email</button>
         </form>
       </div>
       <div class="ecp-main-hidden-frame symphony-ecm" id="symphony-ecm"></div>

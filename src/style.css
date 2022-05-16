@@ -37,3 +37,7 @@ body {
   width: 0;
   height: 100vh;
 }
+label{
+  display: inline-block;
+  width: 70px;
+}
