@@ -2,49 +2,7 @@
 <html>
   <head>
     <title>ECP Demo</title>
-    <style>
-      html, body {
-        height: 100vh;
-        margin: 0;
-      }
-      .app {
-        position: relative;
-        height: 100%;
-      }
-      .description {
-        max-width:60%;
-        padding: 1rem;
-      }
-      .form-group {
-        padding: .4rem;
-      }
-      .ecp-main-hidden-frame {
-        position: fixed;
-        right: 0;
-        width: 0;
-        height: 100vh;
-      }
-      .ecp-frame {
-        position: fixed;
-        bottom: 0px;
-        right: 50px;
-        height: 40%;
-        width: 30%;
-        transition: all .5s ease;
-      }
-      .ecp-frame:last-of-type {
-        right: calc(30% + 100px);
-      }
-      .hidden {
-        height: 0;
-      }
-      .ecp-frame iframe {
-        border: 1px solid black;
-        border-bottom: none;
-        width: 100%;
-        height: 100%;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <div class="app">
