@@ -4,7 +4,7 @@ This repository contains a few examples to demonstrate the different ways of int
 By default, all the demos in the repo will target `develop2.symphony.com`. If you want to target another environment, add the `origin` query parameter.
 For instance, to target develop: `{demo-url}?origin=develop.symphony.com`. 
 
-This repository does not contain any dev server by default, if you want to run the demo locally, you can simply open the html file in your browser or you can use any static file server such as [npx serve](https://github.com/vercel/serve).
+This repository does not contain any dev server by default, if you want to run the demo locally, you can simply open the html file in your browser or you can use any static file server such as [serve](https://github.com/vercel/serve).(Run npx serve in the src folder)
 
 All the examples are slightly more complicated than the real implementation would be as they include a form to open ECP with the input parameters (stream ID / user IDs / user email) and the origin as query parameter.
 
