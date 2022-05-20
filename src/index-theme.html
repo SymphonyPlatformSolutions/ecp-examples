@@ -1,0 +1,153 @@
+<html>
+<head>
+<title>ECP Demo</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+    <div class="description">
+    <h1>Change theming</h1>
+    <p>
+        On ECP, it is possible add some visual customisation.
+        This feature will allow you to match your corporate and ECP colors.
+        You can change your theme as many time as you want thanks to the render function.
+    </p>
+    <p>The first step you need to do is integrate ECP using the sdk:</p>
+    <pre>
+        <code>
+            &lt;div class="ecp-frame symphony-ecm"&gt;
+            &lt;/div&gt;
+        </code>
+    </pre>
+    <p>and add the script:</p>
+    <pre>
+        <code>
+            &lt;script id="symphony-ecm-sdk" data-onload="onSdkLoaded" render="explicit" src="{ECP-SDK-URL}"&gt;&lt;/script&gt;
+        </code>
+    </pre>
+    <p>Notice the <code>data-onload</code> and <code>render="explicit"</code> attributes to tell the sdk you want to run ECP in explicit mode.</p>
+    <p>Once the script is loaded it will call your previously defined <code>onSdkLoaded</code> function passed in data-onload attribute.
+        Here we simply use it to call the sdk <code>render</code> function.</p>
+    <pre>
+        <code>
+            window.onload = () =&gt; {
+                window.symphony.render('symphony-ecm', 
+                {
+                    streamId, 
+                    theme: {
+                        primary: "#ff00dd",
+                        secondary: "#ac0202",
+                        accent: "#F7CA3B",
+                        success: "#2EAA35",
+                        error: "#DE342E",
+                        background: "#ffb8b8",
+                        surface: "#ffe0e0",
+                        text: "#000000",
+                        textPrimary: "#FFFFFF",
+                        textSecondary: "#FFFFFF",
+                        textAccent: "#17181B",
+                        textSuccess: "#FFFFFF",
+                        textError: "#FFFFFF",
+                    },
+                })
+            }
+        </code>
+    </pre>
+    <p>
+        Once ECP is rendered, you can easily switch theme without reloading the whole aplpication with the <code>updateTheme</code> function.
+        This is what we do below if the sdk is already initialized (ie the form has already been submitted once).
+    </p>
+    <p> There is 2 types of theme options :</p>
+    <ul>
+        <li> Mandatory :
+            <ul>
+                <li><code>primary</code> </li>
+                <li><code>secondary</code> </li>
+                <li><code>accent</code> </li>
+                <li><code>success</code> </li>
+                <li><code>error</code> </li>
+                <li><code>background</code> </li>
+                <li><code>surface</code> </li>
+                <li><code>text</code> </li>
+                <li><code>textPrimary</code> </li>
+                <li><code>textSecondary</code> </li>
+                <li><code>textAccent</code> </li>
+                <li><code>textSuccess</code> </li>
+                <li><code>textError</code> </li>
+            </ul>
+        </li>
+        <li> Optional :
+            <ul>
+                <li><code>textShades</code> </li>
+                <li><code>textSurfaceShades</code> </li>
+                <li><code>primaryShades</code> </li>
+                <li><code>secondaryShades</code> </li>
+                <li><code>accentShades</code> </li>
+                <li><code>successShades</code> </li>
+                <li><code>errorShades</code> </li>
+            </ul>
+        </li>
+    </ul>
+    <form id="ecp-form">
+        <div class="form-group">
+        <label for="StreamId">Stream id:</label>
+        <input
+            type="text"
+            class="form-control"
+            id="StreamId"
+            placeholder="Stream ID"
+        />
+        </div>
+        <button type="submit" class="btn">Open ECP</button>
+    </form>
+    <div class="ecp-frame symphony-ecm" id="symphony-ecm"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    const DEFAULT_ORIGIN = "st3.symphony.com";
+    const locationUrl = new URL(location.href);
+    const sdkOrigin = locationUrl.searchParams.get("origin");
+
+    document
+    .getElementById("ecp-form")
+    .addEventListener("submit", (event) => {
+        event.preventDefault();
+        const streamId = document.getElementById("StreamId").value;
+        if (streamId) {
+            if (!window.symphony) {
+                const script = document.createElement("script");
+                script.id = "symphony-ecm-sdk";
+                script.src = `https://${
+                sdkOrigin || DEFAULT_ORIGIN
+                }/embed/sdk.js?`;
+                script.setAttribute("render", "explicit");
+                script.setAttribute("data-onload", "onSdkLoaded");
+                window.onSdkLoaded = () => {
+                    window.symphony.render("symphony-ecm", {
+                        streamId,
+                        theme: {
+                            primary: "#ff00dd",
+                            secondary: "#ac0202",
+                            accent: "#F7CA3B",
+                            success: "#2EAA35",
+                            error: "#DE342E",
+                            background: "#ffb8b8",
+                            surface: "#ffe0e0",
+                            text: "#000000",
+                            textPrimary: "#FFFFFF",
+                            textSecondary: "#FFFFFF",
+                            textAccent: "#17181B",
+                            textSuccess: "#FFFFFF",
+                            textError: "#FFFFFF",
+                        },
+                    });
+                };
+                document.body.appendChild(script);
+            } else {
+                window.symphony.setStream(streamId);
+            }
+        }
+    });
+</script>
+</body>
+</html>
