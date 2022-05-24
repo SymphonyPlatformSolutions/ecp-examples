@@ -34,6 +34,8 @@
           Once the script is loaded it will call your previously defined
           <code>onSdkLoaded</code> function passed in data-onload attribute.
           Here we simply use it to call the sdk <code>render</code> function.
+          Inside this render function you just have to add the "theme" parameter 
+          wich is an object where the initial theme is defined.
         </p>
         <pre>
           <code>
@@ -70,31 +72,31 @@
           <li>
             Mandatory :
             <ul>
-              <li><code>primary</code></li>
-              <li><code>secondary</code></li>
-              <li><code>accent</code></li>
-              <li><code>success</code></li>
-              <li><code>error</code></li>
-              <li><code>background</code></li>
-              <li><code>surface</code></li>
-              <li><code>text</code></li>
-              <li><code>textPrimary</code></li>
-              <li><code>textSecondary</code></li>
-              <li><code>textAccent</code></li>
-              <li><code>textSuccess</code></li>
-              <li><code>textError</code></li>
+              <li><code>primary</code>: Hexadecimal color in a string</li>
+              <li><code>secondary</code>: Hexadecimal color in a string</li>
+              <li><code>accent</code>: Hexadecimal color in a string</li>
+              <li><code>success</code>: Hexadecimal color in a string</li>
+              <li><code>error</code>: Hexadecimal color in a string</li>
+              <li><code>background</code>: Hexadecimal color in a string</li>
+              <li><code>surface</code>: Hexadecimal color in a string</li>
+              <li><code>text</code>: Hexadecimal color in a string</li>
+              <li><code>textPrimary</code>: Hexadecimal color in a string</li>
+              <li><code>textSecondary</code>: Hexadecimal color in a string</li>
+              <li><code>textAccent</code>: Hexadecimal color in a string</li>
+              <li><code>textSuccess</code>: Hexadecimal color in a string</li>
+              <li><code>textError</code>: Hexadecimal color in a string</li>
             </ul>
           </li>
           <li>
             Optional :
             <ul>
-              <li><code>textShades</code></li>
-              <li><code>textSurfaceShades</code></li>
-              <li><code>primaryShades</code></li>
-              <li><code>secondaryShades</code></li>
-              <li><code>accentShades</code></li>
-              <li><code>successShades</code></li>
-              <li><code>errorShades</code></li>
+              <li><code>textShades</code>: color maps (ITextShades)</li>
+              <li><code>textSurfaceShades</code>: color maps (ITextShades)</li>
+              <li><code>primaryShades</code>: color maps (IColorShades)</li>
+              <li><code>secondaryShades</code>: color maps (IColorShades)</li>
+              <li><code>accentShades</code>: color maps (IColorShades)</li>
+              <li><code>successShades</code>: color maps (IColorShades)</li>
+              <li><code>errorShades</code>: color maps (IColorShades)</li>
             </ul>
           </li>
         </ul>
@@ -127,9 +129,6 @@
           const streamId = document.getElementById("StreamId").value;
           if (streamId) {
             if (!window.symphony) {
-              Array.from(document.getElementsByClassName("stylebutton")).forEach((btn) => {
-                btn.style.display = 'inline';
-              });
               const script = document.createElement("script");
               script.id = "symphony-ecm-sdk";
               script.src = `https://${
@@ -141,6 +140,9 @@
                 window.symphony.render("symphony-ecm", {
                   streamId,
                   theme: snowWhiteTheme,
+                });
+                Array.from(document.getElementsByClassName("stylebutton")).forEach((btn) => {
+                  btn.style.display = 'inline';
                 });
               };
               document.body.appendChild(script);
