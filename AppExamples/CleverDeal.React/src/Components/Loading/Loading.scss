@@ -1,0 +1,37 @@
+.loading {
+  max-width: 100%;
+  max-height: 100%;
+  svg {
+    polyline {
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      &.back {
+        stroke: rgba(var(--primary-color),.3);
+      }
+      &.front {
+        stroke: var(--primary-color);
+
+      }
+    }
+    &.animate {
+      polyline {
+        &.front {
+          stroke-dasharray: 12, 36; //Dash 12 & Gap 36
+          stroke-dashoffset: 48;
+          animation: dash 1s linear infinite;
+        }
+      }
+    }
+  }
+        
+  @keyframes dash {
+    62.5% {
+      opacity: 0;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}

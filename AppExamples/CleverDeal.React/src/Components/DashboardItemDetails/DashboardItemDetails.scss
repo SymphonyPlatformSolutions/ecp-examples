@@ -1,0 +1,72 @@
+@import '../../../node_modules/react-tabs/style/react-tabs.scss';
+
+.dashboard-item-details {
+  border: 2px solid var(--surface-color);
+  background-color: var(--surface-color);
+  display: flex;
+  flex-direction: column;
+  .dashboard-item-details-header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    background-color: var(--surface-color);
+    padding: 1rem 0;
+    border-bottom: 2px solid var(--background-color);
+    .title {
+      margin: auto;
+    }
+    .close {
+      cursor: pointer;
+      padding-right: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  }
+  .graph {
+    min-height: 15rem;
+    margin: 1rem;
+    background-color: var(--background-color);
+  }
+  .tabs {
+    margin: 1rem;
+    min-height: 30rem;
+    position: relative;
+    .symphony-ecm-chat {
+      iframe {
+        min-height: 30rem;
+      }
+    }
+    .loader {
+      position: absolute;
+      display: none;
+      z-index: -1;
+      .chat-loading {
+        width: 5rem;
+      }
+      &.loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 30rem;
+        width: 100%;
+        z-index: 999;
+      }
+    }
+  }
+  .deal-details {
+    text-align: left;
+    .deal-detail-block-title {
+      font-weight: 600;
+      font-style: italic;
+    }
+    .deal-detail-block {
+      display: inline-flex;
+      flex-direction: column;
+      width: 50%;
+      margin-bottom: 0.8rem;
+      &:nth-of-type(odd) {
+        text-align: right;
+      }
+    }
+  }
+}

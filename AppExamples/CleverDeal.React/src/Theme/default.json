@@ -1,0 +1,58 @@
+{
+  "data": {
+    "light": {
+      "id": "THEME_LIGHT",
+      "name": "Light",
+      "colors": {
+        "primary": "#0476D6",
+        "secondary": "#F8C43F",
+        "error": "#C51162",
+        "background": "#FFFFFF",
+        "surface": "#F6F6FC",
+        "onPrimary": "#FFFFFF",
+        "onSecondary": "#000000",
+        "onBackground": "#000000",
+        "onSurface": "#000000",
+        "onError": "#FFFFFF",
+        "symphonyMode": "light",
+        "font": "Roboto"
+      }
+    },
+    "dark": {
+      "id": "THEME_DARK",
+      "name": "Dark",
+      "colors": {
+        "primary": "#ECB365",
+        "secondary": "#03DAC6",
+        "error": "#C51162",
+        "background": "#041C32",
+        "surface": "#04293A",
+        "onPrimary": "#FFFFFF",
+        "onSecondary": "#000000",
+        "onBackground": "#FFFFFF",
+        "onSurface": "#FFFFFF",
+        "onError": "#FFFFFF",
+        "symphonyMode": "dark",
+        "font": "Roboto"
+      }
+    },
+    "embers": {
+      "id": "THEME_EMBERS",
+      "name": "Embers",
+      "colors": {
+        "primary": "#984063",
+        "secondary": "#FE9677",
+        "error": "#F64668",
+        "background": "#2A3950",
+        "surface": "#41436A",
+        "onPrimary": "#FFFFFF",
+        "onSecondary": "#2A3950",
+        "onBackground": "#FFFFFF",
+        "onSurface": "#FFFFFF",
+        "onError": "#FFFFFF",
+        "symphonyMode": "dark",
+        "font": "Roboto"
+      }
+    }
+  }
+}

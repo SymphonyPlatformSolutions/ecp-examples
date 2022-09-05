@@ -1,0 +1,44 @@
+
+.App {
+  padding: 0.4rem;
+  .app-header {
+    display: flex;
+    padding: 0 1rem;
+    .brand {
+      display: flex;
+      .logo {
+        width: 3rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 1rem;
+        margin-right: 1rem;
+      }
+    }
+    .app-header-settings {
+      margin-left: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: "#1A1A1A"
+    }
+  }
+}
+
+.app-container {
+  display: flex;
+  width: 100%;
+  text-align: center;
+  
+  .dashboard {
+    flex: 1;
+  }
+  
+  .right-panel {
+    width: 30%;
+  }
+
+  .dashboard, .right-panel {
+    padding: .5rem;
+  }
+}

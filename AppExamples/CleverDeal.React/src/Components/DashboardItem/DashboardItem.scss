@@ -1,0 +1,53 @@
+.item-row {
+  &.clickable {
+    cursor: pointer;
+  }
+  &.active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+    td:not(:last-of-type) {
+      border-right: 1px solid var(--on-primary-color);
+    }
+  }
+  .item-cell {
+    padding: .5rem 0;
+  }
+  td {
+    position: relative;
+    .status-badge-cell {
+      display: flex;
+      justify-content: center;
+      .status-badge {
+        min-width: 4rem;
+        border-radius: 0.3rem;
+        padding: .2rem 1rem;
+        color: black;
+        &.active {
+          background-color: #B8E0D2;
+        }
+        &.inactive {
+          background-color: #EAC4D4;
+        }
+      }
+    }
+  }
+  .badge-count-container {
+    position: absolute;
+    top: 0;
+    right: .5rem;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .badge-count {
+      background-color: var(--secondary-color);
+      color: var(--on-secondary-color);
+      border-radius: 50%;
+      min-width: 1.5rem;
+      min-height: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
