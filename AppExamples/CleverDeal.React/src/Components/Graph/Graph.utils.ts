@@ -1,4 +1,3 @@
-
 var _seed = Date.now();
 
 export function rand(min?: number, max?: number) {
@@ -10,7 +9,7 @@ export function rand(min?: number, max?: number) {
 
 const valueOrDefault = (l: any, r: any) => {
   return l || r;
-}
+};
 
 export function numbers(config: any) {
   var cfg = config || {};
@@ -36,42 +35,69 @@ export function numbers(config: any) {
   return data;
 }
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
+export enum Scope {
+  Day = "day",
+  Week = "week",
+  Month = "month",
+  Year = "year",
+}
+
+export const DAY_LABELS = Array.from(Array(12).keys())
+  .map((h) => ((h + 11) % 12) + 1 + ":00 AM")
+  .concat(
+    Array.from(Array(12).keys()).map((h) => ((h + 11) % 12) + 1 + ":00 PM")
+  );
+
+export const WEEK_LABELS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
 ];
 
-export const CHART_COLORS = {
-  red: 'rgb(255, 99, 132)',
-  orange: 'rgb(255, 159, 64)',
-  yellow: 'rgb(255, 205, 86)',
-  green: 'rgb(75, 192, 192)',
-  blue: 'rgb(54, 162, 235)',
-  purple: 'rgb(153, 102, 255)',
-  grey: 'rgb(201, 203, 207)'
+const monthIndex = new Date().getMonth() + 1;
+export const MONTH_LABELS = Array.from(Array(30).keys()).map(
+  (d) =>
+    (monthIndex < 10 ? "0" : "") +
+    monthIndex +
+    "/" +
+    (d + 1 < 10 ? "0" : "") +
+    (d + 1)
+);
+
+export const YEAR_LABELS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+export const LABELS: any = {
+  [Scope.Day]: DAY_LABELS,
+  [Scope.Week]: WEEK_LABELS,
+  [Scope.Month]: MONTH_LABELS,
+  [Scope.Year]: YEAR_LABELS,
 };
 
-export function months(config: any) {
-  var cfg = config || {};
-  var count = cfg.count || 12;
-  var section = cfg.section;
-  var values = [];
-  var i, value;
+export const CHART_COLORS = {
+  red: "rgb(255, 99, 132)",
+  orange: "rgb(255, 159, 64)",
+  yellow: "rgb(255, 205, 86)",
+  green: "rgb(75, 192, 192)",
+  blue: "rgb(54, 162, 235)",
+  purple: "rgb(153, 102, 255)",
+  grey: "rgb(201, 203, 207)",
+};
 
-  for (i = 0; i < count; ++i) {
-    value = MONTHS[Math.ceil(i) % 12];
-    values.push(value.substring(0, section));
-  }
-
-  return values;
-}
+export const SYNC_CHART_SCOPE_INTENT = "SyncChartScope";

@@ -1,14 +1,15 @@
 .graph {
   position: relative;
-  .share-logo {
+
+  .actions-container {
     position: absolute;
-    cursor: pointer;
-    width: 20px;
-    top: 0;
     right: 0;
-    fill: var(--on-background-color);
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
   }
+  
   .chart-container {
     max-width: 420px;
     margin: auto;
