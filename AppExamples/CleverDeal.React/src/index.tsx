@@ -5,31 +5,31 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const DEFAULT_ORIGIN: string = "corporate.symphony.com";
-// uncomment if you run against st3 pod
-// const DEFAULT_PARTNER_ID: number = 3;
 const originInParams = (new URL(window.location.href)).searchParams.get('ecpOrigin');
+const partnerIdInParams = (new URL(window.location.href)).searchParams.get('partnerId');
 
 const loadSdk = (
-): Promise<void> => {
-  // uncomment if you run against st3 pod
-  // (window as any).symphonyPartnerId = DEFAULT_PARTNER_ID; 
-
-  return new Promise<void>((resolve) => {
-    const sdkScriptNode = document.createElement('script');
-    sdkScriptNode.src = `https://${originInParams || DEFAULT_ORIGIN}/embed/sdk.js`;
-    sdkScriptNode.id = 'symphony-ecm-sdk';
-    sdkScriptNode.setAttribute('render', 'explicit');
-    (window as any).renderRoom = () => {
-      (window as any).symphony
-        .render('symphony-ecm', {
-          showTitle: false,
-          ecpLoginPopup: true
-        }).then(() => {resolve();});
-    };
-    sdkScriptNode.setAttribute('data-onload', 'renderRoom');
-    document.body.appendChild(sdkScriptNode);
-  });
-};
+  ): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      const sdkScriptNode = document.createElement('script');
+      sdkScriptNode.src = `https://${originInParams || DEFAULT_ORIGIN}/embed/sdk.js`;
+      sdkScriptNode.id = 'symphony-ecm-sdk';
+      sdkScriptNode.setAttribute('render', 'explicit');
+      sdkScriptNode.setAttribute('data-onload', 'renderRoom');
+      if (partnerIdInParams) {
+        sdkScriptNode.setAttribute('data-partner-id', partnerIdInParams);
+      }
+      document.body.appendChild(sdkScriptNode);
+  
+      (window as any).renderRoom = () => {
+        (window as any).symphony
+          .render('symphony-ecm', {
+            showTitle: false,
+            ecpLoginPopup: true,
+          }).then(() => {resolve();});
+      };
+    });
+  };
 
 ReactDOM.render(
   <React.StrictMode>
