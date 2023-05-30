@@ -1,103 +1,110 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Chart, registerables } from "chart.js";
-import React from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
-import { CHART_COLORS, months, numbers } from './Graph.utils';
-import {ReactComponent as ShareLogo} from './share.svg';
-import './Graph.scss';
-
-const DATA_COUNT = 14;
-const NUMBER_CFG = {count: DATA_COUNT, min: 50, max: 100};
+import { Icon } from "@symphony-ui/uitoolkit-components";
+import { useState } from "react";
+import ScopeToggle from "../ScopeToggle/ScopeToggle";
+import "./Graph.scss";
+import {
+  CHART_COLORS,
+  LABELS,
+  Scope,
+  SYNC_CHART_SCOPE_INTENT,
+  numbers,
+} from "./Graph.utils";
 
 export interface GraphProps {
   dealId: string;
   dealName: string;
-  onShare: (base64Image: string) => any;
+  onShare: (scope: Scope) => any;
+  onShareScreenshot: (base64Image: string) => any;
+  sdkLoaded: Promise<any>;
 }
 
-export class Graph extends React.PureComponent<GraphProps> {
+export function Graph(props: GraphProps) {
+  const chartId = `chart-${props.dealId}`;
+  const chartRef = useRef<HTMLCanvasElement>(null);
 
-  private chartId: string;
-  private chartRef: React.RefObject<HTMLCanvasElement>;
-  private chart?: Chart;
+  const [chart, setChart] = useState<Chart | undefined>();
+  const [activeScope, setActiveScope] = useState(Scope.Year);
 
-  constructor(props: GraphProps) {
-    super(props);
-    this.chartId = `chart-${this.props.dealId}`
-    this.chartRef = React.createRef<HTMLCanvasElement>();
-  }
+  useEffect(() => {
+    props.sdkLoaded.then(() => {
+      (window as any).symphony.registerInterop((intent: any, context: any) => {
+        if (intent === SYNC_CHART_SCOPE_INTENT) {
+          setActiveScope(context.scope);
+        }
+      });
+    });
 
-  componentDidMount() {
+    return () => {
+      chart?.destroy();
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    chart?.destroy();
+
     Chart.register(...registerables);
-    this.chart = new Chart(this.chartRef.current!.getContext('2d')!, {
-      type: 'line',
+    const labels = LABELS[activeScope];
+    const newChart = new Chart(chartRef.current!.getContext("2d")!, {
+      type: "line",
       data: {
-          labels: months({count: DATA_COUNT}),
-          datasets: [{
-            data: numbers(NUMBER_CFG),
+        labels,
+        datasets: [
+          {
+            data: numbers({
+              count: labels.length,
+              min: 50,
+              max: 100,
+            }),
             borderColor: CHART_COLORS.red,
             backgroundColor: CHART_COLORS.red,
-          }]
+          },
+        ],
       },
       options: {
         responsive: true,
         plugins: {
           legend: {
-            display: false
+            display: false,
           },
           title: {
             display: true,
-            text: this.props.dealName
-          }
-        }
-      }
-    });
-  }
-
-  componentDidUpdate() {
-    if (this.chart) {
-      this.chart.destroy();
-    }
-    this.chart = new Chart(this.chartRef.current!.getContext('2d')!, {
-      type: 'line',
-      data: {
-          labels: months({count: DATA_COUNT}),
-          datasets: [{
-            data: numbers(NUMBER_CFG),
-            borderColor: CHART_COLORS.red, // TODO: USE THEME HERE
-            backgroundColor: CHART_COLORS.red, // TODO: USE THEME HERE
-          }]
+            text: props.dealName,
+          },
+        },
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: false
-          },
-          title: {
-            display: true,
-            text: this.props.dealName
-          }
-        }
-      }
     });
-  }
 
-  share = () => {
-    if (this.chart) {
-      this.props.onShare(this.chart.toBase64Image('image/jpeg', 1))
+    setChart(newChart);
+  }, [activeScope]);
+
+  const onShareScreenshot = () => {
+    if (chart) {
+      props.onShareScreenshot(chart.toBase64Image("image/jpeg", 1));
     }
-  }
+  };
 
-  render() {
-    return (
-      <>
-        <div className="share-logo" onClick={this.share}>
-          <ShareLogo ></ShareLogo>
-        </div>
-        <div className="chart-container">
-          <canvas ref={this.chartRef} id={this.chartId}></canvas>
-        </div>
-      </>
-    );
-  }
+  const onShare = () => {
+    if (chart) {
+      props.onShare(activeScope);
+    }
+  };
+
+  return (
+    <>
+      <div className="actions-container">
+        <Icon iconName="screenshot" onClick={onShareScreenshot} />
+        <Icon iconName="share" onClick={onShare} />
+      </div>
+
+      <div className="chart-container">
+        <canvas ref={chartRef} id={chartId}></canvas>
+      </div>
+
+      <ScopeToggle value={activeScope} onChange={setActiveScope} />
+    </>
+  );
 }

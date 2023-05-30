@@ -5,10 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const DEFAULT_ORIGIN: string = "corporate.symphony.com";
+// uncomment if you run against st3 pod
+// const DEFAULT_PARTNER_ID: number = 3;
 const originInParams = (new URL(window.location.href)).searchParams.get('ecpOrigin');
 
 const loadSdk = (
 ): Promise<void> => {
+  // uncomment if you run against st3 pod
+  // (window as any).symphonyPartnerId = DEFAULT_PARTNER_ID; 
+
   return new Promise<void>((resolve) => {
     const sdkScriptNode = document.createElement('script');
     sdkScriptNode.src = `https://${originInParams || DEFAULT_ORIGIN}/embed/sdk.js`;

@@ -1,0 +1,29 @@
+.toggle-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-top: 1px solid grey;
+  margin-top: 4px;
+
+  button {
+    flex: 1;
+
+    padding: 4px 16px;
+    border: none;
+    background-color: transparent;
+    color: var(--tk-color-graphite-40);
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #eee;
+        color: #333;
+    }
+    &.active {
+      background-color: #333;
+      color: #fff;
+    }
+  }
+}
+
