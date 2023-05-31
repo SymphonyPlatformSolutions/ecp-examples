@@ -18,5 +18,5 @@ export const ThemePicker = () => {
     }
     return !!defaultValue;
   })
-  return <Select options={options} defaultValue={defaultValue} onChange={(e) => setMode(e.value)}/>
+  return <Select options={options} defaultValue={defaultValue} onChange={(e) => setMode(e.value)} className='theme-picker'/>
 }
