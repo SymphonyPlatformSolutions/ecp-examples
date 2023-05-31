@@ -36,10 +36,10 @@ export function numbers(config: any) {
 }
 
 export enum Scope {
-  Day = "day",
-  Week = "week",
-  Month = "month",
-  Year = "year",
+  DAY = "Day",
+  WEEK = "Week",
+  MONTH = "Month",
+  YEAR = "Year",
 }
 
 export const DAY_LABELS = Array.from(Array(12).keys())
@@ -84,10 +84,10 @@ export const YEAR_LABELS = [
 ];
 
 export const LABELS: any = {
-  [Scope.Day]: DAY_LABELS,
-  [Scope.Week]: WEEK_LABELS,
-  [Scope.Month]: MONTH_LABELS,
-  [Scope.Year]: YEAR_LABELS,
+  [Scope.DAY]: DAY_LABELS,
+  [Scope.WEEK]: WEEK_LABELS,
+  [Scope.MONTH]: MONTH_LABELS,
+  [Scope.YEAR]: YEAR_LABELS,
 };
 
 export const CHART_COLORS = {

@@ -27,7 +27,7 @@ export function Graph(props: GraphProps) {
   const chartRef = useRef<HTMLCanvasElement>(null);
 
   const [chart, setChart] = useState<Chart | undefined>();
-  const [activeScope, setActiveScope] = useState(Scope.Year);
+  const [activeScope, setActiveScope] = useState(Scope.YEAR);
 
   useEffect(() => {
     props.sdkLoaded.then(() => {

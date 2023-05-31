@@ -8,30 +8,15 @@ export interface ScopeToggleProps {
 
 const ScopeToggle = (props: ScopeToggleProps) => (
   <div className="toggle-button-container">
-    <button
-      onClick={() => props.onChange(Scope.Day)}
-      className={props.value === Scope.Day ? "active" : ""}
-    >
-      Day
-    </button>
-    <button
-      onClick={() => props.onChange(Scope.Week)}
-      className={props.value === Scope.Week ? "active" : ""}
-    >
-      Week
-    </button>
-    <button
-      onClick={() => props.onChange(Scope.Month)}
-      className={props.value === Scope.Month ? "active" : ""}
-    >
-      Month
-    </button>
-    <button
-      onClick={() => props.onChange(Scope.Year)}
-      className={props.value === Scope.Year ? "active" : ""}
-    >
-      Year
-    </button>
+    {Object.values(Scope).map((value) => (
+      <button
+        key={value}
+        onClick={() => props.onChange(value)}
+        className={props.value === value ? "active" : ""}
+      >
+        {value}
+      </button>
+    ))}
   </div>
 );
 
