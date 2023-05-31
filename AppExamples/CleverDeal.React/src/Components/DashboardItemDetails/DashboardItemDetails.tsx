@@ -110,7 +110,7 @@ export class DashboardItemDetails extends React.PureComponent<
         button1: {
           type: "fdc3.fdc3Intent",
           data: {
-            title: "View Chart",
+            title: `View ${scope} Chart`,
             intent: SYNC_CHART_SCOPE_INTENT,
             context: {
               type: "fdc3.chart.scope",
