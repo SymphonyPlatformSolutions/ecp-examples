@@ -65,22 +65,9 @@
                 <code>isMention</code> : true if the user has been mentioned in
                 the message
               </li>
-              <li>
-                <code>fromWhomName</code><sup>*</sup> : Name of the sender
-              </li>
-              <li><code>streamName</code><sup>*</sup> : Title of the chat</li>
-              <li><code>message</code><sup>*</sup> : Content of the message</li>
             </ul>
           </li>
         </ul>
-        <p>
-          <i>
-            Items with a <sup>*</sup> are only returned when allowApiContent is
-            enabled on the pod's Client Configuration This will allow the ECP
-            API to return sensitive information (such as user names, room names,
-            message content).
-          </i>
-        </p>
         <p>
           Note that the code of this page is slightly more complicated because
           here we use a form to set the streamId and a zone to show
