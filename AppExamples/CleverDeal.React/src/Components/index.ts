@@ -5,3 +5,4 @@ export * from './Graph';
 export * from './ScopeToggle';
 export * from './Loading';
 export * from './ThemePicker';
+export * from './HelpButton';

@@ -20,7 +20,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      color: "#1A1A1A"
+      color: "#1A1A1A";
+      gap: 1rem;
     }
   }
 }
@@ -29,11 +30,11 @@
   display: flex;
   width: 100%;
   text-align: center;
-  
+
   .dashboard {
     flex: 1;
   }
-  
+
   .right-panel {
     width: 27%;
     min-width: 400px;
