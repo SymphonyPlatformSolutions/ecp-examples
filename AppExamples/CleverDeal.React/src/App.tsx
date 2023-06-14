@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import './App.scss';
 
-import { Dashboard, DashboardItemDetails, Loading, ThemePicker } from './Components'
+import { Dashboard, DashboardItemDetails, Loading, ThemePicker, HelpButton } from './Components'
 import { DashboardItemInterface } from './Models';
 
-import { deals } from './Data/deals';
+import { deals, helpRoom } from './Data/deals';
 
 interface AppProps {
   sdkLoaded: Promise<any>;
@@ -22,6 +22,7 @@ function App(props: AppProps) {
         </div>
         <div className="app-header-settings">
           <ThemePicker></ThemePicker>
+          <HelpButton ecpOrigin={props.ecpOrigin} helpRoom={helpRoom} />
         </div>
       </div>
       <div className="app-container">
@@ -29,7 +30,7 @@ function App(props: AppProps) {
           <Dashboard ecpOrigin={props.ecpOrigin} sdkLoaded={props.sdkLoaded} onDashboardItemClick={setSelectedDeal} dashboardItems={deals} selectedDealId={selectedDeal?.dealId}></Dashboard>
         </div>
         {
-          selectedDeal ? 
+          selectedDeal ?
           (
             <div className="right-panel">
               <DashboardItemDetails sdkLoaded={props.sdkLoaded} deal={selectedDeal} ecpOrigin={props.ecpOrigin} onClose={() => setSelectedDeal(undefined)}></DashboardItemDetails>

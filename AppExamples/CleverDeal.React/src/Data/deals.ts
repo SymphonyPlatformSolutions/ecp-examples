@@ -1,4 +1,4 @@
-import { DashboardItemInterface } from "../Models";
+import { DashboardItemInterface, RoomIdMap } from "../Models";
 
 const yannick = {
   id: '',
@@ -81,6 +81,11 @@ export const deals: DashboardItemInterface[] = [
     riskLevel: 'Low',
     type: 'Corporate Bond',
     minimum: '$150k'
-  }},  
+  }},
   ...generateDeals(12)
 ];
+
+export const helpRoom: RoomIdMap = {
+    'st3.symphony.com': '+Slk3L9bALdV8EW82EPCfX///ndFonF/dA==',
+    'corporate.symphony.com': 'HASQkcT2VaQXxHKFPjFb9H///ndGbRFidA=='
+};
