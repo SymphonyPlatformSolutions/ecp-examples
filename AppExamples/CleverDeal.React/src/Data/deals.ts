@@ -51,7 +51,7 @@ export const deals: DashboardItemInterface[] = [
     members: [yannick, thomas, zimmy],
     roomId: {
       'st3.symphony.com': 'Cm2ZKi4E3qdH8NqUt4BHQH///oCvvlv6dA==',
-      'corporate.symphony.com': '2n/aK4gQ3S8VnXPgPbXzF3///oCcFZezdA=='
+      'corporate.symphony.com': 'VkaN/ZxK+37EYQLBiKHyNH///ncESK8ndA=='
     },
     country: 'France',
     riskLevel: 'Medium',
