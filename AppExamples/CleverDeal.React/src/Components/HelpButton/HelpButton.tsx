@@ -11,12 +11,9 @@ export interface HelpButtonProps {
 export const HelpButton = (props : HelpButtonProps) => {
     const dialogRef = React.useRef(null);
     const minimisedRef = React.useRef(null);
-    let dialog : HTMLDialogElement;
-    let minimised : HTMLDivElement;
 
     const launchHelp = () => {
-        dialog = (dialogRef.current as any);
-        minimised = (minimisedRef.current as any);
+        const dialog = (dialogRef.current as any);
         if (dialog.open) {
             dialog.close();
         } else {
@@ -26,6 +23,8 @@ export const HelpButton = (props : HelpButtonProps) => {
     };
 
     const toggleHelp = () => {
+        const dialog = (dialogRef.current as any);
+        const minimised = (minimisedRef.current as any);
         dialog.style.visibility = dialog.style.visibility === 'hidden' ? 'visible' : 'hidden';
         minimised.style.visibility = minimised.style.visibility === 'hidden' ? 'visible' : 'hidden';
     };

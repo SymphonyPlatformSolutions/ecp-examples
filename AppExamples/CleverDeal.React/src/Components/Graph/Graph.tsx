@@ -19,7 +19,6 @@ export interface GraphProps {
   dealName: string;
   onShare: (scope: Scope) => any;
   onShareScreenshot: (base64Image: string) => any;
-  sdkLoaded: Promise<any>;
 }
 
 export function Graph(props: GraphProps) {
@@ -30,14 +29,11 @@ export function Graph(props: GraphProps) {
   const [activeScope, setActiveScope] = useState(Scope.YEAR);
 
   useEffect(() => {
-    props.sdkLoaded.then(() => {
-      (window as any).symphony.registerInterop((intent: any, context: any) => {
-        if (intent === SYNC_CHART_SCOPE_INTENT) {
-          setActiveScope(context.scope);
-        }
-      });
+    (window as any).symphony.registerInterop((intent: any, context: any) => {
+    if (intent === SYNC_CHART_SCOPE_INTENT) {
+        setActiveScope(context.scope);
+    }
     });
-
     return () => {
       chart?.destroy();
     };

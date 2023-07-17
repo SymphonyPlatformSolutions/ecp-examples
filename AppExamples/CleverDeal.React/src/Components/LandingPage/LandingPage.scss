@@ -1,0 +1,56 @@
+.app-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex: 1 1 1px;
+  text-align: center;
+  gap: 1.5rem;
+}
+.app-tile {
+  position: relative;
+  > * { margin: 0 }
+  h6 {
+    position: absolute;
+    bottom: .6rem;
+    right: .6rem;
+    font-style: italic;
+    font-weight: 600;
+  }
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+  min-height: 10rem;
+  border: var(--on-background-color) 2px solid;
+  border-radius: .5rem;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--surface-color);
+  position: relative;
+  animation: in .2s ease forwards;
+  user-select: none;
+
+  &[data-enabled=true]:hover {
+    border-color: var(--primary-color);
+    animation: out .2s ease forwards;
+    cursor: pointer;
+    filter: drop-shadow(.5rem .5rem .5rem rgba(200,200,200,.7));
+  }
+  &[data-enabled=false] {
+    color: #bbb;
+    border-color: #ddd;
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}
+
+@keyframes out {
+  from { top: 0; left: 0; }
+  to { top: -.3rem; left: -.3rem; }
+}
+@keyframes in {
+  from { top: -.3rem; left: -.3rem; }
+  to { top: 0; left: 0; }
+}

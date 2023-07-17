@@ -1,0 +1,78 @@
+html, body {
+  background-color: var(--background-color);
+  color: var(--on-background-color);
+};
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root, .App {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.ecp-main-hidden-frame {
+  position: fixed;
+  height: 100vh;
+  right: -1px;
+  top: 0;
+  width: 1px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.large-loading {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .logo {
+      width: 6rem;
+      justify-self: center;
+  }
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  .app-header {
+    display: flex;
+    padding: 1rem;
+    .brand {
+      align-items: center;
+      user-select: none;
+      display: flex;
+      gap: 1rem;
+      > * {
+        margin: 0;
+        display: flex;
+      }
+      .logo { width: 3rem }
+      > svg {
+        font-size: 2rem;
+        color: color-mix(in srgb, var(--primary-color), transparent 30%);
+        & :hover {
+          cursor: pointer;
+          color: var(--primary-color);
+        }
+      }
+    }
+    .app-header-settings {
+      margin-left: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: "#1A1A1A";
+      gap: 1rem;
+    }
+  }
+}

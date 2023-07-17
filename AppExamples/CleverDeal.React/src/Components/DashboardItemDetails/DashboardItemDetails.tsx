@@ -17,7 +17,6 @@ export interface DashboardItemDetailsState {
 }
 export interface DashboardItemDetailsProps {
   deal: DashboardItemInterface;
-  sdkLoaded: Promise<any>;
   ecpOrigin: string;
   onClose: () => any;
 }
@@ -44,19 +43,15 @@ export class DashboardItemDetails extends React.PureComponent<
   };
 
   componentDidMount() {
-    this.props.sdkLoaded.then(() => {
-      this.openStream().then(() => {
-        this.setState({ sdkLoading: false });
-        console.log("FULLY LOADED");
-      });
+    this.openStream().then(() => {
+    this.setState({ sdkLoading: false });
+    console.log("FULLY LOADED");
     });
   }
 
   componentDidUpdate(previousProps: DashboardItemDetailsProps) {
     if (previousProps.deal.dealId !== this.props.deal.dealId) {
-      this.props.sdkLoaded.then(() => {
-        this.openStream();
-      });
+      this.openStream();
     }
   }
 
@@ -145,7 +140,6 @@ export class DashboardItemDetails extends React.PureComponent<
             dealName={this.props.deal.name}
             onShareScreenshot={this.onShareScreenshot}
             onShare={this.onShare}
-            sdkLoaded={this.props.sdkLoaded}
           />
         </div>
         <div className="tabs">

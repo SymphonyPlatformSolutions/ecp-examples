@@ -6,7 +6,6 @@ export interface DashboardProps {
   dashboardItems: DashboardItemInterface[];
   selectedDealId?: string;
   onDashboardItemClick: (item: DashboardItemInterface) => any;
-  sdkLoaded: Promise<any>;
   ecpOrigin: string;
 }
 
@@ -26,10 +25,10 @@ export const Dashboard = (props: DashboardProps) => {
           </tr>
         </thead>
         <tbody>
-          {props.dashboardItems.map((item) => (<DashboardItem ecpOrigin={props.ecpOrigin} sdkLoaded={props.sdkLoaded} isActive={props.selectedDealId === item.dealId} onClick={onDashboardItemClick} key={item.dealId} item={item}></DashboardItem>))}
+          {props.dashboardItems.map((item) => (<DashboardItem ecpOrigin={props.ecpOrigin} isActive={props.selectedDealId === item.dealId} onClick={onDashboardItemClick} key={item.dealId} item={item}></DashboardItem>))}
         </tbody>
       </table>
     </>
-    
+
   );
 }
