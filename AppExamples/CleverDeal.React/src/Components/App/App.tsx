@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Loading, ThemePicker, HelpButton, LandingPage } from '..';
 import { helpRoom } from '../../Data/deals';
 import { routes } from '../../Data/routes';
@@ -72,6 +72,7 @@ export const App = () => {
             element={React.createElement(route.component, ecpProps)}
           />
         ))}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );
