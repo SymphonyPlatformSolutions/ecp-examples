@@ -8,10 +8,10 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       &.back {
-        stroke: rgba(var(--primary-color),.3);
+        stroke: rgba(var(--primary-color, #0476D6),.3);
       }
       &.front {
-        stroke: var(--primary-color);
+        stroke: var(--primary-color, #0476D6);
 
       }
     }
@@ -25,7 +25,7 @@
       }
     }
   }
-        
+
   @keyframes dash {
     62.5% {
       opacity: 0;
