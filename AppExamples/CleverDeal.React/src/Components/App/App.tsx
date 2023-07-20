@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { Loading, ThemePicker, HelpButton, LandingPage } from '..';
-import { helpRoom } from '../../Data/deals';
-import { routes } from '../../Data/routes';
-import { FaHome } from 'react-icons/fa';
-import './app.scss';
+import React, { useEffect, useState } from "react";
+import { FaHome } from "react-icons/fa";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { HelpButton, LandingPage, Loading, ThemePicker } from "..";
+import { helpRoom } from "../../Data/deals";
+import { routes } from "../../Data/routes";
+import { getEcpParam } from "../../Utils/utils";
+import "./app.scss";
 
 const DEFAULT_ORIGIN: string = "corporate.symphony.com";
-const originInParams = (new URL(window.location.href)).searchParams.get('ecpOrigin');
-const partnerIdInParams = (new URL(window.location.href)).searchParams.get('partnerId');
+const ecpOriginParam = getEcpParam("ecpOrigin") || DEFAULT_ORIGIN;
+const partnerIdParam = getEcpParam("partnerId");
 
 const LargeLoading = () => (
   <div className="large-loading">
@@ -20,18 +27,16 @@ export const App = () => {
   const [ loading, setLoading ] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const ecpProps = {
-    ecpOrigin: originInParams || DEFAULT_ORIGIN,
-  };
+  const ecpProps = { ecpOrigin: ecpOriginParam };
 
   useEffect(() => {
     const sdkScriptNode = document.createElement('script');
-    sdkScriptNode.src = `https://${originInParams || DEFAULT_ORIGIN}/embed/sdk.js`;
+    sdkScriptNode.src = `https://${ecpOriginParam}/embed/sdk.js`;
     sdkScriptNode.id = 'symphony-ecm-sdk';
     sdkScriptNode.setAttribute('render', 'explicit');
     sdkScriptNode.setAttribute('data-onload', 'renderRoom');
-    if (partnerIdInParams) {
-      sdkScriptNode.setAttribute('data-partner-id', partnerIdInParams);
+    if (partnerIdParam) {
+      sdkScriptNode.setAttribute('data-partner-id', partnerIdParam);
     }
     document.body.appendChild(sdkScriptNode);
 
