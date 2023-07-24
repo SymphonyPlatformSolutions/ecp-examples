@@ -41,10 +41,11 @@ export const App = () => {
     document.body.appendChild(sdkScriptNode);
 
     (window as any).renderRoom = () =>
-        (window as any).symphony.render('symphony-ecm', {
-            showTitle: false,
-            ecpLoginPopup: true,
-        }).then(() => setLoading(false));
+      (window as any).symphony.render('symphony-ecm', {
+        showTitle: false,
+        ecpLoginPopup: true,
+        allowedApps: "com.symphony.zoom,com.symphony.teams",
+      }).then(() => setLoading(false));
   }, []);
 
   const getAppLabel = () => {

@@ -1,1 +1,3 @@
-export * from './CleverResearch';
+import CleverResearch from "./CleverResearch";
+
+export default CleverResearch;
