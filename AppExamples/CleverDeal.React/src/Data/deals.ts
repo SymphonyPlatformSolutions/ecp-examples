@@ -1,4 +1,4 @@
-import { DashboardItemInterface, RoomIdMap } from "../Models";
+import { DashboardItemInterface, ResearchData, RoomIdMap } from "../Models";
 
 const yannick = {
   id: '',
@@ -86,6 +86,31 @@ export const deals: DashboardItemInterface[] = [
 ];
 
 export const helpRoom: RoomIdMap = {
-    'st3.symphony.com': '+Slk3L9bALdV8EW82EPCfX///ndFonF/dA==',
-    'corporate.symphony.com': 'HASQkcT2VaQXxHKFPjFb9H///ndGbRFidA=='
+  'st3.symphony.com': '+Slk3L9bALdV8EW82EPCfX///ndFonF/dA==',
+  'corporate.symphony.com': 'HASQkcT2VaQXxHKFPjFb9H///ndGbRFidA=='
+};
+
+export const researchData: ResearchData = {
+  coverageRoom: {
+    'st3.symphony.com': '',
+    'corporate.symphony.com': 'eKxjK/4px0R2/k6oWPTtpn///nZqvBphdA=='
+  },
+  customerRooms: [
+    {
+      name: 'Jane Doe',
+      company: 'Cedar Buyside',
+      roomId: {
+        'st3.symphony.com': '',
+        'corporate.symphony.com': 'UARecxsv4ELyLncuqsHXQX///nZqtFLodA=='
+      }
+    },
+    {
+      name: 'John Smith',
+      company: 'Pine Investments',
+      roomId: {
+        'st3.symphony.com': '',
+        'corporate.symphony.com': '6cJ2tY2KdIXAeYJcep++2X///nZqs5ZIdA=='
+      }
+    },
+  ]
 };

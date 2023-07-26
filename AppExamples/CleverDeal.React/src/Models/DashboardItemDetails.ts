@@ -18,7 +18,7 @@ export interface DashboardItemDetailsInterface {
   riskLevel: string;
   type: string;
   minimum: string;
-} 
+}
 
 export interface DashboardItemInterface {
   dealId: string;
