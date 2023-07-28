@@ -36,8 +36,24 @@ export const useTheme = () => {
     document.documentElement.style.setProperty('--on-background-color', theme.colors.onBackground);
     document.documentElement.style.setProperty('--on-surface-color', theme.colors.onSurface);
     document.documentElement.style.setProperty('--on-error-color', theme.colors.onError);
-    if ((window as any).symphony) {
-      (window as any).symphony.updateSettings({mode: theme.colors.symphonyMode})
+    const symphony = (window as any).symphony;
+    if (symphony) {
+      symphony.updateSettings({mode: theme.colors.symphonyMode});
+      symphony.updateTheme({
+        primary: theme.colors.primary,
+        secondary: theme.colors.secondary,
+        accent: theme.colors.primary,
+        success: theme.colors.primary,
+        error: theme.colors.error,
+        background: theme.colors.background,
+        surface: theme.colors.surface,
+        text: theme.colors.onSurface,
+        textPrimary: theme.colors.onPrimary,
+        textSecondary: theme.colors.onSecondary,
+        textAccent: theme.colors.onPrimary,
+        textSuccess: theme.colors.onPrimary,
+        textError: theme.colors.onError,
+      });
     }
   }, [theme])
 

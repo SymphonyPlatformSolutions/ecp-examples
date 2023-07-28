@@ -1,5 +1,6 @@
 export * from './App';
 export * from './CleverInvestments';
+export * from './CleverResearch';
 export * from './Dashboard';
 export * from './DashboardItem';
 export * from './DashboardItemDetails';

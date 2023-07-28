@@ -1,4 +1,5 @@
-import { CleverInvestments } from '../Components/CleverInvestments/CleverInvestments';
+import { CleverInvestments } from "../Components/CleverInvestments";
+import { CleverResearch } from "../Components/CleverResearch";
 
 export interface AppEntry {
   label: string;
@@ -8,6 +9,6 @@ export interface AppEntry {
 export const routes : AppEntry[] = [
   { label: 'Investments', path: 'investments', component: CleverInvestments },
   { label: 'Operations' },
-  { label: 'Research' },
+  { label: 'Research', path: 'research', component: CleverResearch },
   { label: 'Wealth' },
 ];
