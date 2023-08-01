@@ -50,11 +50,12 @@ const TradeExceptionDetails = ({
     TradeField.REFERENCE,
   ];
 
-  const targetStreamId = tradeException.streamId?.[ecpOrigin];
   const showHelper = tradeException.status === TradeExceptionStatus.UNRESOLVED;
   const canSelectConflictCell = showHelper && isStreamReady;
 
   useEffect(() => {
+    const targetStreamId = tradeException.streamId?.[ecpOrigin];
+
     // no stream associated to the trade --> create a new room
     if (!targetStreamId) {
       setIsStreamReady(false);
@@ -101,7 +102,7 @@ const TradeExceptionDetails = ({
         });
       return;
     }
-  }, [targetStreamId]);
+  }, [tradeException.entry1.reference]);
 
   const handleExceptionRequest = (value: any) => {
     const newTradeException = {
