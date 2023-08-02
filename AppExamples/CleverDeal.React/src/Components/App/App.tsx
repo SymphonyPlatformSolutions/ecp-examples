@@ -31,7 +31,7 @@ export const App = () => {
 
   useEffect(() => {
     const sdkScriptNode = document.createElement('script');
-    sdkScriptNode.src = `https://${ecpOriginParam}/embed/sdk.js`;
+    sdkScriptNode.src = `https://${ecpOriginParam}/apps/embed/daily/sdk.js`;
     sdkScriptNode.id = 'symphony-ecm-sdk';
     sdkScriptNode.setAttribute('render', 'explicit');
     sdkScriptNode.setAttribute('data-onload', 'renderRoom');
