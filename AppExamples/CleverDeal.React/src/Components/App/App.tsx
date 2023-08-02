@@ -17,6 +17,9 @@ const DEFAULT_ORIGIN: string = "corporate.symphony.com";
 const ecpOriginParam = getEcpParam("ecpOrigin") || DEFAULT_ORIGIN;
 const partnerIdParam = getEcpParam("partnerId");
 
+const DEFAULT_SDK_PATH: string = "/embed/sdk.js";
+const sdkPath = getEcpParam("sdkPath", false) || DEFAULT_SDK_PATH;
+
 const LargeLoading = () => (
   <div className="large-loading">
     <Loading animate={true} className="logo"></Loading>
@@ -24,44 +27,48 @@ const LargeLoading = () => (
 );
 
 export const App = () => {
-  const [ loading, setLoading ] = useState(true);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const ecpProps = { ecpOrigin: ecpOriginParam };
 
   useEffect(() => {
-    const sdkScriptNode = document.createElement('script');
-    sdkScriptNode.src = `https://${ecpOriginParam}/apps/embed/daily/sdk.js`;
-    sdkScriptNode.id = 'symphony-ecm-sdk';
-    sdkScriptNode.setAttribute('render', 'explicit');
-    sdkScriptNode.setAttribute('data-onload', 'renderRoom');
+    const sdkScriptNode = document.createElement("script");
+    sdkScriptNode.src = `https://${ecpOriginParam}${sdkPath}`;
+    sdkScriptNode.id = "symphony-ecm-sdk";
+    sdkScriptNode.setAttribute("render", "explicit");
+    sdkScriptNode.setAttribute("data-onload", "renderRoom");
     if (partnerIdParam) {
-      sdkScriptNode.setAttribute('data-partner-id', partnerIdParam);
+      sdkScriptNode.setAttribute("data-partner-id", partnerIdParam);
     }
     document.body.appendChild(sdkScriptNode);
 
     (window as any).renderRoom = () =>
-      (window as any).symphony.render('symphony-ecm', {
-        showTitle: false,
-        ecpLoginPopup: true,
-        allowedApps: "com.symphony.zoom,com.symphony.teams",
-      }).then(() => setLoading(false));
+      (window as any).symphony
+        .render("symphony-ecm", {
+          showTitle: false,
+          ecpLoginPopup: true,
+          allowedApps: "com.symphony.zoom,com.symphony.teams",
+        })
+        .then(() => setLoading(false));
   }, []);
 
   const getAppLabel = () => {
     const route = routes.find(({ path }) => `/${path}` === location.pathname);
-    return route ? `: ${route.label}` : '';
+    return route ? `: ${route.label}` : "";
   };
 
-  return loading ? <LargeLoading /> : (
+  return loading ? (
+    <LargeLoading />
+  ) : (
     <div className="App">
       <div className="app-header">
-        <div className="brand" onClick={() => navigate('/')}>
+        <div className="brand" onClick={() => navigate("/")}>
           <FaHome />
           <Loading animate={false} className="logo"></Loading>
           <h1>
             Clever Deal 2.0
-            { getAppLabel() }
+            {getAppLabel()}
           </h1>
         </div>
         <div className="app-header-settings">
@@ -71,13 +78,15 @@ export const App = () => {
       </div>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        { routes.filter(({ component }) => component).map((route) => (
-          <Route
-            key={route.path}
-            {...route}
-            element={React.createElement(route.component, ecpProps)}
-          />
-        ))}
+        {routes
+          .filter(({ component }) => component)
+          .map((route) => (
+            <Route
+              key={route.path}
+              {...route}
+              element={React.createElement(route.component, ecpProps)}
+            />
+          ))}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

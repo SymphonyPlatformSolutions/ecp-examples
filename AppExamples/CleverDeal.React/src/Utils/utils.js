@@ -8,13 +8,19 @@ const SS_PREFIX = "cleverdeal::";
  * @param {*} name the ECP param name
  * @returns the ECP param value
  */
-export const getEcpParam = (name: string): string | null => {
+export const getEcpParam = (name: string, useSessionStorage: boolean = true): string | null => {
     const sessionStorageKey = SS_PREFIX + name;
 
     const queryParam = new URL(window.location.href).searchParams.get(name);
+
+    if (!useSessionStorage) {
+        return queryParam;
+    }
+
     if (queryParam) {
         sessionStorage.setItem(sessionStorageKey, queryParam);
         return queryParam;
     }
+
     return sessionStorage.getItem(sessionStorageKey);
 };
