@@ -1,1 +1,3 @@
-export * from './CleverInvestments';
+import { CleverInvestments } from "./CleverInvestments";
+
+export default CleverInvestments;

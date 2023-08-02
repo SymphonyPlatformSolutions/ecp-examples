@@ -1,5 +1,5 @@
-@import '../../../node_modules/react-tabs/style/react-tabs.scss';
-@import '../../../node_modules/@symphony-ui/uitoolkit-styles/uitoolkit.scss';
+@import "../../../node_modules/react-tabs/style/react-tabs.scss";
+@import "../../../node_modules/@symphony-ui/uitoolkit-styles/uitoolkit.scss";
 
 .dashboard-item-details {
   border: 2px solid var(--surface-color);
@@ -11,7 +11,7 @@
     width: 100%;
     align-items: center;
     background-color: var(--surface-color);
-    padding: .6rem 0;
+    padding: 0.6rem 0;
     border-bottom: 2px solid var(--background-color);
     .title {
       margin: auto;
@@ -24,13 +24,18 @@
     }
   }
   .graph {
-    margin: .5rem;
+    margin: 0.5rem;
     background-color: var(--background-color);
   }
   .tabs {
-    margin: .5rem;
+    margin: 0.5rem;
     min-height: 30rem;
     position: relative;
+
+    .react-tabs__tab:focus:after {
+      background: none;
+    }
+
     .symphony-ecm-chat {
       iframe {
         min-height: 34rem;

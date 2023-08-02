@@ -1,0 +1,47 @@
+@import "../variables.scss";
+
+.fake-left-menu {
+  padding: $panel-padding;
+  margin: $panel-padding;
+  min-width: 9rem;
+  align-self: flex-start;
+  background-color: $menu-bg-color;
+  border-radius: 4px;
+
+  .menu-group {
+    & + .menu-group {
+      margin-top: 16px;
+    }
+
+    .menu-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+
+      svg {
+        color: var(--primary-color);
+      }
+    }
+
+    .menu-items {
+      padding: 4px 0 4px 26px;
+      padding-left: 26px;
+    }
+
+    .menu-item {
+      padding: 6px 10px;
+      color: #a1a1a1;
+      cursor: not-allowed;
+    }
+  }
+
+  // fake active
+  > :last-child .menu-item:first-child {
+    background-color: rgba(0, 0, 255, 0.1);
+    border-radius: 4px;
+    font-weight: bold;
+    color: var(--on-background-color);
+    cursor: pointer;
+  }
+}

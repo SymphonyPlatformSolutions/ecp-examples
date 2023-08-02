@@ -1,0 +1,102 @@
+@import "../../variables.scss";
+
+@keyframes floatAnimation {
+  0% {
+    box-shadow: 0 0 0px var(--on-background-color);
+  }
+  50% {
+    box-shadow: 0 0 6px var(--on-background-color);
+  }
+  100% {
+    box-shadow: 0 0 0px var(--on-background-color);
+  }
+}
+
+table.trade-exception-table {
+  thead tr th {
+    padding: $panel-padding;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--on-background-color);
+
+    td {
+      padding: 0;
+
+      .cell-value {
+        box-sizing: border-box;
+        padding: $panel-padding;
+
+        &.selected {
+          font-weight: bold;
+        }
+
+        &.discarded {
+          text-decoration: line-through;
+        }
+      }
+
+      .chat-indicator {
+        font-size: 20px;
+
+        &.disabled {
+          opacity: 0.2;
+        }
+      }
+    }
+
+    hr {
+      border-color: rgba(128, 128, 128, 0.2);
+      border-width: 1px;
+
+      margin-block-start: 0;
+      margin-block-end: 0;
+    }
+
+    &:not(.approved, .rejected) td.conflict {
+      background-color: $conflict-color;
+
+      &.cell-selectable {
+        background-color: $active-color;
+
+        &:not(:hover) {
+          animation: floatAnimation 3s ease-in-out infinite;
+        }
+      }
+
+      .cell-value {
+        width: 100%;
+        height: 100%;
+
+        &.selectable {
+          cursor: pointer;
+          &:hover {
+            font-weight: bold;
+            background-color: rgba(0, 255, 0, 0.3);
+          }
+        }
+      }
+    }
+
+    &.selectable:hover:not(.active) {
+      cursor: pointer;
+      background-color: $hover-color;
+    }
+
+    &.active {
+      background-color: $active-color;
+    }
+
+    &.pending {
+      background-color: $pending-color !important;
+    }
+
+    &.approved {
+      background-color: $approved-color !important;
+    }
+
+    &.rejected {
+      background-color: $rejected-color !important;
+    }
+  }
+}
