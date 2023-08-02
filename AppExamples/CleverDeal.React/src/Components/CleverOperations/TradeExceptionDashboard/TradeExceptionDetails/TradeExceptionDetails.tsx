@@ -2,7 +2,7 @@
 import { FaQuestionCircle } from "react-icons/fa";
 
 import classNames from "classnames";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TRADE_TARGET_SYM_IDS,
   getTradeExceptionInitialMessage,
@@ -17,10 +17,12 @@ import {
   TradeField,
   TradeFieldLabels,
 } from "../../../../Models";
-import "./TradeExceptionDetails.scss";
 import TradeExceptionTable from "../TradeExceptionTable";
+import "./TradeExceptionDetails.scss";
 
 const CHAT_ID = `symphony-ecm-trade-chat`;
+const CHAT_CONTAINER_CLASS = "chat-container";
+
 interface TraceExceptionDetailsProps {
   tradeException: TradeException;
   ecpOrigin: string;
@@ -34,8 +36,6 @@ const TradeExceptionDetails = ({
 }: TraceExceptionDetailsProps) => {
   const [loadedStreamId, setLoadedStreamId] = useState<string>();
   const [isStreamReady, setIsStreamReady] = useState<boolean>(false);
-
-  const chatRef = useRef<HTMLDivElement>(null);
 
   const conflictingField = Object.values(TradeField).find(
     (field) =>
@@ -53,6 +53,18 @@ const TradeExceptionDetails = ({
   const showHelper = tradeException.status === TradeExceptionStatus.UNRESOLVED;
   const canSelectConflictCell = showHelper && isStreamReady;
 
+  const getChatId = () => document.querySelector(".chat-container")?.id;
+
+  useEffect(() => {
+    const container = document.querySelector(".chat-container");
+    const id = CHAT_ID + Date.now();
+
+    if (container) {
+      container.innerHTML = "";
+      container.id = id;
+    }
+  }, []);
+
   useEffect(() => {
     const targetStreamId = tradeException.streamId?.[ecpOrigin];
 
@@ -60,6 +72,7 @@ const TradeExceptionDetails = ({
     if (!targetStreamId) {
       setIsStreamReady(false);
       setLoadedStreamId(undefined);
+
       (window as any).symphony
         .createRoom(
           getTradeExceptionRoomName(tradeException),
@@ -70,7 +83,7 @@ const TradeExceptionDetails = ({
               conflictingField
             ),
           },
-          `#${CHAT_ID}`
+          `#${getChatId()}`
         )
         .then(async (response: EcpApiResponse) => {
           await (window as any).symphony.pinMessage(
@@ -95,7 +108,7 @@ const TradeExceptionDetails = ({
     if (loadedStreamId !== targetStreamId) {
       setIsStreamReady(false);
       (window as any).symphony
-        .openStream(targetStreamId, `#${CHAT_ID}`)
+        .openStream(targetStreamId, `#${getChatId()}`)
         .then(() => {
           setLoadedStreamId(targetStreamId);
           setIsStreamReady(true);
@@ -124,7 +137,7 @@ const TradeExceptionDetails = ({
       .sendMessage(message, {
         mode: "blast",
         streamIds: [loadedStreamId],
-        container: CHAT_ID,
+        container: getChatId(),
       })
       .then((response: EcpApiResponse) => {
         if (response.messages) {
@@ -169,11 +182,7 @@ const TradeExceptionDetails = ({
         </div>
       </div>
 
-      <div
-        ref={chatRef}
-        id={CHAT_ID}
-        className="details-panel chat-container"
-      />
+      <div className={`details-panel ${CHAT_CONTAINER_CLASS}`} />
     </div>
   );
 };
