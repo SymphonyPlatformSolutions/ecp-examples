@@ -8,8 +8,13 @@
     align-items: center;
     gap: 8px;
     padding: 8px 10px;
+
+    .disabled {
+      cursor: not-allowed !important;
+      opacity: 0.5;
+    }
   }
-  
+
   .chart-container {
     max-width: 420px;
     margin: auto;

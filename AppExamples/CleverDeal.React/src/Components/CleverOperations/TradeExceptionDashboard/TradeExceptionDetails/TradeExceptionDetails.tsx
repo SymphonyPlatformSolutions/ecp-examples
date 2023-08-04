@@ -20,7 +20,7 @@ import {
 import TradeExceptionTable from "../TradeExceptionTable";
 import "./TradeExceptionDetails.scss";
 
-const CHAT_ID = `symphony-ecm-trade-chat`;
+const CHAT_ID_PREFIX = `symphony-ecm-trade-chat`;
 const CHAT_CONTAINER_CLASS = "chat-container";
 
 interface TraceExceptionDetailsProps {
@@ -53,17 +53,20 @@ const TradeExceptionDetails = ({
   const showHelper = tradeException.status === TradeExceptionStatus.UNRESOLVED;
   const canSelectConflictCell = showHelper && isStreamReady;
 
-  const getChatId = () => document.querySelector(".chat-container")?.id;
-
-  useEffect(() => {
-    const container = document.querySelector(".chat-container");
-    const id = CHAT_ID + Date.now();
+  const generateChatId = () => {
+    const container = document.querySelector(`.${CHAT_CONTAINER_CLASS}`);
+    const id = CHAT_ID_PREFIX + Date.now();
 
     if (container) {
       container.innerHTML = "";
       container.id = id;
     }
-  }, []);
+
+    return id;
+  };
+
+  const getChatId = () =>
+    document.querySelector(`.${CHAT_CONTAINER_CLASS}`)?.id || generateChatId();
 
   useEffect(() => {
     const targetStreamId = tradeException.streamId?.[ecpOrigin];

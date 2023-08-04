@@ -1,1 +1,3 @@
-export * from './DashboardItemDetails';
+import DashboardItemDetails from "./DashboardItemDetails";
+
+export default DashboardItemDetails;

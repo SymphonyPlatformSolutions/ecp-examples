@@ -1,43 +1,58 @@
-import { useEffect, useState } from 'react';
-import {DashboardItemInterface} from '../../Models';
-import './DashboardItem.scss';
+import classNames from "classnames";
+import { useEffect, useState } from "react";
+import { DealInterface } from "../../Models";
+import "./DashboardItem.scss";
 
 export interface DashboardItemProps {
-  item: DashboardItemInterface;
+  item: DealInterface;
   isActive: boolean;
-  onClick: (item: DashboardItemInterface) => any;
+  onClick: (item: DealInterface) => any;
   ecpOrigin: string;
 }
 
-export const DashboardItem = (props: DashboardItemProps) => {
-  const {dealId, lastUpdated, status, name} = props.item;
+export const DashboardItem = ({
+  item,
+  isActive,
+  onClick,
+  ecpOrigin,
+}: DashboardItemProps) => {
+  const { dealId, lastUpdated, status, name } = item;
   const [badgeCount, setBadgeCount] = useState<number>(0);
   useEffect(() => {
-    const streamId = props.item.details.roomId && props.item.details.roomId[props.ecpOrigin]
+    const streamId = item.details.roomId && item.details.roomId[ecpOrigin];
     if (streamId) {
       (window as any).symphony.listen({
-        type: 'UnreadCountNotifications',
+        type: "UnreadCountNotifications",
         params: {
-        streamId
+          streamId,
         },
-        callback: (notification: any) => { // TODO: Type?
-        setBadgeCount(notification.count);
+        callback: (notification: any) => {
+          // TODO: Type?
+          setBadgeCount(notification.count);
         },
       });
     }
-  }, [ props.ecpOrigin, props.item.details.roomId ]);
+  }, [ecpOrigin, item.details.roomId]);
   return (
-    <tr className={`item-row ${props.isActive ? 'active' : ''} ${props.item.status === 'active' ? 'clickable' : ''}`} onClick={() => props.item.status === 'active' && props.onClick(props.item)}>
+    <tr
+      className={classNames("item-row", { active: isActive })}
+      onClick={() => onClick(item)}
+    >
       <td className="item-cell">{dealId}</td>
       <td className="item-cell">{lastUpdated}</td>
-      <td className="item-cell status"><div className="status-badge-cell"><div className={`status-badge ${status}`}>{status}</div></div></td>
+      <td className="item-cell status">
+        <div className="status-badge-cell">
+          <div className={`status-badge ${status}`}>{status}</div>
+        </div>
+      </td>
       <td className="item-cell">
         {name}
-        { badgeCount ?
-        (<div className='badge-count-container'><div className="badge-count">{badgeCount}</div></div>) : null
-        }
+        {badgeCount ? (
+          <div className="badge-count-container">
+            <div className="badge-count">{badgeCount}</div>
+          </div>
+        ) : null}
       </td>
-
     </tr>
-  )
+  );
 };
