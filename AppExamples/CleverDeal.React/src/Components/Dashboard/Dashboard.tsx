@@ -1,34 +1,41 @@
-import './Dashboard.scss';
-import { DashboardItemInterface } from '../../Models';
-import { DashboardItem } from '..';
+import "./Dashboard.scss";
+import { DealInterface } from "../../Models";
+import { DashboardItem } from "..";
 
 export interface DashboardProps {
-  dashboardItems: DashboardItemInterface[];
+  dashboardItems: DealInterface[];
   selectedDealId?: string;
-  onDashboardItemClick: (item: DashboardItemInterface) => any;
+  onDashboardItemClick: (item: DealInterface) => any;
   ecpOrigin: string;
 }
 
-export const Dashboard = (props: DashboardProps) => {
-  const onDashboardItemClick = (item: DashboardItemInterface) => {
-    props.onDashboardItemClick(item);
-  }
-  return (
-    <>
-      <table>
-        <thead>
-          <tr>
-            <th>Deal ID</th>
-            <th>Last Updated</th>
-            <th>Status</th>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {props.dashboardItems.map((item) => (<DashboardItem ecpOrigin={props.ecpOrigin} isActive={props.selectedDealId === item.dealId} onClick={onDashboardItemClick} key={item.dealId} item={item}></DashboardItem>))}
-        </tbody>
-      </table>
-    </>
-
-  );
-}
+export const Dashboard = ({
+  dashboardItems,
+  onDashboardItemClick,
+  ecpOrigin,
+  selectedDealId,
+}: DashboardProps) => (
+  <>
+    <table>
+      <thead>
+        <tr>
+          <th>Deal ID</th>
+          <th>Last Updated</th>
+          <th>Status</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {dashboardItems.map((item) => (
+          <DashboardItem
+            ecpOrigin={ecpOrigin}
+            isActive={selectedDealId === item.dealId}
+            onClick={onDashboardItemClick}
+            key={item.dealId}
+            item={item}
+          ></DashboardItem>
+        ))}
+      </tbody>
+    </table>
+  </>
+);

@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Chart, registerables } from "chart.js";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+} from "react";
 
 import { Icon } from "@symphony-ui/uitoolkit-components";
 import { useState } from "react";
@@ -9,19 +15,24 @@ import "./Graph.scss";
 import {
   CHART_COLORS,
   LABELS,
-  Scope,
   SYNC_CHART_SCOPE_INTENT,
+  Scope,
   numbers,
 } from "./Graph.utils";
+import classNames from "classnames";
 
 export interface GraphProps {
   dealId: string;
   dealName: string;
-  onShare: (scope: Scope) => any;
-  onShareScreenshot: (base64Image: string) => any;
+  onShare: ((scope: Scope) => any) | undefined;
+  onShareScreenshot: ((base64Image: string | undefined) => any) | undefined;
 }
 
-export function Graph(props: GraphProps) {
+export interface GraphRefType {
+  getChartImage: () => string | undefined;
+}
+
+const Graph = forwardRef((props: GraphProps, ref) => {
   const chartId = `chart-${props.dealId}`;
   const chartRef = useRef<HTMLCanvasElement>(null);
 
@@ -30,9 +41,9 @@ export function Graph(props: GraphProps) {
 
   useEffect(() => {
     (window as any).symphony.registerInterop((intent: any, context: any) => {
-    if (intent === SYNC_CHART_SCOPE_INTENT) {
+      if (intent === SYNC_CHART_SCOPE_INTENT) {
         setActiveScope(context.scope);
-    }
+      }
     });
     return () => {
       chart?.destroy();
@@ -75,25 +86,39 @@ export function Graph(props: GraphProps) {
     });
 
     setChart(newChart);
-  }, [activeScope]);
+  }, [props.dealId, activeScope]);
+
+  const getChartImage = () => chart?.toBase64Image("image/jpeg", 1);
+
+  useImperativeHandle(ref, () => ({
+    getChartImage,
+  }));
 
   const onShareScreenshot = () => {
     if (chart) {
-      props.onShareScreenshot(chart.toBase64Image("image/jpeg", 1));
+      props.onShareScreenshot?.(getChartImage());
     }
   };
 
   const onShare = () => {
     if (chart) {
-      props.onShare(activeScope);
+      props.onShare?.(activeScope);
     }
   };
 
   return (
     <>
       <div className="actions-container">
-        <Icon iconName="screenshot" onClick={onShareScreenshot} />
-        <Icon iconName="share" onClick={onShare} />
+        <Icon
+          iconName="screenshot"
+          onClick={onShareScreenshot}
+          className={classNames({ disabled: !props.onShareScreenshot })}
+        />
+        <Icon
+          iconName="share"
+          onClick={onShare}
+          className={classNames({ disabled: !props.onShare })}
+        />
       </div>
 
       <div className="chart-container">
@@ -103,4 +128,6 @@ export function Graph(props: GraphProps) {
       <ScopeToggle value={activeScope} onChange={setActiveScope} />
     </>
   );
-}
+});
+
+export default Graph;

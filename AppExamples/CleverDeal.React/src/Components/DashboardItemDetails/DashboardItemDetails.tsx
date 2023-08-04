@@ -1,212 +1,210 @@
-import React, { RefObject } from "react";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-
-import { DashboardItemInterface } from "../../Models";
-import { Graph, Loading } from "..";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useRef, useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import {
+  getCreateDealRoomMessage,
+  getShareMessage,
+  getShareScreenshotMessage,
+} from "../../Data/deals";
+import { DealInterface } from "../../Models";
+import Graph, { GraphRefType } from "../Graph/Graph";
+import { Scope } from "../Graph/Graph.utils";
 import "./DashboardItemDetails.scss";
-import { Scope, SYNC_CHART_SCOPE_INTENT } from "../Graph/Graph.utils";
 
 const TABS = {
   DETAILS: "Details",
   HISTORY: "History",
   CHAT: "Chat",
 };
-export interface DashboardItemDetailsState {
-  sdkLoading: boolean;
-  selectedTab: number;
-}
-export interface DashboardItemDetailsProps {
-  deal: DashboardItemInterface;
+
+interface DashboardItemDetailsProps {
+  deal: DealInterface;
   ecpOrigin: string;
   onClose: () => any;
+  updateDealHandler: (newDeal: DealInterface) => any;
 }
 
-export class DashboardItemDetails extends React.PureComponent<
-  DashboardItemDetailsProps,
-  DashboardItemDetailsState
-> {
-  private chatId: string;
-  private chatRef: RefObject<HTMLDivElement>;
+const CHAT_ID_PREFIX = `symphony-ecm-deal-chat`;
+const CHAT_CONTAINER_CLASS = "chat-container";
 
-  constructor(props: DashboardItemDetailsProps) {
-    super(props);
-    this.chatId = `symphony-ecm-${props.deal.dealId}-${Date.now()}`;
-    this.chatRef = React.createRef();
-    this.state = { sdkLoading: true, selectedTab: 0 };
-  }
+const DashboardItemDetails: React.FC<DashboardItemDetailsProps> = ({
+  deal,
+  ecpOrigin,
+  onClose,
+  updateDealHandler,
+}) => {
+  const roomId = deal.details?.roomId?.[ecpOrigin];
 
-  private openStream = () => {
-    const roomId = this.props.deal.details.roomId?.[this.props.ecpOrigin];
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const graphRef = useRef<GraphRefType>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  const getChatId = () =>
+    document.querySelector(`.${CHAT_CONTAINER_CLASS}`)?.id;
+
+  useEffect(() => {
+    const container = document.querySelector(`.${CHAT_CONTAINER_CLASS}`);
+    const id = CHAT_ID_PREFIX + Date.now();
+
+    if (container) {
+      container.innerHTML = "";
+      container.id = id;
+    }
+  }, []);
+
+  const openOrCreateStream = () => {
     if (roomId) {
-      return (window as any).symphony.openStream(roomId, `#${this.chatId}`);
-    }
-  };
-
-  componentDidMount() {
-    this.openStream().then(() => {
-    this.setState({ sdkLoading: false });
-    console.log("FULLY LOADED");
-    });
-  }
-
-  componentDidUpdate(previousProps: DashboardItemDetailsProps) {
-    if (previousProps.deal.dealId !== this.props.deal.dealId) {
-      this.openStream();
-    }
-  }
-
-  displayTab = (tabName: string) =>
-    this.setState({ selectedTab: Object.values(TABS).indexOf(tabName) });
-
-  onShareScreenshot = (b64Image: string) => {
-    const roomId = this.props.deal.details.roomId?.[this.props.ecpOrigin];
-    if (!roomId) {
-      return;
-    }
-
-    const message = {
-      text: {
-        "text/markdown": "",
-      },
-      entities: {
-        attachmentImage: {
-          type: "fdc3.fileAttachment",
-          data: {
-            name: "graph.jpeg",
-            dataUri: b64Image,
-          },
-        },
-      },
-    };
-
-    this.displayTab(TABS.CHAT);
-
-    return (window as any).symphony.sendMessage(message, {
-      mode: "blast",
-      streamIds: [roomId],
-      users: [],
-      container: this.chatId,
-    });
-  };
-
-  onShare = (scope: Scope) => {
-    const roomId = this.props.deal.details.roomId?.[this.props.ecpOrigin];
-    if (!roomId) {
-      return;
-    }
-
-    this.displayTab(TABS.CHAT);
-
-    const message = {
-      text: {
-        "text/markdown": "",
-      },
-      entities: {
-        button1: {
-          type: "fdc3.fdc3Intent",
-          data: {
-            title: `View ${scope} Chart`,
-            intent: SYNC_CHART_SCOPE_INTENT,
-            context: {
-              type: "fdc3.chart.scope",
-              scope,
+      return (window as any).symphony.openStream(roomId, `#${getChatId()}`);
+    } else {
+      return (window as any).symphony
+        .createRoom(
+          deal.name + " room [" + Date.now() + "]",
+          [],
+          {},
+          `#${getChatId()}`
+        )
+        .then((response: { streamId: string }) => {
+          updateDealHandler({
+            ...deal,
+            status: "active",
+            details: {
+              ...deal.details,
+              roomId: {
+                [ecpOrigin]: response.streamId,
+              },
             },
-          },
-        },
-      },
-    };
+          });
 
-    return (window as any).symphony.sendMessage(message, {
+          const b64Image = graphRef.current?.getChartImage();
+          return (window as any).symphony.sendMessage(
+            getCreateDealRoomMessage(b64Image),
+            {
+              mode: "blast",
+              streamIds: [response.streamId],
+              users: [],
+              container: getChatId(),
+            }
+          );
+        });
+    }
+  };
+
+  useEffect(() => {
+    openOrCreateStream();
+  }, [deal.dealId]);
+
+  const displayTab = (tabName: string) => {
+    setSelectedTab(Object.values(TABS).indexOf(tabName));
+  };
+
+  const onShareScreenshot = (b64Image: string | undefined) => {
+    displayTab(TABS.CHAT);
+
+    return (window as any).symphony.sendMessage(
+      getShareScreenshotMessage(b64Image),
+      {
+        mode: "blast",
+        streamIds: [roomId],
+        users: [],
+        container: getChatId(),
+      }
+    );
+  };
+
+  const onShare = (scope: Scope) => {
+    displayTab(TABS.CHAT);
+
+    return (window as any).symphony.sendMessage(getShareMessage(scope), {
       mode: "blast",
       streamIds: [roomId],
       users: [],
-      container: this.chatId,
+      container: getChatId(),
     });
   };
 
-  render() {
-    const { name, details } = this.props.deal;
-    return (
-      <div className="dashboard-item-details">
-        <div className="dashboard-item-details-header">
-          <h2 className="title">{name}</h2>
-          <div className="close cross" onClick={() => this.props.onClose()}>
-            x
-          </div>
+  return (
+    <div className="dashboard-item-details">
+      <div className="dashboard-item-details-header">
+        <h2 className="title">{deal.name}</h2>
+        <div className="close cross" onClick={onClose}>
+          x
         </div>
-        <div className="graph">
-          <Graph
-            dealId={this.props.deal.dealId}
-            dealName={this.props.deal.name}
-            onShareScreenshot={this.onShareScreenshot}
-            onShare={this.onShare}
-          />
-        </div>
-        <div className="tabs">
-          <Tabs
-            forceRenderTabPanel={true}
-            selectedIndex={this.state.selectedTab}
-            onSelect={(index) => this.setState({ selectedTab: index })}
-          >
-            <TabList>
-              {Object.values(TABS).map((tabName) => (
-                <Tab key={tabName}>{tabName}</Tab>
-              ))}
-            </TabList>
-            <TabPanel>
-              <div className="deal-details">
-                <div className="deal-members">
-                  <div className="deal-detail-block-title">Members</div>
+      </div>
+      <div className="graph">
+        <Graph
+          ref={graphRef}
+          dealId={deal.dealId}
+          dealName={deal.name}
+          onShareScreenshot={roomId ? onShareScreenshot : undefined}
+          onShare={roomId ? onShare : undefined}
+        />
+      </div>
+      <div className="tabs">
+        <Tabs
+          forceRenderTabPanel={true}
+          selectedIndex={selectedTab}
+          onSelect={(index) => setSelectedTab(index)}
+        >
+          <TabList>
+            {Object.values(TABS).map((tabName) => (
+              <Tab key={tabName}>{tabName}</Tab>
+            ))}
+          </TabList>
+          <TabPanel>
+            <div className="deal-details">
+              <div className="deal-members">
+                <div className="deal-detail-block-title">Members</div>
+
+                {!!deal.details?.members?.length ? (
                   <ul>
-                    {this.props.deal.details.members?.map((member) => (
+                    {deal.details?.members?.map((member) => (
                       <li key={`list-item-${member.name}`}>{member.name}</li>
                     ))}
                   </ul>
-                </div>
-                <div className="deal-detail-block">
-                  <span className="deal-detail-block-title">Country</span>
-                  <span className="deal-detail-block-content">
-                    {details.country}
-                  </span>
-                </div>
-                <div className="deal-detail-block">
-                  <span className="deal-detail-block-title">Risk level</span>
-                  <span className="deal-detail-block-content">
-                    {details.riskLevel}
-                  </span>
-                </div>
-                <div className="deal-detail-block">
-                  <span className="deal-detail-block-title">Type</span>
-                  <span className="deal-detail-block-content">
-                    {details.type}
-                  </span>
-                </div>
-                <div className="deal-detail-block">
-                  <span className="deal-detail-block-title">Minimum</span>
-                  <span className="deal-detail-block-content">
-                    {details.minimum}
-                  </span>
-                </div>
+                ) : (
+                  <span className="deal-detail-block-content">None</span>
+                )}
               </div>
-            </TabPanel>
-            <TabPanel>
-              <h3>History</h3>
-            </TabPanel>
-            <TabPanel>
-              <div
-                className={`loader ${this.state.sdkLoading ? "loading" : ""}`}
-              >
-                <Loading animate={true} className="chat-loading"></Loading>
+              <div className="deal-detail-block">
+                <span className="deal-detail-block-title">Country</span>
+                <span className="deal-detail-block-content">
+                  {deal.details?.country}
+                </span>
               </div>
-              <div
-                ref={this.chatRef}
-                className="symphony-ecm-chat"
-                id={this.chatId}
-              ></div>
-            </TabPanel>
-          </Tabs>
-        </div>
+              <div className="deal-detail-block">
+                <span className="deal-detail-block-title">Risk level</span>
+                <span className="deal-detail-block-content">
+                  {deal.details?.riskLevel}
+                </span>
+              </div>
+              <div className="deal-detail-block">
+                <span className="deal-detail-block-title">Type</span>
+                <span className="deal-detail-block-content">
+                  {deal.details?.type}
+                </span>
+              </div>
+              <div className="deal-detail-block">
+                <span className="deal-detail-block-title">Minimum</span>
+                <span className="deal-detail-block-content">
+                  {deal.details?.minimum}
+                </span>
+              </div>
+            </div>
+          </TabPanel>
+          <TabPanel>
+            <h3>History</h3>
+          </TabPanel>
+          <TabPanel>
+            <div
+              ref={chatRef}
+              className={`symphony-ecm-chat ${CHAT_CONTAINER_CLASS}`}
+            ></div>
+          </TabPanel>
+        </Tabs>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+export default DashboardItemDetails;

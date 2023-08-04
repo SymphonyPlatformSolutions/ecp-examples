@@ -9,9 +9,9 @@ export interface Member {
   email: string;
 }
 
-export interface RoomIdMap extends Record<string, string> {};
+export interface RoomIdMap extends Record<string, string> {}
 
-export interface DashboardItemDetailsInterface {
+export interface DealDetailsInterface {
   roomId?: RoomIdMap;
   members: Member[];
   country: string;
@@ -20,10 +20,12 @@ export interface DashboardItemDetailsInterface {
   minimum: string;
 }
 
-export interface DashboardItemInterface {
+export type DealStatus = "active" | "inactive";
+
+export interface DealInterface {
   dealId: string;
   lastUpdated: string;
-  status: string;
+  status: DealStatus;
   name: string;
-  details: DashboardItemDetailsInterface;
+  details: DealDetailsInterface;
 }
