@@ -1,1 +1,3 @@
-export * from "./HelpButton";
+import { HelpButton } from "./HelpButton";
+
+export default HelpButton;

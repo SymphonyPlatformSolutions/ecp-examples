@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-import { FaHome } from "react-icons/fa";
 import {
   Navigate,
   Route,
@@ -7,10 +5,16 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { HelpButton, LandingPage, Loading, ThemePicker } from "..";
+import { createElement, useEffect, useState, useContext } from "react";
+import { FaHome } from "react-icons/fa";
+import { getEcpParam } from "../../Utils/utils";
 import { helpRoom } from "../../Data/deals";
 import { routes } from "../../Data/routes";
-import { getEcpParam } from "../../Utils/utils";
+import { ThemeState, ThemeContext } from '../../Theme/ThemeProvider';
+import HelpButton from "../HelpButton";
+import LandingPage from "../LandingPage";
+import Loading from "../Loading";
+import ThemePicker from "../ThemePicker";
 import "./app.scss";
 
 const DEFAULT_ORIGIN: string = "corporate.symphony.com";
@@ -27,10 +31,11 @@ const LargeLoading = () => (
 );
 
 export const App = () => {
-  const [loading, setLoading] = useState(true);
+  const [ loading, setLoading ] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const ecpProps = { ecpOrigin: ecpOriginParam };
+  const ecpProps = { ecpOrigin: ecpOriginParam, partnerId: partnerIdParam };
+  const { applyTheme } = useContext(ThemeContext) as ThemeState;
 
   useEffect(() => {
     const sdkScriptNode = document.createElement("script");
@@ -50,7 +55,10 @@ export const App = () => {
           ecpLoginPopup: true,
           allowedApps: "com.symphony.zoom,com.symphony.teams",
         })
-        .then(() => setLoading(false));
+        .then(() => {
+          applyTheme();
+          setLoading(false);
+        });
   }, []);
 
   const getAppLabel = () => {
@@ -84,7 +92,7 @@ export const App = () => {
             <Route
               key={route.path}
               {...route}
-              element={React.createElement(route.component, ecpProps)}
+              element={createElement(route.component, ecpProps)}
             />
           ))}
         <Route path="*" element={<Navigate to="/" replace />} />

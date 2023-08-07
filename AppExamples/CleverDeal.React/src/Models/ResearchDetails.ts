@@ -1,4 +1,4 @@
-interface RoomIdMap extends Record<string, string> {};
+import { RoomIdMap } from "../Models";
 
 export interface CustomerRoom {
   name: string;
@@ -9,4 +9,5 @@ export interface CustomerRoom {
 export interface ResearchData {
   coverageRoom: RoomIdMap;
   customerRooms: CustomerRoom[];
+  pdfFile: string;
 }

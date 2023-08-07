@@ -1,4 +1,4 @@
-import { Scope } from "../Graph/Graph.utils";
+import { Scope } from "../../Graph/Graph.utils";
 import "./ScopeToggle.scss";
 
 export interface ScopeToggleProps {

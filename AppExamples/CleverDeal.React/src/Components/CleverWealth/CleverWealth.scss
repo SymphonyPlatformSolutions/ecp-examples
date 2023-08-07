@@ -1,0 +1,81 @@
+.wealth-root {
+  height: calc(100vh - 7rem);
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+
+  @media only screen and (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+}
+.ecp {
+  height: 100%;
+}
+.ecp iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 1rem;
+
+  @media only screen and (max-width: 900px) {
+    flex-direction: row;
+    height: 26rem;
+    overflow: hidden;
+  }
+}
+.details > div {
+  flex: 1 1;
+  h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    padding: .5rem;
+    color: var(--on-primary-color);
+    background-color: var(--primary-color);
+    border-radius: .3rem;
+  }
+}
+.actions-container { display: none }
+.client-profile {
+  .client-card {
+    margin: 1rem 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    svg { font-size: 3rem }
+  }
+  .client-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem;
+  }
+  li {
+    margin: .5rem 0;
+    svg { margin-right: .5rem }
+  }
+}
+.reports {
+  h4 { margin: 1rem 0 0 .5rem }
+  ul { margin-top: 0 }
+  li { line-height: 1.5rem }
+  svg {
+    font-size: 1.5rem;
+    position: relative;
+    top: 0.4rem;
+    left: 0.4rem;
+    cursor: pointer;
+  }
+}

@@ -10,7 +10,7 @@ import {
 
 import { Icon } from "@symphony-ui/uitoolkit-components";
 import { useState } from "react";
-import ScopeToggle from "../ScopeToggle/ScopeToggle";
+import ScopeToggle from "./ScopeToggle/ScopeToggle";
 import "./Graph.scss";
 import {
   CHART_COLORS,
@@ -32,7 +32,7 @@ export interface GraphRefType {
   getChartImage: () => string | undefined;
 }
 
-const Graph = forwardRef((props: GraphProps, ref) => {
+export const Graph = forwardRef((props: GraphProps, ref) => {
   const chartId = `chart-${props.dealId}`;
   const chartRef = useRef<HTMLCanvasElement>(null);
 
@@ -40,11 +40,13 @@ const Graph = forwardRef((props: GraphProps, ref) => {
   const [activeScope, setActiveScope] = useState(Scope.YEAR);
 
   useEffect(() => {
-    (window as any).symphony.registerInterop((intent: any, context: any) => {
-      if (intent === SYNC_CHART_SCOPE_INTENT) {
-        setActiveScope(context.scope);
-      }
-    });
+    if ((window as any).symphony) {
+      (window as any).symphony.registerInterop((intent: any, context: any) => {
+        if (intent === SYNC_CHART_SCOPE_INTENT) {
+          setActiveScope(context.scope);
+        }
+      });
+    }
     return () => {
       chart?.destroy();
     };
@@ -129,5 +131,3 @@ const Graph = forwardRef((props: GraphProps, ref) => {
     </>
   );
 });
-
-export default Graph;

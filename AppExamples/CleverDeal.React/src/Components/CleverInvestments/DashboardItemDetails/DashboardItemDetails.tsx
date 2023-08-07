@@ -5,10 +5,10 @@ import {
   getCreateDealRoomMessage,
   getShareMessage,
   getShareScreenshotMessage,
-} from "../../Data/deals";
-import { DealInterface } from "../../Models";
-import Graph, { GraphRefType } from "../Graph/Graph";
-import { Scope } from "../Graph/Graph.utils";
+} from "../../../Data/deals";
+import { DealInterface } from "../../../Models";
+import { Graph, GraphRefType } from "../../Graph/Graph";
+import { Scope } from "../../Graph/Graph.utils";
 import "./DashboardItemDetails.scss";
 
 const TABS = {

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "./CleverInvestments.scss";
 
-import { Dashboard } from "..";
+import { Dashboard } from "./Dashboard";
 import { DealInterface } from "../../Models";
 
 import { INITIAL_DEALS } from "../../Data/deals";
-import DashboardItemDetails from "../DashboardItemDetails";
+import DashboardItemDetails from "./DashboardItemDetails";
 
 interface AppProps {
   ecpOrigin: string;
