@@ -1,6 +1,6 @@
 import "./Dashboard.scss";
-import { DealInterface } from "../../Models";
-import { DashboardItem } from "..";
+import { DealInterface } from "../../../Models";
+import { DashboardItem } from "../DashboardItem";
 
 export interface DashboardProps {
   dashboardItems: DealInterface[];

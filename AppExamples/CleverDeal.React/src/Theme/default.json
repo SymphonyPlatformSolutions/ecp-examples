@@ -22,7 +22,7 @@
       "id": "THEME_DARK",
       "name": "Dark",
       "colors": {
-        "primary": "#ECB365",
+        "primary": "#b98c4f",
         "secondary": "#03DAC6",
         "error": "#C51162",
         "background": "#041C32",

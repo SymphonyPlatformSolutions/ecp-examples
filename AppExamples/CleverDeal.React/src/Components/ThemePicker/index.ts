@@ -1,1 +1,3 @@
-export * from "./ThemePicker";
+import { ThemePicker } from "./ThemePicker";
+
+export default ThemePicker;

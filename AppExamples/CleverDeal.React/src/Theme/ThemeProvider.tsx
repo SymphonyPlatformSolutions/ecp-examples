@@ -1,31 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createContext } from 'react';
 import defaultThemes from './default.json';
 
-export const useTheme = () => {
-  const themes = defaultThemes.data;
-  const [theme, setTheme] = useState(defaultThemes.data.light);
-  const [themeLoaded, setThemeLoaded] = useState(false);
+export interface Theme {
+  id: string;
+  name: string;
+  colors: Record<string, string>;
+}
+export interface ThemeState {
+  theme: Theme;
+  setTheme: (mode: string) => void;
+  themes: Record<string, Theme>;
+  applyTheme: () => void;
+}
+export const ThemeContext = createContext<ThemeState | null>(null);
+export const ThemeProvider = ({ children } : any) => {
+  const themes = defaultThemes.data as Record<string, Theme>;
+  const [ theme, updateTheme ] = useState<Theme>();
 
-  const setMode = (mode: string) => {
-    const newTheme = (defaultThemes.data as any)[mode];
+  const setTheme = (mode: string) => {
+    const newTheme = themes[mode];
     if (newTheme) {
-      setTheme(newTheme);
+      updateTheme(newTheme);
       window.localStorage.setItem("currentTheme", mode);
     }
   };
 
-  useEffect(() => {
-    const currentTheme = window.localStorage.getItem("currentTheme");
-    if (currentTheme && (defaultThemes as any).data[currentTheme]) {
-      setTheme((defaultThemes as any).data[currentTheme])
-    } else {
-      setTheme(defaultThemes.data.light)
-      window.localStorage.setItem("currentTheme", 'light');
+  const applyTheme = () => {
+    if (!theme) {
+      return;
     }
-    setThemeLoaded(true);
-  }, []);
-
-  useEffect(() => {
     document.documentElement.style.setProperty('--primary-color', theme.colors.primary);
     document.documentElement.style.setProperty('--secondary-color', theme.colors.secondary);
     document.documentElement.style.setProperty('--error-color', theme.colors.error);
@@ -36,6 +39,7 @@ export const useTheme = () => {
     document.documentElement.style.setProperty('--on-background-color', theme.colors.onBackground);
     document.documentElement.style.setProperty('--on-surface-color', theme.colors.onSurface);
     document.documentElement.style.setProperty('--on-error-color', theme.colors.onError);
+
     const symphony = (window as any).symphony;
     if (symphony) {
       symphony.updateSettings({mode: theme.colors.symphonyMode});
@@ -55,7 +59,25 @@ export const useTheme = () => {
         textError: theme.colors.onError,
       });
     }
-  }, [theme])
+  };
 
-  return { theme, themeLoaded, setMode, themes }
+  useEffect(applyTheme, [ theme ]);
+
+  useEffect(() => {
+    const currentTheme = window.localStorage.getItem("currentTheme") as string;
+
+    if (currentTheme && (defaultThemes as any).data[currentTheme]) {
+      updateTheme((defaultThemes as any).data[currentTheme])
+    } else {
+      updateTheme(defaultThemes.data.light)
+      window.localStorage.setItem("currentTheme", 'light');
+    }
+  }, []);
+
+
+  return !theme ? <></> : (
+    <ThemeContext.Provider value={{ theme, setTheme, themes, applyTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  )
 }

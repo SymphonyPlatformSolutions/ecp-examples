@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useEffect, useState } from "react";
-import { DealInterface } from "../../Models";
+import { DealInterface } from "../../../Models";
 import "./DashboardItem.scss";
 
 export interface DashboardItemProps {
