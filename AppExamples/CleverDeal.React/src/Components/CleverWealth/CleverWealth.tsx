@@ -4,7 +4,6 @@ import {
 } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { getEcpParam } from "../../Utils/utils";
-import { helpRoom } from "../../Data/deals";
 import { ThemeState, ThemeContext } from '../../Theme/ThemeProvider';
 import { useContext, useEffect, Fragment } from 'react';
 import { wealthData } from "../../Data/wealth";
@@ -136,7 +135,7 @@ export const CleverWealth = () => (
       </div>
       <div className="app-header-settings">
         <ThemePicker />
-        <HelpButton ecpOrigin={ecpOrigin} helpRoom={helpRoom} />
+        <HelpButton ecpOrigin={ecpOrigin} />
       </div>
     </div>
     <WealthApp />

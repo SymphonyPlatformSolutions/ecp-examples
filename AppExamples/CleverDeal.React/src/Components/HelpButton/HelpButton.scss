@@ -1,4 +1,4 @@
-.help-button {
+.button {
     border-width: 0;
     border-radius: 4px;
     font-size: 1rem;
@@ -7,22 +7,29 @@
     padding: .6rem 1rem;
     cursor: pointer;
 }
-.minimised {
+.minimised-bar {
     position: fixed;
     bottom: 0;
     right: 1rem;
-    padding: 1rem;
-    color: var(--on-primary-color);
-    background-color: var(--primary-color);
-    box-shadow: 0 1rem 2rem 0 rgba(0, 0, 0, .3), 0 1rem 3rem 0 rgba(0, 0, 0, .3);
-    z-index: 2;
-    cursor: pointer;
-    user-select: none;
+    display: flex;
+    gap: 1rem;
+
+    .minimised {
+        padding: 1rem;
+        color: var(--on-primary-color);
+        background-color: var(--primary-color);
+        box-shadow:
+            0 1rem 2rem 0 rgba(0, 0, 0, .3),
+            0 1rem 3rem 0 rgba(0, 0, 0, .3);
+        z-index: 2;
+        cursor: pointer;
+        user-select: none;
+    }
 }
 .help-button:hover, .minimised:hover {
     opacity: .8;
 }
-#help-dialog {
+.help-dialog {
     padding: 0;
     border: 0;
     user-select: none;
@@ -31,10 +38,9 @@
     top: 25vh;
     left: 25vw;
     z-index: 2;
-    box-shadow: 0 1rem 2rem 0 rgba(0, 0, 0, .3), 0 1rem 3rem 0 rgba(0, 0, 0, .3);
-}
-#help-dialog::backdrop {
-    background: transparent;
+    box-shadow:
+        0 1rem 2rem 0 rgba(0, 0, 0, .3),
+        0 1rem 3rem 0 rgba(0, 0, 0, .3);
 }
 .app-bar {
     display: flex;
@@ -61,4 +67,18 @@
     width: 50vw;
     height: 50vh;
     overflow: hidden;
+}
+.max-dialog {
+    user-select: none;
+    border-radius: 0.5rem;
+    border: none;
+    color: var(--on-surface-color);
+    border: var(--on-background-color) 2px solid;
+    background-color: var(--surface-color);
+    text-align: center;
+
+    &::backdrop {
+        backdrop-filter: blur(0.5rem);
+    }
+    .button { margin-top: 1rem }
 }
