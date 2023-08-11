@@ -8,7 +8,6 @@ import {
 import { createElement, useEffect, useState, useContext } from "react";
 import { FaHome } from "react-icons/fa";
 import { getEcpParam } from "../../Utils/utils";
-import { helpRoom } from "../../Data/deals";
 import { routes } from "../../Data/routes";
 import { ThemeState, ThemeContext } from '../../Theme/ThemeProvider';
 import HelpButton from "../HelpButton";
@@ -38,6 +37,9 @@ export const App = () => {
   const { applyTheme } = useContext(ThemeContext) as ThemeState;
 
   useEffect(() => {
+    if ((window as any).symphony) {
+      return;
+    }
     const sdkScriptNode = document.createElement("script");
     sdkScriptNode.src = `https://${ecpOriginParam}${sdkPath}`;
     sdkScriptNode.id = "symphony-ecm-sdk";
@@ -59,7 +61,7 @@ export const App = () => {
           applyTheme();
           setLoading(false);
         });
-  }, []);
+  }, [ applyTheme ]);
 
   const getAppLabel = () => {
     const route = routes.find(({ path }) => `/${path}` === location.pathname);
@@ -81,7 +83,7 @@ export const App = () => {
         </div>
         <div className="app-header-settings">
           <ThemePicker />
-          <HelpButton ecpOrigin={ecpProps.ecpOrigin} helpRoom={helpRoom} />
+          <HelpButton ecpOrigin={ecpProps.ecpOrigin} />
         </div>
       </div>
       <Routes>

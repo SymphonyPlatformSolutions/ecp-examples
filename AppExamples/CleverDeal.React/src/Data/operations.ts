@@ -191,17 +191,24 @@ export const getTradeExceptionRoomName = (tradeException: TradeException) =>
 export const getMessageTable = (
   tradeException: TradeException,
   fields = Object.values(TradeField)
-) => {
-  return `<table>
+) => `<table>
   <thead>
-  <tr>${fields.map((field) => `<th>${TradeFieldLabels[field]}</th>`)}</tr>
+    <tr>
+      <th>Reference</th>
+      <th>${tradeException.entry1.reference}</th>
+      <th>${tradeException.entry2.reference}</th>
+    </tr>
   </thead>
   <tbody>
-  <tr>${fields.map((field) => `<th>${tradeException.entry1[field]}</th>`)}</tr>
-  <tr>${fields.map((field) => `<th>${tradeException.entry2[field]}</th>`)}</tr>
+    ${fields.filter((field) => field !== 'reference').map((field) => (
+      `<tr>
+        <td>${TradeFieldLabels[field]}</td>
+        <td>${tradeException.entry1[field]}</td>
+        <td>${tradeException.entry2[field]}</td>
+      </tr>`
+    )).join('')}
   </tbody>
   </table>`;
-};
 
 export const getTradeExceptionInitialMessage = (
   tradeException: TradeException,
@@ -209,8 +216,11 @@ export const getTradeExceptionInitialMessage = (
 ) => ({
   text: {
     "text/markdown": [
-      `### Trade Exception Resolution`,
-      `A conflict has been detected on field **${TradeFieldLabels[conflictingField]}**.`,
+      `**Trade Exception Resolution**`,
+      '&nbsp;',
+      `Conflict on field **${TradeFieldLabels[conflictingField]}**: *${tradeException.entry1[conflictingField]}* vs *${tradeException.entry2[conflictingField]}*`,
+      'Please select the correct value in the table above this chat',
+      '&nbsp;',
       getMessageTable(tradeException),
     ].join("\n"),
   },

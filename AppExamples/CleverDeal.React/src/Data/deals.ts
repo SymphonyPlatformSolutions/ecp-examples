@@ -2,7 +2,7 @@ import {
   SYNC_CHART_SCOPE_INTENT,
   Scope,
 } from "../Components/Graph/Graph.utils";
-import { DealInterface, RoomIdMap } from "../Models";
+import { DealInterface } from "../Models";
 
 const yannick = {
   id: "",
@@ -123,11 +123,6 @@ export const INITIAL_DEALS: DealInterface[] = [
   },
   ...generateInactiveDeals(12),
 ];
-
-export const helpRoom: RoomIdMap = {
-  "st3.symphony.com": "+Slk3L9bALdV8EW82EPCfX///ndFonF/dA==",
-  "corporate.symphony.com": "HASQkcT2VaQXxHKFPjFb9H///ndGbRFidA==",
-};
 
 export const getShareScreenshotMessage = (b64Image: string | undefined) => ({
   text: {
