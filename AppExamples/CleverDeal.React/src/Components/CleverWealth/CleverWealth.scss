@@ -11,13 +11,13 @@
     height: 100vh;
   }
 }
-.ecp {
+.wealth-root .ecp {
   height: 100%;
-}
-.ecp iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
 }
 .details {
   display: flex;
@@ -44,7 +44,15 @@
     border-radius: .3rem;
   }
 }
-.actions-container { display: none }
+.performance .actions-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  position: relative;
+  top: 1.5rem;
+  right: 0.3rem;
+  i.tk-icon-share { display: none }
+}
 .client-profile {
   .client-card {
     margin: 1rem 0.5rem;
