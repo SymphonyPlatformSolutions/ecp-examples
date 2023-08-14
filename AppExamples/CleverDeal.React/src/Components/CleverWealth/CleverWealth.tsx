@@ -4,10 +4,11 @@ import {
 } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { getEcpParam } from "../../Utils/utils";
+import { getShareScreenshotMessage } from "../../Data/deals";
+import { Graph, GraphRefType } from "../Graph/Graph";
 import { ThemeState, ThemeContext } from '../../Theme/ThemeProvider';
-import { useContext, useEffect, Fragment } from 'react';
+import { useContext, useEffect, useRef, Fragment } from 'react';
 import { wealthData } from "../../Data/wealth";
-import Graph from "../Graph";
 import HelpButton from "../HelpButton";
 import Loading from "../Loading";
 import ThemePicker from "../ThemePicker";
@@ -26,6 +27,7 @@ const LargeLoading = () => (
 );
 
 const WealthApp = () => {
+  const graphRef = useRef<GraphRefType>(null);
   const { applyTheme } = useContext(ThemeContext) as ThemeState;
 
   useEffect(() => {
@@ -72,6 +74,13 @@ const WealthApp = () => {
     });
   };
 
+  const handleShareScreenshot = (b64Image: string | undefined) =>
+    (window as any).symphony.sendMessage(
+      getShareScreenshotMessage(b64Image), {
+        mode: "blast",
+        streamIds: [ wealthData.wealthRoom[ecpOrigin] ],
+      });
+
   return (
     <div className="wealth-root">
       <div className="ecp">
@@ -101,10 +110,11 @@ const WealthApp = () => {
         <div className="performance">
           <h3>Performance</h3>
           <Graph
-            dealId=""
-            dealName=""
+            ref={graphRef}
+            dealId="Deal"
+            dealName="Portfolio Return"
+            onShareScreenshot={handleShareScreenshot}
             onShare={() => {}}
-            onShareScreenshot={() => {}}
           />
         </div>
         <div className="reports">
