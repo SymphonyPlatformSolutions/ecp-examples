@@ -23,8 +23,16 @@ export const LandingPage = () => {
   );
 
   return (
-    <div className="app-grid">
-      { routes.map((app) => <AppTile key={app.label} {...app} />) }
-    </div>
+    <>
+      <div className="app-grid">
+        { routes.map((app) => <AppTile key={app.label} {...app} />) }
+      </div>
+      <a
+        target="_blank" rel="noreferrer"
+        href="https://docs.google.com/document/d/1HKkfX1jKHpyQRfLz1ZG9cgYdrQcFobYFPZLxOUzavJY"
+      >
+        How to Demo Clever Deal 2.0
+      </a>
+    </>
   );
 };
