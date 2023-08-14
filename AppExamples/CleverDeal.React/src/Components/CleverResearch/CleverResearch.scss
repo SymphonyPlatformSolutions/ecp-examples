@@ -10,9 +10,9 @@
     border-radius: .5rem;
     display: flex;
     flex-direction: column;
-    width: 85%;
+    width: 95%;
     min-width: 50rem;
-    height: calc(90% - 4px);
+    height: calc(95% - 4px);
     min-height: 35rem;
     background-color: var(--surface-color);
     > * { padding: 1.2rem }
@@ -41,6 +41,10 @@
     grid-template-rows: 1fr 2fr;
     grid-template-columns: 1fr 1.2fr;
     gap: 1rem;
+    > * {
+        display: flex;
+        flex-direction: column;
+    }
 }
 .table {
     > * {
@@ -66,3 +70,9 @@
 }
 .research-list .table { grid-template-columns: 3fr 1fr 1fr 2rem }
 .client-list .table { grid-template-columns: 1.5fr 2fr 1fr 2rem }
+.ecp {
+    display: flex;
+    flex: 1 1 1px;
+    outline: 1px solid grey;
+    border-radius: 0.5rem;
+}

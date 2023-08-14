@@ -107,7 +107,10 @@ export const CleverResearch = (props: AppProps) => {
               </div>
             </div>
           </div>
-          <div className="coverage-ecp"></div>
+          <div>
+            <h3>Coverage Room</h3>
+            <div className="ecp coverage-ecp"></div>
+          </div>
           <div className="client-list">
             <h3>Clients</h3>
             <div className="table">
@@ -131,7 +134,10 @@ export const CleverResearch = (props: AppProps) => {
               ))}
             </div>
           </div>
-          <div className="client-ecp"></div>
+          <div>
+            <h3>Client Room</h3>
+            <div className="ecp client-ecp"></div>
+          </div>
         </div>
       </div>
     </div>
