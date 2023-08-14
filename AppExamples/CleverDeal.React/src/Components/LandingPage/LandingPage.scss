@@ -8,6 +8,13 @@
   text-align: center;
   gap: 1.5rem;
 }
+.app-grid + a {
+  opacity: 0.7;
+  color: var(--on-background-color);
+  text-decoration: none;
+  padding: 1rem;
+  align-self: end;
+}
 .app-tile {
   position: relative;
   > * { margin: 0 }
