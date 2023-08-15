@@ -1,18 +1,9 @@
-import { useNavigate } from 'react-router-dom';
 import { routes, AppEntry } from '../../Data/routes';
 import './LandingPage.scss';
 
 export const LandingPage = () => {
-  const navigate = useNavigate();
-
-  const goto = (path : string | undefined) => {
-    if (path) {
-      if (path !== 'wealth') {
-        navigate(path);
-      } else {
-        window.location.href = path;
-      }
-    }
+  const goto = (path : string) => {
+    window.location.href = path;
   };
 
   const AppTile = ({ label, path, component } : AppEntry) => (

@@ -37,6 +37,10 @@ export const App = () => {
   const { applyTheme } = useContext(ThemeContext) as ThemeState;
 
   useEffect(() => {
+    if (location.pathname === '/') {
+      setLoading(false);
+      return;
+    }
     if ((window as any).symphony) {
       return;
     }
@@ -61,7 +65,7 @@ export const App = () => {
           applyTheme();
           setLoading(false);
         });
-  }, [ applyTheme ]);
+  }, [ applyTheme, location.pathname ]);
 
   const getAppLabel = () => {
     const route = routes.find(({ path }) => `/${path}` === location.pathname);

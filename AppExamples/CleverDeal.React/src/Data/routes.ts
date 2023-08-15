@@ -5,8 +5,8 @@ import CleverWealth from "../Components/CleverWealth";
 
 export interface AppEntry {
   label: string;
-  path?: string;
-  component?: any;
+  path: string;
+  component: any;
 }
 export const routes: AppEntry[] = [
   { label: "Investments", path: "investments", component: CleverInvestments },
