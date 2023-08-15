@@ -7,7 +7,7 @@ import { getEcpParam } from "../../Utils/utils";
 import { getShareScreenshotMessage } from "../../Data/deals";
 import { Graph, GraphRefType } from "../Graph/Graph";
 import { ThemeState, ThemeContext } from '../../Theme/ThemeProvider';
-import { useContext, useEffect, useRef, Fragment } from 'react';
+import { useContext, useEffect, useState, useRef, Fragment } from 'react';
 import { wealthData } from "../../Data/wealth";
 import HelpButton from "../HelpButton";
 import Loading from "../Loading";
@@ -20,13 +20,11 @@ const partnerId = getEcpParam("partnerId");
 const DEFAULT_SDK_PATH: string = "/embed/sdk.js";
 const sdkPath = getEcpParam("sdkPath", false) || DEFAULT_SDK_PATH;
 
-const LargeLoading = () => (
-  <div className="large-loading">
-    <Loading animate={true} className="logo"></Loading>
-  </div>
-);
+interface WealthProps {
+  setLoading: (loading : boolean) => void;
+}
 
-const WealthApp = () => {
+const WealthApp = ({ setLoading } : WealthProps) => {
   const graphRef = useRef<GraphRefType>(null);
   const { applyTheme } = useContext(ThemeContext) as ThemeState;
 
@@ -53,9 +51,12 @@ const WealthApp = () => {
         condensed: true,
         allowedApps: "com.symphony.zoom,com.symphony.teams",
       })
-      .then(applyTheme);
+      .then(() => {
+        setLoading(false);
+        applyTheme();
+      });
     }
-  }, [ applyTheme ]);
+  }, [ applyTheme, setLoading ]);
 
   const share = (file : string) => {
     const payload = {
@@ -83,9 +84,7 @@ const WealthApp = () => {
 
   return (
     <div className="wealth-root">
-      <div className="ecp">
-        <LargeLoading />
-      </div>
+      <div className="ecp"></div>
       <div className="details">
         <div className="client-profile">
           <h3>Client Profile</h3>
@@ -135,19 +134,22 @@ const WealthApp = () => {
   );
 };
 
-export const CleverWealth = () => (
-  <div className="App">
-    <div className="app-header">
-      <div className="brand" onClick={() => window.location.href = '/'}>
-        <FaHome />
-        <Loading animate={false} className="logo"></Loading>
-        <h1>Clever Deal 2.0: Wealth</h1>
+export const CleverWealth = () => {
+  const [ loading, setLoading ] = useState(true);
+  return (
+    <div className="App">
+      <div className="app-header">
+        <div className="brand" onClick={() => window.location.href = '/'}>
+          <FaHome />
+          <Loading animate={false} className="logo"></Loading>
+          <h1>Clever Deal 2.0: Wealth</h1>
+        </div>
+        <div className="app-header-settings">
+          <ThemePicker />
+          <HelpButton disabled={loading} ecpOrigin={ecpOrigin} />
+        </div>
       </div>
-      <div className="app-header-settings">
-        <ThemePicker />
-        <HelpButton ecpOrigin={ecpOrigin} />
-      </div>
+      <WealthApp setLoading={setLoading} />
     </div>
-    <WealthApp />
-  </div>
-);
+  );
+};

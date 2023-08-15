@@ -7,6 +7,10 @@
     padding: .6rem 1rem;
     cursor: pointer;
 }
+.button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 .minimised-bar {
     position: fixed;
     bottom: 0;

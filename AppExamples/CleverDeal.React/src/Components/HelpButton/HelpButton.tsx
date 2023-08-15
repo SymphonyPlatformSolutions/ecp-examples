@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import Draggable from "react-draggable";
 
 export interface HelpButtonProps {
+  disabled: boolean;
   ecpOrigin: string;
 }
 
@@ -16,22 +17,15 @@ export const HelpButton = (props: HelpButtonProps) => {
   const [ currentSlot, setCurrentSlot ] = useState(0);
   const [ chatIndex, setChatIndex ] = useState(1);
   const [ chatIndexes, setChatIndexes ] = useState([ 0, 0 ]);
-
-  const helpDialogVisible = () => {
-    const dialog1 = dialogRefs[0].current as any;
-    const dialog2 = dialogRefs[1].current as any;
-    return (
-      (dialog1.open && dialog1.style.visibility === "visible") ||
-      (dialog2.open && dialog2.style.visibility === "visible")
-    );
-  };
+  const [ dialogVisible, setDialogVisible ] = useState(false);
 
   const launchHelp = () => {
     const isFullCollab = location.pathname === '/wealth';
 
-    if (helpDialogVisible()) {
+    if (dialogVisible) {
       return;
     }
+    setDialogVisible(true);
     if (currentSlot > 1) {
       (maxDialogRef.current as any).showModal();
       return;
@@ -78,6 +72,7 @@ export const HelpButton = (props: HelpButtonProps) => {
       dialog.style.visibility === "hidden" ? "visible" : "hidden";
     minimised.style.display =
       minimised.style.display === "none" ? "block" : "none";
+    setDialogVisible(minimised.style.display === "none");
   };
 
   const closeHelp = (slot: number) => {
@@ -86,11 +81,16 @@ export const HelpButton = (props: HelpButtonProps) => {
       ref.close();
     }
     setCurrentSlot(slot);
+    setDialogVisible(false);
   };
 
   const getHelpDialog = (slot: number, ref: any) => (
     <Draggable nodeRef={ref} key={`dialog-${slot}`}>
-      <dialog className="help-dialog" ref={ref}>
+      <dialog
+        ref={ref}
+        className="help-dialog"
+        style={{ "visibility": "visible" }}
+      >
         <div className="app-bar">
           <div>Help Chat {chatIndexes[slot]}</div>
           <div className="action-buttons">
@@ -121,7 +121,11 @@ export const HelpButton = (props: HelpButtonProps) => {
 
   return (
     <>
-      <button className="button" onClick={launchHelp}>
+      <button
+        disabled={props.disabled || dialogVisible}
+        className="button"
+        onClick={launchHelp}
+      >
         Help
       </button>
 

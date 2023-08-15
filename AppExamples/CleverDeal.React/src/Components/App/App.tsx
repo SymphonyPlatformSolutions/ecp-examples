@@ -37,10 +37,6 @@ export const App = () => {
   const { applyTheme } = useContext(ThemeContext) as ThemeState;
 
   useEffect(() => {
-    if (location.pathname === '/') {
-      setLoading(false);
-      return;
-    }
     if ((window as any).symphony) {
       return;
     }
@@ -72,7 +68,7 @@ export const App = () => {
     return route ? `: ${route.label}` : "";
   };
 
-  return loading ? (
+  return (loading && location.pathname !== '/') ? (
     <LargeLoading />
   ) : (
     <div className="App">
@@ -87,7 +83,7 @@ export const App = () => {
         </div>
         <div className="app-header-settings">
           <ThemePicker />
-          <HelpButton ecpOrigin={ecpProps.ecpOrigin} />
+          <HelpButton disabled={loading} ecpOrigin={ecpProps.ecpOrigin} />
         </div>
       </div>
       <Routes>
