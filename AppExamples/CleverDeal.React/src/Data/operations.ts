@@ -28,7 +28,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
       reference: "E18389829323",
     },
     entry2: {
-      executingParty: "ABC Broker",
+      executingParty: "Capital Management",
       securityIsin: "US88160R1014",
       tradeType: "BUY",
       price: 238.54,
@@ -46,7 +46,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
   },
   {
     entry1: {
-      executingParty: "XY HF",
+      executingParty: "ABC Broker",
       securityIsin: "US5949181045",
       tradeType: "SELL",
       price: 67.69,
@@ -71,7 +71,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
   },
   {
     entry1: {
-      executingParty: "1x IDB",
+      executingParty: "ABC Broker",
       securityIsin: "ES0105066007",
       tradeType: "BUY",
       price: 54.5,
@@ -96,7 +96,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
   },
   {
     entry1: {
-      executingParty: "Global Traders",
+      executingParty: "ABC Broker",
       securityIsin: "GB0005405286",
       tradeType: "SELL",
       price: 36.2,
@@ -121,7 +121,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
   },
   {
     entry1: {
-      executingParty: "Alpha Investments",
+      executingParty: "ABC Broker",
       securityIsin: "FR0000131104",
       tradeType: "BUY",
       price: 42.9,
@@ -147,7 +147,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
 
   {
     entry1: {
-      executingParty: "Wealth Managers",
+      executingParty: "ABC Broker",
       securityIsin: "CH0038863350",
       tradeType: "BUY",
       price: 91.8,

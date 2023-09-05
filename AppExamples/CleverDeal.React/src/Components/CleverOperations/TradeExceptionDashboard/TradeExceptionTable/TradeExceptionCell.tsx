@@ -27,6 +27,7 @@ const TradeExceptionCell = ({
         selectable: isCellSelectable,
         selected: selectedValue !== undefined && value === selectedValue,
         discarded: selectedValue !== undefined && value !== selectedValue,
+        bold: field === 'executingParty' && value === 'ABC Broker',
       })}
       onClick={() => isCellSelectable && onConflictCellSelect(value)}
     >
