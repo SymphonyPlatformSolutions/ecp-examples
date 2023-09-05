@@ -49,7 +49,7 @@ const WealthApp = ({ setLoading } : WealthProps) => {
         streamId: wealthData.wealthRoom[ecpOrigin],
         ecpLoginPopup: true,
         condensed: true,
-        allowedApps: "com.symphony.zoom,com.symphony.teams",
+        allowedApps: "com.symphony.zoom,com.symphony.teams,salesforce2-app",
       })
       .then(() => {
         setLoading(false);
