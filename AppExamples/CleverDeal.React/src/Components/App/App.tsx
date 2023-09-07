@@ -56,6 +56,7 @@ export const App = () => {
           showTitle: false,
           ecpLoginPopup: true,
           allowedApps: "com.symphony.zoom,com.symphony.teams",
+          sound: false,
         })
         .then(() => {
           applyTheme();

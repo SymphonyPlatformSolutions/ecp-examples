@@ -50,6 +50,7 @@ const WealthApp = ({ setLoading } : WealthProps) => {
         ecpLoginPopup: true,
         condensed: true,
         allowedApps: "com.symphony.zoom,com.symphony.teams,salesforce2-app",
+        sound: false,
       })
       .then(() => {
         setLoading(false);
