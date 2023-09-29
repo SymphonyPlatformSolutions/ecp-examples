@@ -4,6 +4,5 @@ node_modules
 dist
 coverage
 .project
-
-yarn.lock
+build
 package-lock.json
