@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect } from "react";
 import { AiOutlineShareAlt } from "react-icons/ai";
 import { BsChatDotsFill } from "react-icons/bs";
 import { researchData } from "../../Data/research";
@@ -9,31 +9,16 @@ interface AppProps {
 }
 
 export const CleverResearch = (props: AppProps) => {
-  const [clientEcpId, setClientEcpId] = useState("");
-
   useEffect(() => {
-    const roomId = researchData.coverageRoom[props.ecpOrigin];
-    const container = document.querySelector(".coverage-ecp");
-    if (container) {
-      container.innerHTML = "";
-      container.id = `coverage-ecp-${Date.now()}`;
-      (window as any).symphony.openStream(roomId, `#${container.id}`);
-    }
+    const coverageRoomId = researchData.coverageRoom[props.ecpOrigin];
+    (window as any).symphony.openStream(coverageRoomId, '.coverage-ecp');
 
-    openClientChat(
-      researchData.customerRooms.map((c) => c.roomId[props.ecpOrigin])[0]
-    );
+    const firstClientRoomId = researchData.customerRooms.map((c) => c.roomId[props.ecpOrigin])[0];
+    openClientChat(firstClientRoomId);
   }, [props.ecpOrigin]);
 
-  const openClientChat = (streamId: string) => {
-    const container = document.querySelector(".client-ecp");
-    if (container) {
-      container.innerHTML = "";
-      container.id = `client-ecp-${Date.now()}`;
-      setClientEcpId(container.id);
-      (window as any).symphony.openStream(streamId, `#${container.id}`);
-    }
-  };
+  const openClientChat = (streamId: string) =>
+    (window as any).symphony.openStream(streamId, '.client-ecp');
 
   const blastReport = () => {
     const payload = {
@@ -50,7 +35,7 @@ export const CleverResearch = (props: AppProps) => {
       streamIds: researchData.customerRooms.map(
         (c) => c.roomId[props.ecpOrigin]
       ),
-      container: `#${clientEcpId}`,
+      container: 'client-ecp',
     });
   };
 
