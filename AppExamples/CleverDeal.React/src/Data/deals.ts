@@ -78,6 +78,7 @@ export const INITIAL_DEALS: DealInterface[] = [
       roomId: {
         "st3.symphony.com": "Cm2ZKi4E3qdH8NqUt4BHQH///oCvvlv6dA==",
         "corporate.symphony.com": "VkaN/ZxK+37EYQLBiKHyNH///ncESK8ndA==",
+        "preview.symphony.com": "vD0QMTD0IeTviyPlDriyS3///nUHWH8TdA==",
       },
       country: "France",
       riskLevel: "Medium",
@@ -96,6 +97,7 @@ export const INITIAL_DEALS: DealInterface[] = [
       roomId: {
         "st3.symphony.com": "egJ5XAdOKzC+1f42Zhewy3///oCvvdYAdA==",
         "corporate.symphony.com": "eboDMTcQT4GsDk6AjQP3zn///n8cy6jVdA==",
+        "preview.symphony.com": "jY1WJbxuydIN+CjetRcWgn///nUHVtL2dA==",
       },
       country: "China",
       riskLevel: "High",
@@ -114,6 +116,7 @@ export const INITIAL_DEALS: DealInterface[] = [
       roomId: {
         "st3.symphony.com": "egJ5XAdOKzC+1f42Zhewy3///oCvvdYAdA==",
         "corporate.symphony.com": "m4okqNL/fAtDdRBhVOxloX///n8cyzwNdA==",
+        "preview.symphony.com": "gDd2EuVMutPw/NncbCkwFH///nUHVgTCdA==",
       },
       country: "USA",
       riskLevel: "Low",
