@@ -42,6 +42,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
     streamId: {
       "corporate.symphony.com": "SKFW0sGWPuZM9EagQpotin///nZkSTrCdA==",
       "st3.symphony.com": "xcOpL0MuJjmIVbq22DpFA3///nZtMty9dA==",
+      "preview.symphony.com": "t9KU+xY4WOKj6Y+Zvrxc+H///nUHUhaadA==",
     } as RoomIdMap,
   },
   {
@@ -178,6 +179,7 @@ export const TRADE_TARGET_SYM_IDS = {
   userId: {
     "corporate.symphony.com": "99986838651014",
     "st3.symphony.com": "9139691040326",
+    "preview.symphony.com": "99986838651014",
   } as RoomIdMap,
 };
 

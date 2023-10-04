@@ -11,6 +11,7 @@ export const wealthData : WealthData = {
   wealthRoom: {
     "st3.symphony.com": "oCQx1R2K7mYcrI8z6/4NSX///nYr1OKEdA==",
     "corporate.symphony.com": "ZFLJvom6ah5U0tr39vNGlX///nZE+r6KdA==",
+    "preview.symphony.com": "ZFLJvom6ah5U0tr39vNGlX///nZE+r6KdA==",
   },
   reports: [
     {

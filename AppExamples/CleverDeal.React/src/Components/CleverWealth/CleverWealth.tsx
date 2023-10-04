@@ -14,7 +14,9 @@ import Loading from "../Loading";
 import ThemePicker from "../ThemePicker";
 import "../App/app.scss";
 import "./CleverWealth.scss";
+import PodPicker from "../PodPicker";
 
+const DEFAULT_PARTNER_ID: string = "symphony_internal_BYC-XXX";
 const ecpOrigin = getEcpParam("ecpOrigin") || "corporate.symphony.com";
 const partnerId = getEcpParam("partnerId");
 const DEFAULT_SDK_PATH: string = "/embed/sdk.js";
@@ -40,6 +42,8 @@ const WealthApp = ({ setLoading } : WealthProps) => {
     sdkScriptNode.setAttribute("data-onload", "renderEcp");
     if (partnerId) {
       sdkScriptNode.setAttribute("data-partner-id", partnerId);
+    } else if (ecpOrigin !== 'st3.symphony.com') {
+      sdkScriptNode.setAttribute("data-partner-id", DEFAULT_PARTNER_ID);
     }
     document.body.appendChild(sdkScriptNode);
 
@@ -146,6 +150,7 @@ export const CleverWealth = () => {
           <h1>Clever Deal 2.0: Wealth</h1>
         </div>
         <div className="app-header-settings">
+          <PodPicker />
           <ThemePicker />
           <HelpButton disabled={loading} ecpOrigin={ecpOrigin} />
         </div>

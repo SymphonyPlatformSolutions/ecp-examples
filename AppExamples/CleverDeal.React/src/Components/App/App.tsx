@@ -15,8 +15,10 @@ import LandingPage from "../LandingPage";
 import Loading from "../Loading";
 import ThemePicker from "../ThemePicker";
 import "./app.scss";
+import PodPicker from "../PodPicker";
 
 const DEFAULT_ORIGIN: string = "corporate.symphony.com";
+const DEFAULT_PARTNER_ID: string = "symphony_internal_BYC-XXX";
 const ecpOriginParam = getEcpParam("ecpOrigin") || DEFAULT_ORIGIN;
 const partnerIdParam = getEcpParam("partnerId");
 
@@ -47,6 +49,8 @@ export const App = () => {
     sdkScriptNode.setAttribute("data-onload", "renderRoom");
     if (partnerIdParam) {
       sdkScriptNode.setAttribute("data-partner-id", partnerIdParam);
+    } else if (ecpOriginParam !== 'st3.symphony.com') {
+      sdkScriptNode.setAttribute("data-partner-id", DEFAULT_PARTNER_ID);
     }
     document.body.appendChild(sdkScriptNode);
 
@@ -83,6 +87,7 @@ export const App = () => {
           </h1>
         </div>
         <div className="app-header-settings">
+          <PodPicker />
           <ThemePicker />
           <HelpButton disabled={loading} ecpOrigin={ecpProps.ecpOrigin} />
         </div>

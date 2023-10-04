@@ -1,0 +1,28 @@
+.pod-picker {
+  width: 9rem;
+  .pod-picker__control,
+  .pod-picker__menu {
+    background-color: var(--surface-color);
+  }
+  .pod-picker__single-value {
+    color: var(--on-surface-color);
+  }
+  .pod-picker__option--is-selected {
+    color: var(--on-primary-color);
+    background-color: var(--primary-color);
+  }
+  .pod-picker__option--is-focused {
+    color: var(--on-secondary-color);
+    background-color: var(--secondary-color);
+  }
+  .pod-picker__control {
+    border-color: var(--primary-color);
+  }
+  .pod-picker__control--is-focused {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 1px var(--primary-color);
+  }
+  .pod-picker__indicator {
+    color: var(--primary-color);
+  }
+}
