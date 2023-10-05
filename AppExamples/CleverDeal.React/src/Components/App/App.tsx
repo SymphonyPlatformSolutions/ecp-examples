@@ -23,7 +23,7 @@ const ecpOriginParam = getEcpParam("ecpOrigin") || DEFAULT_ORIGIN;
 const partnerIdParam = getEcpParam("partnerId");
 
 const DEFAULT_SDK_PATH: string = "/embed/sdk.js";
-const sdkPath = getEcpParam("sdkPath", false) || DEFAULT_SDK_PATH;
+const sdkPath = getEcpParam("sdkPath") || DEFAULT_SDK_PATH;
 
 const LargeLoading = () => (
   <div className="large-loading">

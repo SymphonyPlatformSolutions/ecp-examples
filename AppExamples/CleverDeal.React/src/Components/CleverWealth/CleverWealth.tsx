@@ -20,7 +20,7 @@ const DEFAULT_PARTNER_ID: string = "symphony_internal_BYC-XXX";
 const ecpOrigin = getEcpParam("ecpOrigin") || "corporate.symphony.com";
 const partnerId = getEcpParam("partnerId");
 const DEFAULT_SDK_PATH: string = "/embed/sdk.js";
-const sdkPath = getEcpParam("sdkPath", false) || DEFAULT_SDK_PATH;
+const sdkPath = getEcpParam("sdkPath") || DEFAULT_SDK_PATH;
 
 interface WealthProps {
   setLoading: (loading : boolean) => void;
