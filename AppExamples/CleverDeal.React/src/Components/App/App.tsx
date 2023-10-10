@@ -59,6 +59,7 @@ export const App = () => {
         .render("symphony-ecm", {
           showTitle: false,
           ecpLoginPopup: true,
+          canAddPeople: true,
           allowedApps: "com.symphony.zoom,com.symphony.teams",
           sound: false,
         })
