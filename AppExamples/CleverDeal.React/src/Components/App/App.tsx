@@ -46,7 +46,7 @@ export const App = () => {
     sdkScriptNode.src = `https://${ecpOriginParam}${sdkPath}`;
     sdkScriptNode.id = "symphony-ecm-sdk";
     sdkScriptNode.setAttribute("render", "explicit");
-    sdkScriptNode.setAttribute("data-onload", "renderRoom");
+    sdkScriptNode.setAttribute("data-onload", "onLoad");
     if (partnerIdParam) {
       sdkScriptNode.setAttribute("data-partner-id", partnerIdParam);
     } else if (ecpOriginParam !== 'st3.symphony.com') {
@@ -54,19 +54,31 @@ export const App = () => {
     }
     document.body.appendChild(sdkScriptNode);
 
-    (window as any).renderRoom = () =>
-      (window as any).symphony
-        .render("symphony-ecm", {
-          showTitle: false,
-          ecpLoginPopup: true,
-          canAddPeople: true,
-          allowedApps: "com.symphony.zoom,com.symphony.teams",
-          sound: false,
-        })
-        .then(() => {
-          applyTheme();
-          setLoading(false);
-        });
+    (window as any).onLoad = async () => {
+      const symphony = (window as any).symphony;
+      const config = {
+        showTitle: false,
+        allowedApps: "com.symphony.zoom,com.symphony.teams",
+        sound: false,
+        canAddPeople: true,
+      };
+      const { isLoggedIn, authenticationType } = await symphony.checkAuth(null);
+      if (!isLoggedIn) {
+        console.debug('ECP not logged in')
+        if (authenticationType === 'password') {
+          console.debug('ECP pod uses password')
+          await symphony.render("symphony-ecm", config, true);
+        } else {
+          console.debug('ECP pod uses SSO')
+          await symphony.render("symphony-ecm", { ...config, ecpLoginPopup: true });
+        }
+      } else {
+        console.debug('ECP is logged in')
+        await symphony.render("symphony-ecm", config);
+      }
+      applyTheme();
+      setLoading(false);
+    };
   }, [ applyTheme, location.pathname ]);
 
   const getAppLabel = () => {
