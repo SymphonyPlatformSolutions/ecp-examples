@@ -52,6 +52,7 @@ const WealthApp = ({ setLoading } : WealthProps) => {
       (window as any).symphony.render("ecp", {
         streamId: wealthData.wealthRoom[ecpOrigin],
         ecpLoginPopup: true,
+        canAddPeople: true,
         condensed: true,
         allowedApps: "com.symphony.zoom,com.symphony.teams,salesforce2-app,com.symphony.sfs.admin-app",
         sound: false,
