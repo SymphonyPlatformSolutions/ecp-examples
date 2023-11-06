@@ -34,7 +34,6 @@ export const TradeFieldLabels = {
 };
 
 export const TradeExceptionFields = [
-  TradeField.TRADE_TYPE,
   TradeField.PRICE,
   TradeField.TOTAL_TRADE_AMOUNT,
   TradeField.TRADE_COMMISSION,
