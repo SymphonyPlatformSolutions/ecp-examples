@@ -30,7 +30,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
     entry2: {
       executingParty: "Capital Management",
       securityIsin: "US88160R1014",
-      tradeType: "BUY",
+      tradeType: "SELL",
       price: 238.54,
       totalTradeAmount: 150000,
       tradeCommission: 4350,
@@ -60,7 +60,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
     entry2: {
       executingParty: "XY HF",
       securityIsin: "US5949181045",
-      tradeType: "SELL",
+      tradeType: "BUY",
       price: 67.69,
       totalTradeAmount: 250000,
       tradeCommission: 25000,
@@ -85,7 +85,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
     entry2: {
       executingParty: "1x IDB",
       securityIsin: "ES0105066007",
-      tradeType: "BUY",
+      tradeType: "SELL",
       price: 54.5,
       totalTradeAmount: 1230000,
       tradeCommission: 0,
@@ -99,7 +99,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
     entry1: {
       executingParty: "ABC Broker",
       securityIsin: "GB0005405286",
-      tradeType: "SELL",
+      tradeType: "BUY",
       price: 36.2,
       totalTradeAmount: 800000,
       tradeCommission: 32000,
@@ -135,7 +135,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
     entry2: {
       executingParty: "Alpha Investments",
       securityIsin: "FR0000131104",
-      tradeType: "BUY",
+      tradeType: "SELL",
       price: 42.9,
       totalTradeAmount: 3000000,
       tradeCommission: 90000,
@@ -161,7 +161,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
     entry2: {
       executingParty: "Wealth Managers",
       securityIsin: "CH0038863350",
-      tradeType: "BUY",
+      tradeType: "SELL",
       price: 918.0,
       totalTradeAmount: 1500000,
       tradeCommission: 45000,
