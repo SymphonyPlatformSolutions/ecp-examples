@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   INITIAL_TRADE_EXCEPTIONS,
   TRADE_EXCEPTION_REQUEST_INTENT,
@@ -17,11 +17,12 @@ interface TradeExceptionDashboardProps {
 export const TradeExceptionDashboard = (
   props: TradeExceptionDashboardProps
 ) => {
+  const { ecpOrigin } = props;
   const [tradeExceptions, setTradeExceptions] = useState<TradeException[]>([
     ...INITIAL_TRADE_EXCEPTIONS,
   ]);
   const tradeExceptionsLatest = useRef<TradeException[]>(tradeExceptions);
-
+  const dataListenersRef = useRef<string[]>([]);
   const [selectedException, setSelectedException] = useState<TradeException>();
 
   const updateTradeException = (newTradeException: TradeException) => {
@@ -35,17 +36,49 @@ export const TradeExceptionDashboard = (
     newTradeExceptions[tradeExceptionIndex] = newTradeException;
 
     setTradeExceptions(newTradeExceptions);
-    setSelectedException(newTradeException);
+    setSelectedException((currentSelection) => {
+      if (!currentSelection || currentSelection.streamId?.[ecpOrigin] === newTradeException.streamId?.[ecpOrigin]) {
+        return newTradeException
+      }
+      return currentSelection;
+    });
   };
 
   useEffect(() => {
     tradeExceptionsLatest.current = tradeExceptions;
+    tradeExceptions.forEach((tradeException: TradeException) => {
+      const streamId = tradeException.streamId?.[ecpOrigin];
+      if (streamId && !dataListenersRef.current.includes(streamId)) {
+        dataListenersRef.current = [...dataListenersRef.current, streamId];
+        (window as any).symphony.listen({
+          type: 'DataNotifications',
+          params: {
+            type: TRADE_EXCEPTION_REQUEST_INTENT,
+            streamId
+          },
+          callback: onReceivedData
+        });
+      }
+    })
   }, [tradeExceptions]);
+
+  const sendData = (tradeException: TradeException) => {
+    const streamId = tradeException.streamId?.[ecpOrigin];
+    (window as any).symphony.sendData({
+      type: TRADE_EXCEPTION_REQUEST_INTENT,
+      content: tradeException,
+    }, {streamId});
+  };
+
+  const onReceivedData = useCallback(({content}: any) => {
+    updateTradeException(content);
+  }, [selectedException]);
 
   useEffect(() => {
     (window as any).symphony.registerInterop((intent: any, context: any) => {
       if (intent === TRADE_EXCEPTION_REQUEST_INTENT) {
         updateTradeException(context.tradeException);
+        sendData(context.tradeException);
       }
     });
   }, []);
@@ -56,13 +89,13 @@ export const TradeExceptionDashboard = (
         <div className="content-header">
           <FakeTopMenu />
         </div>
-
+        
         <div className="table-container">
           <TradeExceptionTable
             selectedException={selectedException}
             onRowSelect={setSelectedException}
             tradeExceptions={tradeExceptions}
-            ecpOrigin={props.ecpOrigin}
+            ecpOrigin={ecpOrigin}
           />
         </div>
       </div>
@@ -71,8 +104,9 @@ export const TradeExceptionDashboard = (
         <div className="details-container">
           <TradeExceptionDetails
             tradeException={selectedException}
-            ecpOrigin={props.ecpOrigin}
+            ecpOrigin={ecpOrigin}
             updateTradeExceptionHandler={updateTradeException}
+            sendData={sendData}
           />
         </div>
       )}

@@ -27,12 +27,14 @@ interface TraceExceptionDetailsProps {
   tradeException: TradeException;
   ecpOrigin: string;
   updateTradeExceptionHandler: (newTradeException: TradeException) => void;
+  sendData: (tradeException: TradeException) => void;
 }
 
 const TradeExceptionDetails = ({
   updateTradeExceptionHandler,
   tradeException,
   ecpOrigin,
+  sendData
 }: TraceExceptionDetailsProps) => {
   const [loadedStreamId, setLoadedStreamId] = useState<string>();
   const [isStreamReady, setIsStreamReady] = useState<boolean>(false);
@@ -145,6 +147,7 @@ const TradeExceptionDetails = ({
       .then((response: EcpApiResponse) => {
         if (response.messages) {
           updateTradeExceptionHandler(newTradeException);
+          sendData(newTradeException);
         }
       });
   };

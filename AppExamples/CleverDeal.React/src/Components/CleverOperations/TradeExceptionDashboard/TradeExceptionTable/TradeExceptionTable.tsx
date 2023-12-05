@@ -36,9 +36,9 @@ const TradeExceptionTable = ({
       </tr>
     </thead>
     <tbody>
-      {tradeExceptions.map((tradeException) => (
+      {tradeExceptions.map((tradeException, index: number) => (
         <TradeExceptionRow
-          key={tradeException.entry1.executingParty}
+          key={`${tradeException.entry1.executingParty}-${index}`}
           isActive={tradeException === selectedException}
           tradeException={tradeException}
           onClick={
