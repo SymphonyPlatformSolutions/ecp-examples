@@ -94,6 +94,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
       reference: "I02348237923",
     },
     status: TradeExceptionStatus.UNRESOLVED,
+    forceUserIds: ['70368744179986'],
   },
   {
     entry1: {

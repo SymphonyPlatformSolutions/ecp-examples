@@ -79,7 +79,7 @@ const TradeExceptionDetails = ({
       (window as any).symphony
         .createRoom(
           getTradeExceptionRoomName(tradeException),
-          [TRADE_TARGET_SYM_IDS.userId[ecpOrigin]],
+          [tradeException.forceUserIds || TRADE_TARGET_SYM_IDS.userId[ecpOrigin]],
           {
             message: getTradeExceptionInitialMessage(
               tradeException,
