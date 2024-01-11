@@ -64,6 +64,7 @@ export interface TradeException {
   status: TradeExceptionStatus;
   resolution?: TradeExceptionResolution;
   streamId?: RoomIdMap;
+  forceUserIds?: string[];
 }
 
 export interface EcpApiResponse {
