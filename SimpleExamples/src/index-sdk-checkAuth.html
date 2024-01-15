@@ -1,0 +1,137 @@
+<html>
+  <head>
+    <title>ECP Demo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="description">
+        <h1>Check Authentication before lodaing ECP</h1>
+        <p>
+          The checkAuth API allows to determine whether the user is logged in or not.
+          If not, it returns the authentication type ("password" or "sso")
+        </p>
+        <p>
+          As usually, add the frame container that the script will use to insert
+          the iframe into.
+        </p>
+        <pre>
+          <code>
+            &lt;div class="ecp-frame symphony-ecm"&gt;
+            &lt;/div&gt;
+          </code>
+        </pre>
+        <p>Add the script and use explicit mode:</p>
+        <pre>
+          <code>
+            &lt;script id="symphony-ecm-sdk" data-onload="sdkLoaded" render="explicit" src="{ECP-SDK-URL}"&gt;&lt;/script&gt;
+          </code>
+        </pre>
+        <p>
+          Once the script is loaded, check whether the user is authenticated or not.
+          Based on the authentication state and type, you can load ECP normally, or directly from the login page if not in popup login mode.
+        </p>
+        <pre>
+          <code>
+            window.sdkLoaded = async () =&gt; {
+              // whether to preload ECP scripts during authentication check
+              // not preloading will result in a faster authentication check but the application might start a bit slower afterwards
+              let preLoadApp: boolean | undefined = undefined; 
+              const {isLoggedIn, authenticationType} = await symphony.checkAuth(preLoadApp);
+
+              if (!isLoggedIn) {
+                if (authenticationType === 'password') {
+                  let fromLogin: boolean = true;
+                  // directly go to login page
+                  await symphony.render('symphony-ecm', {streamId: 'someStream=='}, fromLogin);
+                } else {
+                  // authentication type is sso. As some sso providers don't support being embedded, we use login popup
+                  await symphony.render('symphony-ecm',  {streamId: 'someStream==', ecpLoginPopup: true}); 
+                }
+              } else {
+                // go to ECP as the user is logged in
+                await symphony.render('symphony-ecm',  {streamId: 'someStream=='});
+              }
+            }
+          </code>
+        </pre>
+        <form id="ecp-form">
+          <div class="form-group">
+            <label for="StreamId">Stream id:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="StreamId"
+              placeholder="Stream ID"
+            />
+          </div>
+          <div class="form-group">
+            <label for="UserIds">User ids:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="UserIds"
+              placeholder="User IDs"
+            />
+          </div>
+          <button type="submit" class="btn">Open ECP</button>
+        </form>
+      </div>
+      <div class="ecp-frame symphony-ecm" id="symphony-ecm"></div>
+    </div>
+    <script type="text/javascript">
+      const DEFAULT_ORIGIN = "develop2.symphony.com";
+      const locationUrl = new URL(location.href);
+      const sdkOrigin = locationUrl.searchParams.get("origin");
+
+      document
+        .getElementById("ecp-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const streamId = document.getElementById("StreamId").value;
+          const userIds = document.getElementById("UserIds").value;
+          if (streamId || userIds) {
+            const frameContainer = document.getElementById("symphony-ecm");
+            // The first time, we need to load the script and render the chat once the script is loaded.
+            if (!window.symphony) {
+              const script = document.createElement("script");
+              script.id = "symphony-ecm-sdk";
+              script.src = `https://${
+                sdkOrigin || DEFAULT_ORIGIN
+              }/embed/sdk.js`;
+              script.setAttribute("render", "explicit");
+              script.setAttribute("data-onload", "onSdkLoaded");
+              window.onSdkLoaded = async () => {
+                // whether to preload ECP scripts during authentication check
+                // not preloading will result in a faster authentication check but the application might start a bit slower afterwards
+                let preLoadApp = true; 
+                const {isLoggedIn, authenticationType} = await symphony.checkAuth(preLoadApp);
+
+                if (!isLoggedIn) {
+                  if (authenticationType === 'password') {
+                    let fromLogin = true;
+                    // directly go to login page
+                    await symphony.render('symphony-ecm', {streamId, userIds}, fromLogin);
+                  } else {
+                    // authentication type is sso. As some sso providers don't support being embedded, we use login popup
+                    await symphony.render('symphony-ecm',  {streamId, userIds, ecpLoginPopup: true}); 
+                  }
+                } else {
+                  // go to ECP as the user is logged in
+                  await symphony.render('symphony-ecm',  {streamId, userIds});
+                }
+              };
+              document.body.appendChild(script);
+            } else {
+              // If the script is already loaded, we can just replace the chat
+              if (streamId) {
+                window.symphony.setStream(streamId);
+              } else if (userIds) {
+                window.symphony.startRoom(userIds.split(","));
+              }
+            }
+          }
+        });
+    </script>
+  </body>
+</html>
