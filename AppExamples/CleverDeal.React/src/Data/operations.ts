@@ -94,7 +94,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
       reference: "I02348237923",
     },
     status: TradeExceptionStatus.UNRESOLVED,
-    forceUserIds: ['70368744179986'],
+    forceUserIds: ["70368744179986"],
   },
   {
     entry1: {
@@ -109,7 +109,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
       reference: "E0983745621",
     },
     entry2: {
-      executingParty: "Global Traders",
+      executingParty: "Sym Bank",
       securityIsin: "GB0005405286",
       tradeType: "SELL",
       price: 36.2,
@@ -120,6 +120,7 @@ export const INITIAL_TRADE_EXCEPTIONS: TradeException[] = [
       reference: "I0983745621",
     },
     status: TradeExceptionStatus.UNRESOLVED,
+    createRoomFilters: [{ type: "BIC", value: "SBSBSB06" }],
   },
   {
     entry1: {
@@ -203,13 +204,17 @@ export const getMessageTable = (
     </tr>
   </thead>
   <tbody>
-    ${fields.filter((field) => field !== 'reference').map((field) => (
-      `<tr>
+    ${fields
+      .filter((field) => field !== "reference")
+      .map(
+        (field) =>
+          `<tr>
         <td>${TradeFieldLabels[field]}</td>
         <td>${tradeException.entry1[field]}</td>
         <td>${tradeException.entry2[field]}</td>
       </tr>`
-    )).join('')}
+      )
+      .join("")}
   </tbody>
   </table>`;
 
@@ -220,10 +225,10 @@ export const getTradeExceptionInitialMessage = (
   text: {
     "text/markdown": [
       `**Trade Exception Resolution**`,
-      '&nbsp;',
+      "&nbsp;",
       `Conflict on field **${TradeFieldLabels[conflictingField]}**: *${tradeException.entry1[conflictingField]}* vs *${tradeException.entry2[conflictingField]}*`,
-      'Please select the correct value in the table above this chat',
-      '&nbsp;',
+      "Please select the correct value in the table above this chat",
+      "&nbsp;",
       getMessageTable(tradeException),
     ].join("\n"),
   },

@@ -65,6 +65,12 @@ export interface TradeException {
   resolution?: TradeExceptionResolution;
   streamId?: RoomIdMap;
   forceUserIds?: string[];
+  createRoomFilters?: CreateRoomFilters[];
+}
+
+export interface CreateRoomFilters {
+  type: string;
+  value: string;
 }
 
 export interface EcpApiResponse {
