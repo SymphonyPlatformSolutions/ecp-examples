@@ -49,7 +49,7 @@ export const App = () => {
     sdkScriptNode.setAttribute("data-onload", "renderRoom");
     if (partnerIdParam) {
       sdkScriptNode.setAttribute("data-partner-id", partnerIdParam);
-    } else if (ecpOriginParam !== 'st3.symphony.com') {
+    } else if (ecpOriginParam !== 'st3.dev.symphony.com') {
       sdkScriptNode.setAttribute("data-partner-id", DEFAULT_PARTNER_ID);
     }
     document.body.appendChild(sdkScriptNode);

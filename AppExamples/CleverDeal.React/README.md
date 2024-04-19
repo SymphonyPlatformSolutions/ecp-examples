@@ -20,7 +20,7 @@ yarn start
 
 - open http://localhost:3000/
 
-## Run against st3.symphony.com
+## Run against st3.dev.symphony.com
 
 - run the app with:
 
@@ -28,11 +28,11 @@ yarn start
 HTTPS=true yarn start
 ```
 
-- open https://localhost:3000/?ecpOrigin=st3.symphony.com&partnerId=3
+- open https://localhost:3000/?ecpOrigin=st3.dev.symphony.com&partnerId=3
 
 ## Query params
 
-- `ecpOrigin`: URL of the target pod to be loaded in ECP (supported values are `corporate.symphony.com` [default] and `st3.symphony.com`)
+- `ecpOrigin`: URL of the target pod to be loaded in ECP (supported values are `corporate.symphony.com` [default] and `st3.dev.symphony.com`)
 - `partnerId`: loads ECP with a given partnerId, useful if your environment has partnership configurations (use partnerId=3 to allow Symphony to be loaded on localhost)
 - `sdkPath`: used to target a specific version of ECP (supported values are `/embed/sdk.js` [default] and `/apps/embed/{tag}/sdk.js`)
     

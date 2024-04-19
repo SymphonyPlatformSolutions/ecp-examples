@@ -2,7 +2,7 @@ interface UserIdMap extends Record<string, number> {}
 
 export const botUserId : UserIdMap = {
   "corporate.symphony.com": 70368744179899,
-  "st3.symphony.com": 9139691185433,
+  "st3.dev.symphony.com": 9139691185433,
   "preview.symphony.com": 70368744179899,
 };
 

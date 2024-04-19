@@ -12,7 +12,7 @@ export const PodPicker = () => {
   const options : OptionType[] = useMemo(() => [
     { label: 'Corporate', value: 'corporate.symphony.com' },
     { label: 'Preview', value: 'preview.symphony.com' },
-    { label: 'ST3', value: 'st3.symphony.com' },
+    { label: 'ST3', value: 'st3.dev.symphony.com' },
   ], []);
   const [ origin, setOrigin ] = useState<OptionType | null | undefined>(options[0]);
 

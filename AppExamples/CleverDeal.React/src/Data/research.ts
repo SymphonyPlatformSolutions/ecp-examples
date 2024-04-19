@@ -2,7 +2,7 @@ import { ResearchData } from "../Models";
 
 export const researchData: ResearchData = {
   coverageRoom: {
-    "st3.symphony.com": "",
+    "st3.dev.symphony.com": "",
     "corporate.symphony.com": "eKxjK/4px0R2/k6oWPTtpn///nZqvBphdA==",
     "preview.symphony.com": "rSJVVAOskd6ia+gj/tUXen///nUHUEkadA==",
   },
@@ -11,7 +11,7 @@ export const researchData: ResearchData = {
       name: "Jane Doe",
       company: "Cedar Buyside",
       roomId: {
-        "st3.symphony.com": "6cu9/OECrUZkXQIbBpoLQn///nYr09BwdA==",
+        "st3.dev.symphony.com": "6cu9/OECrUZkXQIbBpoLQn///nYr09BwdA==",
         "corporate.symphony.com": "UARecxsv4ELyLncuqsHXQX///nZqtFLodA==",
         "preview.symphony.com": "UARecxsv4ELyLncuqsHXQX///nZqtFLodA==",
       },
@@ -20,7 +20,7 @@ export const researchData: ResearchData = {
       name: "John Smith",
       company: "Pine Investments",
       roomId: {
-        "st3.symphony.com": "dRaJE3Q6+D7y0PsY7Xgabn///nYr1ELodA==",
+        "st3.dev.symphony.com": "dRaJE3Q6+D7y0PsY7Xgabn///nYr1ELodA==",
         "corporate.symphony.com": "6cJ2tY2KdIXAeYJcep++2X///nZqs5ZIdA==",
         "preview.symphony.com": "6cJ2tY2KdIXAeYJcep++2X///nZqs5ZIdA==",
       },

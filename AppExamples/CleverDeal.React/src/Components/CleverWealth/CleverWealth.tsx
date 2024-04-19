@@ -42,7 +42,7 @@ const WealthApp = ({ setLoading } : WealthProps) => {
     sdkScriptNode.setAttribute("data-onload", "renderEcp");
     if (partnerId) {
       sdkScriptNode.setAttribute("data-partner-id", partnerId);
-    } else if (ecpOrigin !== 'st3.symphony.com') {
+    } else if (ecpOrigin !== 'st3.dev.symphony.com') {
       sdkScriptNode.setAttribute("data-partner-id", DEFAULT_PARTNER_ID);
     }
     document.body.appendChild(sdkScriptNode);
