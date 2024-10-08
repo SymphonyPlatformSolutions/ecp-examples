@@ -1,0 +1,66 @@
+body {
+    font-family: "system-ui", Lato, "Segoe UI", "Helvetica Neue", Verdana, Arial, sans-serif;
+    background: rgb(47, 47, 47);
+    padding: 10px 20px;
+    padding-bottom: 0;
+}
+
+hr {
+    border-color: rgb(47, 47, 47);
+}
+
+/* Layout  */
+
+.page-container {
+    max-width: 100%;
+    overflow: auto;
+}
+
+.horizontal {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+}
+
+.vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.no-shrink {
+    flex-shrink: 0;
+}
+
+.panel {
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    padding-top: 8px;
+}
+
+.panel>div:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+/* Frames */
+
+iframe {
+    border-radius: 4px;
+    border: 1px solid rgba(128, 128, 128, .3);
+}
+
+#symphony-main-frame-container iframe {
+    border-color: rgba(128, 128, 128, .7);
+}
+
+#symphony-frames-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.frame-container {
+    width: 400px;
+    height: 526px;
+}
