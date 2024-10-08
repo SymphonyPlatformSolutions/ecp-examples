@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ECP Open SDK example</title>
+
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+
+    <!-- Symphony styling -->
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.symphony.com/resources/ui-toolkit/v4.3.2/css/uitoolkit.css">
+
+    <!-- Additional styling -->
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+
+<body class="dark tk-text-color">
+    <h1 class="tk-typography tk-typography--h1 tk-mb-2">ECP Open SDK example</h1>
+
+    <div class="page-container horizontal">
+
+        <div class="vertical no-shrink">
+
+            <!-- Configuration -->
+            <div class="panel">
+                <h2 class="tk-typography tk-typography--h2 tk-mb-1">Configuration</h2>
+
+                <div class="tk-input-group">
+                    <div class="tk-input-group__header">
+                        <label class="tk-label--required" for="pod-url">Pod URL</label>
+                    </div>
+                    <div class="tk-input__container">
+                        <input id="pod-url" class="tk-input disable-on-main"
+                            value="https://develop2.symphony.com" />
+                    </div>
+                </div>
+
+                <div class="tk-input-group">
+                    <div class="tk-input-group__header">
+                        <label for="partner-id">Partner ID</label>
+                    </div>
+                    <div class="tk-input__container">
+                        <input id="partner-id" class="tk-input disable-on-main" value="" />
+                    </div>
+                    <div class="tk-input__helper">Not required when targeting UAT pods</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="panel">
+                <h2 class="tk-typography tk-typography--h2 tk-mb-1">Actions</h2>
+
+                <div class="tk-input-group">
+                    <div class="tk-input-group__header">
+                        <label for="stream-id" class="tk-label--required">Stream ID</label>
+                    </div>
+                    <div class="tk-input__container">
+                        <input id="stream-id" class="tk-input"
+                            value="0UbMs0SfTxKAQL2GdAa0JH///m2ZuWMTdA==" />
+                    </div>
+                </div>
+
+                <div>
+                    <button class="tk-button tk-button--primary"
+                        onclick="configureSDK(); window.sdk.openStream(getStreamId(), 'symphony-main-frame-container')">
+                        Open in main frame
+                    </button>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.openStream(getStreamId(), 'symphony-frames-container')">
+                        Open in new frame
+                    </button>
+                </div>
+
+                <hr />
+
+                <div>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.updateSettings({ mode: 'light'})">
+                        Use light mode
+                    </button>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.updateSettings({ mode: 'dark'})">
+                        Use dark mode
+                    </button>
+                </div>
+
+                <div>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.sendMessage(getStreamId(), 'Hello !')">
+                        Send a message from main frame
+                    </button>
+                </div>
+
+                <div>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.onMessageNotification((n) => alert('Stream message notification: ' + JSON.stringify(n)), getStreamId())">
+                        Listen to stream new messages
+                    </button>
+                </div>
+                <div>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.onMessageNotification((n) => alert('Global message notification: ' +JSON.stringify(n)))">
+                        Listen to any new message
+                    </button>
+                </div>
+                <div>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.onUnreadCountNotification((n) => alert('Stream message count notification: ' + JSON.stringify(n)), getStreamId())">
+                        Listen to stream unread message count
+                    </button>
+                </div>
+
+                <div>
+                    <button disabled class="tk-button tk-button--primary disable-if-no-main"
+                        onclick="window.sdk.onUnreadCountNotification((n) => alert('Global message count notification: ' + JSON.stringify(n)))">
+                        Listen to any unread message count
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Symphony frames -->
+        <div class="panel">
+            <h2 class="tk-typography tk-typography--h2 tk-mb-1">Symphony frames</h2>
+            <h4 class="tk-typography tk-typography--h4 tk-mb-1">
+                Symphony main frame and children frames are rendered here.
+            </h4>
+
+            <div id="symphony-frames-container">
+                <div id="symphony-main-frame-container">
+                    <!-- Main frame will be injected here -->
+                </div>
+
+                <!-- Children frames will be injected here -->
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM helpers
+        const getPodUrl = () => document.getElementById('pod-url')?.value;
+        const getPartnerId = () => document.getElementById('partner-id')?.value;
+        const getStreamId = () => document.getElementById('stream-id')?.value;
+
+        // SDK configuration
+        const configureSDK = () => {
+            window.sdk.configuration = {
+                podUrl: getPodUrl(),
+                partnerId: getPartnerId(),
+                onReady: () => {
+                    // enable all SDK actions
+                    document.querySelectorAll(".disable-if-no-main").forEach(el => el.removeAttribute("disabled"));
+                    // disabled configuration fields
+                    document.querySelectorAll(".disable-on-main").forEach(el => el.setAttribute("disabled", "true"));
+                },
+            }
+        }
+    </script>
+
+    <!-- SDK injection -->
+    <script src="./sdk.js"></script>
+</body>
+
+</html>
