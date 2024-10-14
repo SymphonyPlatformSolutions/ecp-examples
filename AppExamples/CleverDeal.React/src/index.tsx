@@ -14,7 +14,7 @@ ReactDOM.render(
         <Routes>
           <Route path="wealth" element={<CleverWealth />} />
           <Route path="*" element={<App />} />
-          <Route path="content" element={<ContentDistribution />} />
+          <Route path="content/*" element={<ContentDistribution />} />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>

@@ -1,9 +1,9 @@
 import React from 'react';
-import MarketFeed from './MarketFeed';
-import MarketFlow from './MarketFlow';
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Search, Menu, TrendingUp, TrendingDown } from 'lucide-react';
+import MarketFeed from './MarketFeed';
+import MarketFlow from './MarketFlow';
 
 const data = [
   { time: '19:00', value: 5458 },
@@ -31,36 +31,48 @@ const watchlistItems = [
   { symbol: 'USDJPY', price: 159.76, change: 0.54, color: 'green' },
 ];
 
+const getNavItems = () => [
+  { name: 'Market Flow', path: '/content' },
+  { name: 'Market Feed', path: '/content/feed' },
+  { name: 'Markets', path: '/' },
+  { name: 'News', path: '/' },
+  { name: 'Brokers', path: '/' },
+  { name: 'Clever Deal', path: '/' },
+];
+
 export const ContentDistribution = () => {
   // dynamic import of tailwind css so that other components are not affected
   require("./index.css"); 
   return (
     <div className="ContentDistribution">
        <Routes>
-        {/* <Route path="/" element={<Layout />}> */}
           <Route index element={<Home />} />
-          <Route path="blotter" element={<Home />} />
-          <Route path="feed" element={<Feed />} />
-          <Route path="*" element={<NoMatch />} />
-        {/* </Route> */}
+            <Route path="feed" element={<Feed />} />
+            <Route path="*" element={<NoMatch />} />
       </Routes>
      </div>
   );
 };
 
 function Home() {
+  const location = useLocation();
+  const navItems = getNavItems();
+
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
-            {['Home', 'Trade Feed', 'Community', 'Markets', 'News', 'Brokers'].map((item) => (
-              <button key={item} className="text-gray-300 hover:text-blue-400 transition-colors duration-200" onClick={() => {
-                if (item === 'Home') window.location.href = '/';
-                else if (item === 'Trade Feed') window.location.href = '/feed';
-              }}>
-                {item}
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                className={`text-gray-300 hover:text-blue-400 transition-colors duration-200 ${location.pathname === item.path ? 'font-bold text-blue-400' : ''}`}
+                onClick={() => {
+                  window.location.href = item.path;
+                }}
+              >
+                {item.name}
               </button>
             ))}
           </nav>
@@ -108,7 +120,6 @@ function Home() {
           </div>
 
           <div>
-            {/* <XenicsFlow /> */}
             <MarketFlow />
           </div>
         </div>
@@ -136,26 +147,41 @@ function Home() {
 }
 
 function Feed() {
+  const location = useLocation();
+  const navItems = getNavItems();
+
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <span className="text-2xl font-bold text-blue-500">Xenics Flow</span>
+          <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
-            {['Home', 'Trade Feed', 'Community', 'Markets', 'News', 'Brokers'].map((item) => (
-              <button key={item} className="text-gray-300 hover:text-blue-400 transition-colors duration-200" onClick={() => {
-                if (item === 'Home') window.location.href = '/';
-                else if (item === 'Trade Feed') window.location.href = '/blotter';
-              }}>
-                {item}
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                className={`text-gray-300 hover:text-blue-400 transition-colors duration-200 ${location.pathname === item.path ? 'font-bold text-blue-400' : ''}`}
+                onClick={() => {
+                  window.location.href = item.path;
+                }}
+              >
+                {item.name}
               </button>
             ))}
           </nav>
         </div>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input type="text" placeholder="Search" className="bg-gray-700 text-white rounded-full py-2 px-4 pl-10 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+          <button className="bg-blue-600 rounded-full p-2 hover:bg-blue-700 transition-colors duration-200">
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
       </header>
       <span className="text-sm text-gray-400 flex items-center"></span>
       <p className="text-center text-2xl text-gray-400 mt-6">
-        Trade Feed
+        Market Feed
       </p>
       <div className="bg-gray-800 p-4 rounded-lg shadow-lg mt-6 font-mono">
         <MarketFeed />
@@ -165,18 +191,24 @@ function Feed() {
 }
 
 function NoMatch() {
+  const location = useLocation();
+  const navItems = getNavItems();
+
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <span className="text-2xl font-bold text-blue-500">Xenics Flow</span>
+          <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
-            {['Home', 'Trade Feed', 'Community', 'Markets', 'News', 'Brokers'].map((item) => (
-              <button key={item} className="text-gray-300 hover:text-blue-400 transition-colors duration-200" onClick={() => {
-                if (item === 'Home') window.location.href = '/';
-                else if (item === 'Trade Feed') window.location.href = '/blotter';
-              }}>
-                {item}
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                className={`text-gray-300 hover:text-blue-400 transition-colors duration-200 ${location.pathname === item.path ? 'text-blue-400' : ''}`}
+                onClick={() => {
+                  window.location.href = item.path;
+                }}
+              >
+                {item.name}
               </button>
             ))}
           </nav>
