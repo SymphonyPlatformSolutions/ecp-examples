@@ -2,7 +2,7 @@ import CleverInvestments from "../Components/CleverInvestments";
 import CleverOperations from "../Components/CleverOperations";
 import CleverResearch from "../Components/CleverResearch";
 import CleverWealth from "../Components/CleverWealth";
-import ContentDistribution from "../Components/ContentDistribution/App";
+import ContentDistribution from "../Components/ContentDistribution";
 
 export interface AppEntry {
   label: string;

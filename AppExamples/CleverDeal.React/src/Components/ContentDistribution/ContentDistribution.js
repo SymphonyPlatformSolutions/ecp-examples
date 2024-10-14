@@ -31,15 +31,15 @@ const watchlistItems = [
   { symbol: 'USDJPY', price: 159.76, change: 0.54, color: 'green' },
 ];
 
-const ContentDistribution = () => {
+export const ContentDistribution = () => {
   // dynamic import of tailwind css so that other components are not affected
   require("./index.css"); 
   return (
     <div className="ContentDistribution">
        <Routes>
         {/* <Route path="/" element={<Layout />}> */}
-          <Route index element={<Blotter />} />
-          <Route path="blotter" element={<Blotter />} />
+          <Route index element={<Home />} />
+          <Route path="blotter" element={<Home />} />
           <Route path="feed" element={<Feed />} />
           <Route path="*" element={<NoMatch />} />
         {/* </Route> */}
@@ -48,7 +48,7 @@ const ContentDistribution = () => {
   );
 };
 
-function Blotter() {
+function Home() {
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
@@ -195,5 +195,3 @@ function NoMatch() {
     </div>
   );
 }
-
-export default ContentDistribution;
