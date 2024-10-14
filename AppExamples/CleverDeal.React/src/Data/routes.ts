@@ -2,6 +2,7 @@ import CleverInvestments from "../Components/CleverInvestments";
 import CleverOperations from "../Components/CleverOperations";
 import CleverResearch from "../Components/CleverResearch";
 import CleverWealth from "../Components/CleverWealth";
+import ContentDistribution from "../Components/ContentDistribution/App";
 
 export interface AppEntry {
   label: string;
@@ -13,4 +14,5 @@ export const routes: AppEntry[] = [
   { label: "Operations", path: "operations", component: CleverOperations },
   { label: "Research", path: "research", component: CleverResearch },
   { label: "Wealth", path: "wealth", component: CleverWealth },
+  { label: "Content", path: "content", component: ContentDistribution },
 ];
