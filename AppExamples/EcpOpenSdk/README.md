@@ -98,7 +98,7 @@ https://{myPodUrl}/apps/client2/default?embed=true&partnerId={myPartnerId}&strea
 ECP interacts with the SDK through `postMessage` events. ECP main events allow to:
 
 - detect that main frame is fully loaded and ECP is ready for interaction
-- receive a response after ECP API call
+- receive a response after any ECP API call
 - be notified when a subscription callback is triggered (new and unread message notifications)
 
 To make our SDK listening to ECP events, use the following code:
@@ -118,9 +118,11 @@ const onEcpMessage = (e) => {
     }
     // in response of each ECP API call
     case "sdk-resolve": {
-      if (payload?.data?.error) {
+      if (payload.data.error) {
         const { type, message } = payload.data.error;
         console.error(`[${type}] ${message}`);
+      } else {
+        console.log(`sdk-action with id "${payload.id}" was successful`);
       }
       break;
     }
@@ -198,6 +200,7 @@ const data = {
   eventType: "sdk-action",
   payload: {
     name: "set-settings",
+    id: "set-settings-id", // optional - used by ECP to identify the request
     params: {
       mode: "dark",
       showTitle: false,
@@ -211,6 +214,9 @@ iframe.contentWindow.postMessage(data, myPodUrl);
 
 A full list of configurable settings is available in the [Symphony ECP settings documentation](https://docs.developers.symphony.com/embedded-modules/embedded-collaboration-platform/configuration-parameters#ecp-settings).
 
+Once this `sdk-action` message is posted, ECP responds with a `sdk-resolve` message which indicates wether the action is successful or not.
+This response message payload includes the provided request `id` (`set-settings-id` here) to identify the initial action request.
+
 ### Updating the rendered chat
 
 To change the rendered chat in a frame, post the following message through the main iframe:
@@ -222,6 +228,7 @@ const data = {
   eventType: "sdk-action",
   payload: {
     name: "set-stream",
+    id: "set-stream-id", // optional - used by ECP to identify the request
     params: {
       streamId: "anotherStreamId",
       container: "#iframe-container-id", // optional
@@ -234,6 +241,9 @@ iframe.contentWindow.postMessage(data, myPodUrl);
 
 Please note that `container` parameter corresponds to a child iframe container id. If not provided, the target frame is the main frame.
 
+Once this `sdk-action` message is posted, ECP responds with a `sdk-resolve` message which indicates wether the action is successful or not.
+This response message payload includes the provided request `id` (`set-stream-id` here) to identify the initial action request.
+
 ### Sending messages
 
 To trigger the send message dialog in a frame, post the following message through the main iframe:
@@ -245,6 +255,7 @@ const data = {
   eventType: "sdk-action",
   payload: {
     name: "send-message",
+    id: "send-message-id", // optional - used by ECP to identify the request
     params: {
       message: "Hello!",
       options: {
@@ -260,6 +271,9 @@ iframe.contentWindow.postMessage(data, myPodUrl);
 ```
 
 Refer to the [Symphony send message documentation](https://docs.developers.symphony.com/embedded-modules/embedded-collaboration-platform/send-a-message) for additional details on message properties.
+
+Once this `sdk-action` message is posted, ECP responds with a `sdk-resolve` message which indicates wether the action is successful or not.
+This response message payload includes the provided request `id` (`send-message-id` here) to identify the initial action request.
 
 ### Receiving notifications
 

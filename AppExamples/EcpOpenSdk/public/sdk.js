@@ -29,6 +29,7 @@ let sdkConfiguration = {};
 let isMainFrameLoaded = false;
 let childFrameCount = 0;
 let subscriptionCallbacks = {}; // { [id]: callbackFn }
+let actionId = 0;
 
 // --------------
 // FRAME HANDLING
@@ -141,6 +142,8 @@ const onEcpMessage = (e) => {
                 const errorMessage = `[${type}] ${message}`;
                 console.error(errorMessage);
                 alert(errorMessage);
+            } else {
+                console.log(`sdk-action with id "${payload.id}" was successful !`);
             }
             break;
         }
@@ -224,6 +227,7 @@ const setStream = (streamId, containerId) => {
 
     postEcpMessage('sdk-action', {
         name: 'set-stream',
+        id: `set-stream-${++actionId}`,
         params: {
             streamId,
             container: containerId ? `#${containerId}` : undefined
@@ -241,6 +245,7 @@ const updateSettings = (settings) => {
 
     postEcpMessage('sdk-action', {
         name: 'set-settings',
+        id: `set-settings-${++actionId}`,
         params: settings,
     });
 }
@@ -257,6 +262,7 @@ const sendMessage = (streamId, message, containerId) => {
 
     postEcpMessage('sdk-action', {
         name: 'send-message',
+        id: `send-message-${++actionId}`,
         params: {
             message,
             options: {
