@@ -6,6 +6,7 @@ module.exports = {
   './src/Components/ContentDistribution/MarketFeed.js',
   './src/Components/ContentDistribution/MarketFlow.js'
   ],
+  darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {},
   },
