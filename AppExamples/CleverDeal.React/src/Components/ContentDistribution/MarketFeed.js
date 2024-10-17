@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 const MarketFeed = () => {
+    // dynamic import of tailwind css so that other components are not affected
+    require("./index.css"); 
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
