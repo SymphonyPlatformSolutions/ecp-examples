@@ -4,7 +4,7 @@ const MarketFeed = () => {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        const socket = new WebSocket("ws://poc.symphonymarket.solutions/ws");
+        const socket = new WebSocket("wss://poc.symphonymarket.solutions/ws");
 
         socket.onopen = () => {
             console.log("WebSocket connection established");
