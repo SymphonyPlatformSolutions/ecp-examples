@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const MarketFlow = () => {
+    require("./index.css");
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -65,7 +66,7 @@ const MarketFlow = () => {
                             <th className="px-2 py-4 font-medium text-gray-900 dark:text-white w-2/8">Notes</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-gray-800 p-4 rounded-lg shadow-lg mt-6">
                         {currentItems.map((message, index) => (
                             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" key={index}>
                                 <td className="px-2 py-4">{new Date().toLocaleString()}</td>

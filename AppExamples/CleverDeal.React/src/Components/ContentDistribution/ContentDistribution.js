@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { Search, Menu, TrendingUp, TrendingDown } from 'lucide-react';
 import MarketFeed from './MarketFeed';
 import MarketFlow from './MarketFlow';
+import './index.css';
 
 const data = [
   { time: '19:00', value: 5458 },
