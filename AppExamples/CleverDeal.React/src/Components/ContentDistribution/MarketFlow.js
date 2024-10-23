@@ -54,7 +54,15 @@ const MarketFlow = () => {
     return (
         <div className="bg-gray-800 p-4 rounded-lg shadow-lg mt-6">
             <div className="overflow-auto relative max-h-screen">
-                <h2 className="text-2xl font-semibold mb-6 text-blue-400">Real Time Market Feed</h2>
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex gap-2">
+                        {/* Other elements can go here */}
+                    </div>
+                    <div className={`rounded-md flex items-center py-0.5 px-2.5 border border-transparent text-sm transition-all shadow-sm ${messages.length > 0 ? 'bg-green-200 text-green-600' : 'bg-red-100 text-red-900'}`}>
+                        <div className={`mx-auto block h-2 w-2 rounded-full ${messages.length > 0 ? 'bg-green-300' : 'bg-red-900'} mr-2`}></div>
+                        {messages.length > 0 ? 'Online' : 'Offline'}
+                    </div>
+                </div>
                 <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mb-6">
                     <thead className="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
@@ -72,17 +80,17 @@ const MarketFlow = () => {
                                 <td className="px-2 py-4">{new Date().toLocaleString()}</td>
                                 <td className="px-2 py-4">
                                     <span className="rounded-md bg-blue-600 py-0.5 px-2.5 border border-transparent text-sm text-white transition-all shadow-sm">
-                                        {JSON.parse(JSON.stringify(message.product.instrument.id.ticker))}
+                                        {message.product.instrument.id.ticker}
                                     </span>
                                 </td>
-                                <td className="px-2 py-4">{JSON.parse(JSON.stringify(message.product.id.productId))}</td>
+                                <td className="px-2 py-4">{message.product.id.productId}</td>
                                 <td className="px-2 py-4">
                                     <span className={`text-sm px-2 py-1 rounded ${message.product.id.type === 'CALL' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
-                                        {JSON.parse(JSON.stringify(message.product.id.type))}
+                                        {message.product.id.type}
                                     </span>
                                 </td>
-                                <td className="px-2 py-4">{JSON.parse(JSON.stringify(message.name))}</td>
-                                <td className="px-2 py-4">{JSON.parse(JSON.stringify(message.id.notes))}</td>
+                                <td className="px-2 py-4">{message.name}</td>
+                                <td className="px-2 py-4">{message.id.notes}</td>
                             </tr>
                         ))}
                     </tbody>

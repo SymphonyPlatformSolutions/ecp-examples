@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { Search, Menu, TrendingUp, TrendingDown } from 'lucide-react';
 import MarketFeed from './MarketFeed';
 import MarketFlow from './MarketFlow';
+import logo from './img/marketflow-logo.png';
 
 const data = [
   { time: '19:00', value: 5458 },
@@ -32,7 +33,7 @@ const watchlistItems = [
 ];
 
 const getNavItems = () => [
-  { name: 'Market Flow', path: '/content' },
+  { name: 'Home', path: '/content' },
   { name: 'Market Feed', path: '/content/feed' },
   { name: 'Markets', path: '/' },
   { name: 'News', path: '/' },
@@ -62,6 +63,7 @@ function Home() {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
+          <img src={logo} alt="Market Flow Logo" className="w-14 h-14 rounded-lg" />
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
             {navItems.map((item) => (
@@ -90,7 +92,7 @@ function Home() {
 
       <main className="flex-grow p-6 overflow-hidden flex">
         <div className="flex-grow mr-4">
-          <h2 className="text-2xl font-semibold mb-6 text-blue-400">Market Summary</h2>
+          <h2 className="text-xl font-semibold mb-4 text-blue-400">Market Summary</h2>
           <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
             {indices.map((index) => (
               <div key={index.name} className="bg-gray-800 p-4 rounded-lg shadow-lg">
@@ -119,7 +121,9 @@ function Home() {
             </ResponsiveContainer>
           </div>
 
-          <div>
+          {/* <div> */}
+          <div className="flex-grow mr-4 space-y-2">
+          <h2 className="text-xl font-semibold mt-4 mb-4 text-blue-400">Real Time Feed</h2>
             <MarketFlow />
           </div>
         </div>
@@ -154,6 +158,7 @@ function Feed() {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
+        <img src={logo} alt="Market Flow Logo" className="w-14 h-14 rounded-lg" />
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
             {navItems.map((item) => (
@@ -198,6 +203,7 @@ function NoMatch() {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
+        <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
             {navItems.map((item) => (
