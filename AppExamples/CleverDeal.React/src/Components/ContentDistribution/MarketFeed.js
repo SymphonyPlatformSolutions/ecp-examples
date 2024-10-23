@@ -47,7 +47,7 @@ const MarketFeed = () => {
                 <div className="flex gap-2">
                     {/* Other elements can go here */}
                 </div>
-                <div className={`rounded-md flex items-center py-0.5 px-2.5 border border-transparent text-sm transition-all shadow-sm ${messages.length > 0 ? 'bg-green-200 text-green-600' : 'bg-red-100 text-red-900'}`}>
+                <div className={`rounded-md flex items-center py-0.5 px-2.5 border border-transparent text-sm transition-all shadow-sm ${messages.length > 0 ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
                     <div className={`mx-auto block h-2 w-2 rounded-full ${messages.length > 0 ? 'bg-green-300' : 'bg-red-900'} mr-2`}></div>
                     {messages.length > 0 ? 'Online' : 'Offline'}
                 </div>
