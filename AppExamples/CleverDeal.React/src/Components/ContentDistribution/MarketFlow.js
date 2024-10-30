@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const MarketFlow = () => {
-    require("./index.css");
+    require("./tailwind.css");
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
