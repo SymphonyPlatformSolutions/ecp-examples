@@ -5,6 +5,7 @@ import { Search, Menu, TrendingUp, TrendingDown } from 'lucide-react';
 import MarketFeed from './MarketFeed';
 import MarketFlow from './MarketFlow';
 import logo from './img/marketflow-logo.png';
+import { withTailwindCSS } from '../../Utils/hooks';
 
 const data = [
   { time: '19:00', value: 5458 },
@@ -41,19 +42,15 @@ const getNavItems = () => [
   { name: 'Clever Deal', path: '/' },
 ];
 
-export const ContentDistribution = () => {
-  // dynamic import of tailwind css so that other components are not affected
-  require("./index.css"); 
-  return (
-    <div className="ContentDistribution">
-       <Routes>
-          <Route index element={<Home />} />
-            <Route path="feed" element={<Feed />} />
-            <Route path="*" element={<NoMatch />} />
-      </Routes>
-     </div>
-  );
-};
+export const ContentDistribution = withTailwindCSS(() =>
+  <div className="ContentDistribution">
+    <Routes>
+      <Route index element={<Home />} />
+      <Route path="feed" element={<Feed />} />
+      <Route path="*" element={<NoMatch />} />
+    </Routes>
+  </div>
+);
 
 function Home() {
   const location = useLocation();

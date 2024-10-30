@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { withTailwindCSS } from '../../Utils/hooks';
 
 const MarketFeed = () => {
     // dynamic import of tailwind css so that other components are not affected
@@ -74,4 +75,4 @@ const MarketFeed = () => {
     );
 };
 
-export default MarketFeed;
+export default withTailwindCSS(MarketFeed);

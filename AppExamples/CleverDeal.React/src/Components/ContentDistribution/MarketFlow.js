@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { withTailwindCSS } from '../../Utils/hooks';
 
 const MarketFlow = () => {
     require("./index.css");
@@ -135,4 +136,4 @@ const MarketFlow = () => {
     );
 };
 
-export default MarketFlow;
+export default withTailwindCSS(MarketFlow);
