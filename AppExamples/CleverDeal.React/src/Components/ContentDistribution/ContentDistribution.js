@@ -1,6 +1,7 @@
-import { Menu, Search, TrendingDown, TrendingUp } from 'lucide-react';
-import { Link, Route, Routes, useLocation } from "react-router-dom";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import React from 'react';
+import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Search, Menu, TrendingUp, TrendingDown } from 'lucide-react';
 import MarketFeed from './MarketFeed';
 import MarketFlow from './MarketFlow';
 
@@ -41,16 +42,15 @@ const getNavItems = () => [
 
 export const ContentDistribution = () => {
   // dynamic import of tailwind css so that other components are not affected
-  require("./tailwind.css");
-
+  require("./index.css"); 
   return (
     <div className="ContentDistribution">
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="feed" element={<Feed />} />
-        <Route path="*" element={<NoMatch />} />
+       <Routes>
+          <Route index element={<Home />} />
+            <Route path="feed" element={<Feed />} />
+            <Route path="*" element={<NoMatch />} />
       </Routes>
-    </div>
+     </div>
   );
 };
 
