@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { withTailwindCSS } from '../../Utils/hooks';
 
 const MarketFlow = () => {
-    require("./index.css");
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
