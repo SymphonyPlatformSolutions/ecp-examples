@@ -4,6 +4,8 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'rec
 import MarketFeed from './MarketFeed';
 import MarketFlow from './MarketFlow';
 import logo from './img/marketflow-logo.png';
+import help_gif from './img/marketflow-help.gif';
+
 import { withTailwindCSS } from '../../Utils/hooks';
 
 const data = [
@@ -35,9 +37,9 @@ const watchlistItems = [
 const getNavItems = () => [
   { name: 'Home', path: '/content' },
   { name: 'Market Feed', path: '/content/feed' },
-  { name: 'Markets', path: '/' },
-  { name: 'News', path: '/' },
-  { name: 'Brokers', path: '/' },
+  { name: 'News', path: '/content/news' },
+  { name: 'Brokers', path: '/content/brokers' },
+  { name: 'Help', path: '/content/help' },
   { name: 'Clever Deal', path: '/' },
 ];
 
@@ -46,6 +48,9 @@ export const ContentDistribution = withTailwindCSS(() =>
     <Routes>
       <Route index element={<Home />} />
       <Route path="feed" element={<Feed />} />
+      <Route path="news" element={<News />} />
+      <Route path="brokers" element={<Brokers />} />
+      <Route path="help" element={<Help />} />
       <Route path="*" element={<NoMatch />} />
     </Routes>
   </div>
@@ -191,6 +196,176 @@ function Feed() {
   );
 }
 
+function News() {
+  const location = useLocation();
+  const navItems = getNavItems();
+
+  return (
+    <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
+      <header className="bg-gray-800 p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
+          <span className="text-2xl font-bold text-blue-500">Market Flow</span>
+          <nav className="hidden md:flex space-x-6">
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                className={`text-gray-300 hover:text-blue-400 transition-colors duration-200 ${location.pathname === item.path ? 'text-blue-400' : ''}`}
+                onClick={() => {
+                  window.location.href = item.path;
+                }}
+              >
+                {item.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input type="text" placeholder="Search" className="bg-gray-700 text-white rounded-full py-2 px-4 pl-10 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+          <button className="bg-blue-600 rounded-full p-2 hover:bg-blue-700 transition-colors duration-200">
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+      <span className="text-sm text-gray-400 flex items-center"></span>
+      <p className="text-center text-2xl text-gray-400 mt-6">
+        404 - Not Found
+      </p>
+      <p className="text-center text-2x1 text-gray-400 mt-6">
+        Oops! The page you are looking for might have been removed.
+      </p>
+      <p className="text-center text-2x1 text-gray-400 mt-6">
+        <Link to="/content">Let's go back to the Home page</Link>
+      </p>
+    </div>
+  );
+}
+
+function Brokers() {
+  const location = useLocation();
+  const navItems = getNavItems();
+
+  return (
+    <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
+      <header className="bg-gray-800 p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
+          <span className="text-2xl font-bold text-blue-500">Market Flow</span>
+          <nav className="hidden md:flex space-x-6">
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                className={`text-gray-300 hover:text-blue-400 transition-colors duration-200 ${location.pathname === item.path ? 'text-blue-400' : ''}`}
+                onClick={() => {
+                  window.location.href = item.path;
+                }}
+              >
+                {item.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input type="text" placeholder="Search" className="bg-gray-700 text-white rounded-full py-2 px-4 pl-10 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+          <button className="bg-blue-600 rounded-full p-2 hover:bg-blue-700 transition-colors duration-200">
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+      <span className="text-sm text-gray-400 flex items-center"></span>
+      <p className="text-center text-2xl text-gray-400 mt-6">
+        404 - Not Found
+      </p>
+      <p className="text-center text-2x1 text-gray-400 mt-6">
+        Oops! The page you are looking for might have been removed.
+      </p>
+      <p className="text-center text-2x1 text-gray-400 mt-6">
+        <Link to="/content">Let's go back to the Home page</Link>
+      </p>
+    </div>
+  );
+}
+
+function Help() {
+  const location = useLocation();
+  const navItems = getNavItems();
+
+  return (
+    <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
+      <header className="bg-gray-800 p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
+          <span className="text-2xl font-bold text-blue-500">Market Flow</span>
+          <nav className="hidden md:flex space-x-6">
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                className={`text-gray-300 hover:text-blue-400 transition-colors duration-200 ${location.pathname === item.path ? 'text-blue-400' : ''}`}
+                onClick={() => {
+                  window.location.href = item.path;
+                }}
+              >
+                {item.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input type="text" placeholder="Search" className="bg-gray-700 text-white rounded-full py-2 px-4 pl-10 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+          <button className="bg-blue-600 rounded-full p-2 hover:bg-blue-700 transition-colors duration-200">
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+      <main className="flex-grow p- overflow-hidden flex flex-col items-center">
+      <p className="text-center text-2xl text-gray-400 mt-6">Help Page</p>
+        <p className="text-lg text-center text-gray-400 mt-6">Here you can find help and support for using Market Flow.</p><br/>
+        <img src={help_gif} alt="Market Flow Help" className="w-full max-w-3xl rounded-lg shadow-lg mb-6" />
+        <div className="text-gray-400">
+          <h2 className="text-2xl font-semibold mt-4">Frequently Asked Questions</h2>
+          <h3 className="text-2xl font-semibold mt-4">What is Market Flow?</h3>
+          <p className="text-lg mt-4">
+            Market Flow is a demonstration of a financial portal that is being provided near real-time information directly from a bot that's sitting in a Symphony chat room.
+            <br />This example shows how Symphony can be leveraged to distribute content. The MarketFlow Bot publishes information then another bot (Acme Bank Subscriber) "listens"
+            <br />for this new content and then publishes this information to the Market Flow web portal.
+            <br />
+          </p>
+          <br/>
+          <h3 className="text-2xl font-semibold mt-4">How do I use Market Flow?</h3>
+          <p className="text-lg mt-4 mb-4">
+            Navigate to the <a href='https://open.symphony.com/?streamId=bBnbhkxXsoSbOrcWbLq5iH%2F%2F%2Fm1pEOVTdA%3D%3D&streamType=chatroom' target="_blank" rel="noreferrer" className="text-blue-500">Content Distribution Room</a> and invoke the Publishing bot using the command <b>@Market Flow Publish /publish</b>
+          </p>
+          <ul className="list-disc list-inside space-y-2">
+            <li>You should start seeing information being published in the Content Distribution Room.</li>
+            <li>View the members of the room, you will see two bots, the MarketFlow Bot and the Acme Bank Subscriber Bot.</li>
+            <li>The Market Flow Publisher bot is broadcasting content to the Symphony chat room.</li>
+            <li>The Acme Bank Subscriber Bot is listening for new content and then publishing this information to the Market Flow web portal.</li>
+            <li>Navigate to the <Link to="/content" className="text-blue-500">Market Flow</Link> web portal to see the content being published.</li>
+            <li>Navigate to the <Link to="/content/feed" className="text-blue-500">Market Feed</Link> page, here you can view the raw messages being sent in the Symphony chat room.</li>
+          </ul>
+          <br/>
+          <h3 className="text-2xl font-semibold mt-4">How can I contact support?</h3>
+          <p className="text-lg mt-4">Reach out to the Symphony Partnership team </p>
+          <br/>
+          <h3 className="text-2xl font-semibold mt-4">Where can I find more information?</h3>
+          <p className="text-lg mt-4">
+            You can check out the presentation <a href='https://docs.google.com/presentation/d/1YNkD5HsVv5SWUUpU7eb-3qGZJeqT93bu0P3OzDBkzbU/edit?usp=sharing' target="_blank" rel="noreferrer" className="text-blue-500">here</a>
+          </p>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 function NoMatch() {
   const location = useLocation();
   const navItems = getNavItems();
@@ -233,7 +408,7 @@ function NoMatch() {
         Oops! The page you are looking for might have been removed.
       </p>
       <p className="text-center text-2x1 text-gray-400 mt-6">
-        <Link to="/">Let's go back to the Home page</Link>
+        <Link to="/content">Let's go back to the Home page</Link>
       </p>
     </div>
   );
