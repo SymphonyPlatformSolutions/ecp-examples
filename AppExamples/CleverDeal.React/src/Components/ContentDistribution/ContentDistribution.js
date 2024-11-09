@@ -204,7 +204,7 @@ function News() {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
+          <img src={logo} alt="Market Flow Logo" className="w-14 h-14 rounded-lg" />
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
             {navItems.map((item) => (
@@ -252,7 +252,7 @@ function Brokers() {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
+          <img src={logo} alt="Market Flow Logo" className="w-14 h-14 rounded-lg" />
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
             {navItems.map((item) => (
@@ -300,7 +300,7 @@ function Help() {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
+          <img src={logo} alt="Market Flow Logo" className="w-14 h-14 rounded-lg" />
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
             {navItems.map((item) => (
@@ -374,7 +374,7 @@ function NoMatch() {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <header className="bg-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <img src={logo} alt="Market Flow Logo" className="w-10 h-10 rounded-lg" />
+          <img src={logo} alt="Market Flow Logo" className="w-14 h-14 rounded-lg" />
           <span className="text-2xl font-bold text-blue-500">Market Flow</span>
           <nav className="hidden md:flex space-x-6">
             {navItems.map((item) => (
