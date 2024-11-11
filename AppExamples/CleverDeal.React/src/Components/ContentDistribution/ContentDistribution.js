@@ -326,18 +326,15 @@ function Help() {
           </button>
         </div>
       </header>
-      <main className="flex-grow p- overflow-hidden flex flex-col items-center">
+      <main className="flex-grow p-overflow-hidden flex flex-col items-center">
       <p className="text-center text-2xl text-gray-400 mt-6">Help Page</p>
         <p className="text-lg text-center text-gray-400 mt-6">Here you can find help and support for using Market Flow.</p><br/>
         <img src={help_gif} alt="Market Flow Help" className="w-full max-w-3xl rounded-lg shadow-lg mb-6" />
-        <div className="text-gray-400">
+        <div className="flex-grow text-justify text-gray-400 px-20">
           <h2 className="text-2xl font-semibold mt-4">Frequently Asked Questions</h2>
           <h3 className="text-2xl font-semibold mt-4">What is Market Flow?</h3>
-          <p className="text-lg mt-4">
-            Market Flow is a demonstration of how you can leverage the Symphony network to distribute content.
-            <br />Broadcast near real-time content directly into chat rooms via a Symphony chat bot.
-            <br />The MarketFlow Bot publishes information for Symphony users and other bots to consume.
-            <br />The Acme Bank Bot "listens" for this new content and then publishes this information to the Market Flow web portal.
+          <p className="text-lg md:justify-center mt-4">
+            Market Flow is a demonstration of how you can leverage the Symphony network to distribute content.  Broadcast near real-time information directly into chat rooms via a Symphony chat bot.  This demo has a <b>MarketFlow Bot</b> which publishes information for Symphony users and other bots to consume.  The <b>Acme Bank Bot</b> "listens" for this new content and then publishes this information to the Market Flow web portal.
             <br />
           </p>
           <br/>
@@ -345,7 +342,7 @@ function Help() {
           <p className="text-lg mt-4 mb-4">
             Navigate to the <a href='https://open.symphony.com/?streamId=bBnbhkxXsoSbOrcWbLq5iH%2F%2F%2Fm1pEOVTdA%3D%3D&streamType=chatroom' target="_blank" rel="noreferrer" className="text-blue-500">Content Distribution Room</a> and invoke the Publishing bot using the command <b>@Market Flow Publish /publish</b>
           </p>
-          <ul className="list-disc list-inside space-y-2">
+          <ul className="text-lg list-disc list-inside space-y-2">
             <li>You should start seeing information being published in the Content Distribution Room.</li>
             <li>View the members of the room, you will see two bots, the MarketFlow Bot and the Acme Bank Subscriber Bot.</li>
             <li>The Market Flow Publisher bot is broadcasting content to the Symphony chat room.</li>
