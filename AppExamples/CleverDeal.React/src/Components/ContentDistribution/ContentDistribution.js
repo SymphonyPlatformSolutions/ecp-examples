@@ -334,9 +334,10 @@ function Help() {
           <h2 className="text-2xl font-semibold mt-4">Frequently Asked Questions</h2>
           <h3 className="text-2xl font-semibold mt-4">What is Market Flow?</h3>
           <p className="text-lg mt-4">
-            Market Flow is a demonstration of a financial portal that is being provided near real-time information directly from a bot that's sitting in a Symphony chat room.
-            <br />This example shows how Symphony can be leveraged to distribute content. The MarketFlow Bot publishes information then another bot (Acme Bank Subscriber) "listens"
-            <br />for this new content and then publishes this information to the Market Flow web portal.
+            Market Flow is a demonstration of how you can leverage the Symphony network to distribute content.
+            <br />Broadcast near real-time content directly into chat rooms via a Symphony chat bot.
+            <br />The MarketFlow Bot publishes information for Symphony users and other bots to consume.
+            <br />The Acme Bank Bot "listens" for this new content and then publishes this information to the Market Flow web portal.
             <br />
           </p>
           <br/>
@@ -351,6 +352,7 @@ function Help() {
             <li>The Acme Bank Subscriber Bot is listening for new content and then publishing this information to the Market Flow web portal.</li>
             <li>Navigate to the <Link to="/content" className="text-blue-500">Market Flow</Link> web portal to see the content being published.</li>
             <li>Navigate to the <Link to="/content/feed" className="text-blue-500">Market Feed</Link> page, here you can view the raw messages being sent in the Symphony chat room.</li>
+            <li>Messages will stop publishing after a few minutes automatically.</li>
           </ul>
           <br/>
           <h3 className="text-2xl font-semibold mt-4">How can I contact support?</h3>
