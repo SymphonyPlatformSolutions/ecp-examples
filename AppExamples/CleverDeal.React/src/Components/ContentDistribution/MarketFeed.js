@@ -63,7 +63,7 @@ const MarketFeed = () => {
                     {messages.map((message, index) => (
                         <tr className="bg-gray-800 p-4 justify-between font-mono" key={index}>
                             {Object.values(message).map((value, i) => (
-                                <td classname="px-2 py-4 font-mono" key={i}>{JSON.stringify(value)}</td>
+                                <td className="px-2 py-4 font-mono w-16 h-2" key={i}>{JSON.stringify(value)}</td>
                             ))}
                         </tr>
                     ))}
