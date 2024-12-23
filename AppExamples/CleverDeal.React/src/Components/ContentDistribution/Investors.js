@@ -40,10 +40,10 @@ const InvestorRelations = () => {
       externalNetwork: 'WHATSAPP',
       firstName: formData.firstName,
       lastName: formData.lastName,
-      onboarderEmailAddress: 'vinay@symphony.com',
+      onboarderEmailAddress: 'investorrelations@marketflowllc.com',
       phoneNumber: `${formData.countryCode}${formattedPhone}`,
-      advisorSymphonyIds: ['349026222342678'],
-      advisorEmailAddresses: ['vinay@symphony.com']
+      advisorSymphonyIds: ['349026222362736'],
+      advisorEmailAddresses: ['investorrelations@marketflowllc.com']
     };
 
     try {
