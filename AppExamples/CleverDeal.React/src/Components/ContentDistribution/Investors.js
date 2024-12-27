@@ -42,10 +42,12 @@ const InvestorRelations = () => {
       lastName: formData.lastName,
       onboarderEmailAddress: 'investorrelations@marketflowllc.com',
       phoneNumber: `${formData.countryCode}${formattedPhone}`,
-      advisorSymphonyIds: ['349026222362736'],
-      advisorEmailAddresses: ['investorrelations@marketflowllc.com']
+      advisorSymphonyIds: null,
+      advisorEmailAddresses: null
     };
 
+    console.log('Payload:', payload); // Log the payload for debugging
+    
     try {
       const response = await fetch('https://poc.symphonymarket.solutions/onboard_user', {
         method: 'POST',
@@ -84,6 +86,7 @@ const InvestorRelations = () => {
       phone: '',
       countryCode: ''
     });
+    setFormError('');
     setShowForm(true);
     setSubmissionStatus(null);
   };
