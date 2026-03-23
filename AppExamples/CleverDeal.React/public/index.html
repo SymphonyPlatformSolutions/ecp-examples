@@ -25,6 +25,32 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Clever Deal 2.0</title>
+    <!--
+      Suppress cross-origin "Script error." events from the Symphony ECP SDK
+      iframe. Must run before bundle.js so our listener is registered first
+      and can call stopImmediatePropagation before CRA's overlay handler.
+    -->
+    <script>
+      (function () {
+        if (!document.getElementById('symphony-ecm')) {
+          return;
+        }
+
+        window.addEventListener(
+          'error',
+          function (e) {
+            if (
+              (e.message === 'Script error.' || e.message === 'Script error') &&
+              e.filename === ''
+            ) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+            }
+          },
+          true,
+        );
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

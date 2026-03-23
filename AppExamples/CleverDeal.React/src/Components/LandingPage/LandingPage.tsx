@@ -6,10 +6,10 @@ export const LandingPage = () => {
     window.location.href = path;
   };
 
-  const AppTile = ({ label, path, component } : AppEntry) => (
-    <div className="app-tile" data-enabled={!!component} onClick={() => goto(path)}>
+  const AppTile = ({ label, path, component, enabled } : AppEntry) => (
+    <div className="app-tile" data-enabled={enabled ?? !!component} onClick={() => goto(path)}>
       <h3>{ label }</h3>
-      { !component && <h6>Coming Soon</h6>}
+      { !(enabled ?? !!component) && <h6>Coming Soon</h6>}
     </div>
   );
 

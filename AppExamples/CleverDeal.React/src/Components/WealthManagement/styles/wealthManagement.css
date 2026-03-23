@@ -1,0 +1,9 @@
+/*
+ * Tailwind utilities for the Nakatomi Wealth Management page only.
+ *
+ * @tailwind base is intentionally omitted to prevent Tailwind's Preflight
+ * CSS reset from overriding the SCSS-based styles used elsewhere in
+ * CleverDeal.React.
+ */
+@tailwind components;
+@tailwind utilities;
