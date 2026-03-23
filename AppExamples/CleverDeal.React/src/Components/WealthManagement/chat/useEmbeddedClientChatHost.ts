@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { wealthManagementShellData, type ShellContact } from '../../../Data/wealthManagementShell';
+import { wealthManagementShellData, type ShellContact } from '../data/wealthManagementShell';
 import { symphonyNotifications } from './symphonyNotifications';
 import { getWealthSymphonyThemeUrlParams } from './wealthSymphonyTheme';
 

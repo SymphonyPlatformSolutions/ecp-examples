@@ -1,4 +1,4 @@
-import type { RoomIdMap } from './DashboardItemDetails';
+export type RoomIdMap = Record<string, string>;
 
 interface Customer {
   name: string;
@@ -44,7 +44,7 @@ export interface CommSummaryEntry {
 
 export type ContactSegment = 'UHNW' | 'HNW' | 'Retail';
 
-export const SEGMENT_STYLES: Record<string, string> = {
+export const SEGMENT_STYLES: Record<ContactSegment, string> = {
   UHNW: 'bg-rose-600 text-white',
   HNW: 'bg-violet-600 text-white',
   Retail: 'bg-slate-600 text-white',

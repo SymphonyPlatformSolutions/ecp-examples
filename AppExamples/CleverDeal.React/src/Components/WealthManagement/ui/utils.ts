@@ -1,5 +1,5 @@
-import classNames from 'classnames'
+import classNames from 'classnames';
 
 export function cn(...inputs: Array<string | undefined | null | false>) {
-  return classNames(inputs)
+  return classNames(inputs);
 }

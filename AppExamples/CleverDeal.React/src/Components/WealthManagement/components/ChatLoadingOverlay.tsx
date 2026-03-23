@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react';
-import { cn } from '../../ui/utils';
+import { cn } from '../ui/utils';
 
 interface ChatLoadingOverlayProps {
   title?: string;

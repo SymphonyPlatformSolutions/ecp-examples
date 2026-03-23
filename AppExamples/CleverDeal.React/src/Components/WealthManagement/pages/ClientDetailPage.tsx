@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, type ReactNode } from 'react';
 import {
   AlertTriangle,
   CalendarDays,
@@ -13,23 +13,19 @@ import {
 } from 'lucide-react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { Navigate, useParams } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
-import { Badge } from '../../ui/badge';
-import { wealthManagementData } from '../../../Data/wealthManagement';
-import { SEGMENT_STYLES } from '../../../Models/WealthManagementData';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { wealthManagementData } from '../data/wealthManagement';
+import { SEGMENT_STYLES } from '../models/WealthManagementData';
 import { useEmbeddedClientChatHost, type ClientChatHostMessage } from '../chat/useEmbeddedClientChatHost';
+import { debugWealth } from '../chat/wealthDebug';
 import ChatLoadingOverlay from '../components/ChatLoadingOverlay';
 
 
 
 
 function debugDocumentShare(message: string, context?: Record<string, unknown>) {
-  if (context) {
-    console.debug(`[WealthClientShare] ${message}`, context);
-    return;
-  }
-
-  console.debug(`[WealthClientShare] ${message}`);
+  debugWealth('WealthClientShare', message, context);
 }
 
 function getInitials(name: string) {
@@ -60,10 +56,10 @@ function ProfileTile({
   children,
 }: {
   title: string;
-  headerContent?: React.ReactNode;
+  headerContent?: ReactNode;
   bodyClassName?: string;
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className={`${TILE_CLASSNAME} ${className ?? ''}`.trim()}>

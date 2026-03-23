@@ -10,15 +10,15 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { ArrowUpDown, MessageSquare, Search, TrendingUp, Users, Wallet, Activity } from 'lucide-react';
-import { wealthManagementData } from '../../../Data/wealthManagement';
-import type { Contact, ContactSegment, ServiceStatus } from '../../../Models/WealthManagementData';
-import { SEGMENT_STYLES } from '../../../Models/WealthManagementData';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
-import { Badge } from '../../ui/badge';
-import { Button } from '../../ui/button';
-import { Card, CardContent } from '../../ui/card';
-import { Table, TBody, TD, TH, THead, TR } from '../../ui/table';
-import { cn } from '../../ui/utils';
+import { wealthManagementData } from '../data/wealthManagement';
+import type { Contact, ContactSegment, ServiceStatus } from '../models/WealthManagementData';
+import { SEGMENT_STYLES } from '../models/WealthManagementData';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Table, TBody, TD, TH, THead, TR } from '../ui/table';
+import { cn } from '../ui/utils';
 import { symphonyNotifications, type SymphonyStreamUnreadCounts } from '../chat/symphonyNotifications';
 
 const STATUS_VARIANT: Record<ServiceStatus, 'success' | 'default' | 'secondary'> = {
@@ -78,7 +78,9 @@ export default function ContactsPage({ onOpenChat }: ContactsPageProps) {
 
   const contacts = useMemo(() => wealthManagementData.contacts ?? [], []);
 
-  useEffect(() => symphonyNotifications.onStreamUnreadChange(setStreamUnreadCounts), []);
+  useEffect(() => {
+    return symphonyNotifications.onStreamUnreadChange(setStreamUnreadCounts);
+  }, []);
   const filteredContacts = useMemo(
     () =>
       contacts.filter((contact) => {
@@ -140,7 +142,7 @@ export default function ContactsPage({ onOpenChat }: ContactsPageProps) {
         accessorKey: 'segment',
         header: 'Segment',
         cell: ({ getValue }) => {
-          const seg = String(getValue());
+          const seg = getValue() as ContactSegment;
           return (
             <span className={cn(
               'rounded-md px-2.5 py-1 text-[11px] font-semibold',

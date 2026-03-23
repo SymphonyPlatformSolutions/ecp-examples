@@ -1,13 +1,13 @@
 import {
   Contact,
   WealthManagementData,
-} from '../Models/WealthManagementData';
-import AmeliaChenProfile from '../Components/WealthManagement/assets/Amelia_Chen.png';
-import EvelynReedProfile from '../Components/WealthManagement/assets/Evelyn_Reed.png';
-import FayeZhangProfile from '../Components/WealthManagement/assets/Faye_Zhang.png';
-import HansGruberProfile from '../Components/WealthManagement/assets/Hans_Gruber.png';
-import JonathanSmithProfile from '../Components/WealthManagement/assets/Jonathan_Smith.png';
-import RajPatelProfile from '../Components/WealthManagement/assets/Raj_Patel.png';
+} from '../models/WealthManagementData';
+import AmeliaChenProfile from '../assets/Amelia_Chen.png';
+import EvelynReedProfile from '../assets/Evelyn_Reed.png';
+import FayeZhangProfile from '../assets/Faye_Zhang.png';
+import HansGruberProfile from '../assets/Hans_Gruber.png';
+import JonathanSmithProfile from '../assets/Jonathan_Smith.png';
+import RajPatelProfile from '../assets/Raj_Patel.png';
 
 const sharedAllocation = [
   { name: 'Core Equities', value: 40, color: '#123b7a' },

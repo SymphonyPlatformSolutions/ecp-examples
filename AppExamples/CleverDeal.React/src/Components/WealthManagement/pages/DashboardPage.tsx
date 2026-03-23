@@ -15,12 +15,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { wealthManagementData } from '../../../Data/wealthManagement';
+import { wealthManagementData } from '../data/wealthManagement';
 import { symphonyNotifications } from '../chat/symphonyNotifications';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
-import { Badge } from '../../ui/badge';
-import { Calendar } from '../../ui/calendar';
-import { cn } from '../../ui/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Calendar } from '../ui/calendar';
+import { cn } from '../ui/utils';
 
 const ACTIVITY_STYLES = {
   meeting: {

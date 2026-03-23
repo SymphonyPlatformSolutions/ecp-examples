@@ -1,6 +1,6 @@
 import { AlertCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../ui/button';
+import { Button } from '../ui/button';
 import { useEmbeddedClientChatHost } from '../chat/useEmbeddedClientChatHost';
 import ChatLoadingOverlay from './ChatLoadingOverlay';
 import SymphonyMark from './SymphonyMark';

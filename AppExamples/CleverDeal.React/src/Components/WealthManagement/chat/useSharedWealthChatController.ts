@@ -7,29 +7,13 @@ import {
   getWealthSymphonyRenderOptions,
   WEALTH_SHARED_CHAT_SELECTOR,
 } from './wealthSymphonyTheme';
-
-const WEALTH_DEBUG_STORAGE_KEY = 'wealthDebugTheme';
-
-function isWealthThemeDebugEnabled() {
-  try {
-    const query = new URLSearchParams(window.location.search);
-    return query.get(WEALTH_DEBUG_STORAGE_KEY) === '1' || window.localStorage.getItem(WEALTH_DEBUG_STORAGE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
+import { debugWealth, isWealthDebugFlagEnabled } from './wealthDebug';
 
 function debugWealthChat(message: string, context?: Record<string, unknown>) {
-  if (!isWealthThemeDebugEnabled()) {
+  if (!isWealthDebugFlagEnabled()) {
     return;
   }
-
-  if (context) {
-    console.debug(`[WealthChat] ${message}`, context);
-    return;
-  }
-
-  console.debug(`[WealthChat] ${message}`);
+  debugWealth('WealthChat', message, context);
 }
 
 const BOOTSTRAP_RETRY_DELAYS_MS = [1000, 2000, 4000];

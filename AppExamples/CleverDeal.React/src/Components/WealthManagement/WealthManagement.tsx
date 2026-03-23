@@ -3,8 +3,8 @@ import { AlertCircle, Bell, House, Menu, Search } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { getEcpParam } from '../../Utils/utils';
 import Loading from '../Loading';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Button } from './ui/button';
 import {
   DropdownMenu,
   DropdownMenuChevron,
@@ -13,15 +13,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
-import { cn } from '../ui/utils';
+} from './ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { cn } from './ui/utils';
 import SymphonyChatShell from './components/SymphonyChatShell';
 import SymphonyMark from './components/SymphonyMark';
 import { symphonyNotifications } from './chat/symphonyNotifications';
 import { acquireWealthSymphonyThemeOwnership, applyWealthSymphonyTheme } from './chat/wealthSymphonyTheme';
 import { useSharedChatPresentationTransition } from './chat/useSharedChatPresentationTransition';
-import { wealthManagementShellData } from '../../Data/wealthManagementShell';
+import { wealthManagementShellData } from './data/wealthManagementShell';
 import { useSharedWealthChatController } from './chat/useSharedWealthChatController';
 import ModulePlaceholderPage from './pages/ModulePlaceholderPage';
 import './styles/wealthManagement.css';

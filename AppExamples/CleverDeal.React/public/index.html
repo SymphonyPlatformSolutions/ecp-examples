@@ -31,12 +31,25 @@
       and can call stopImmediatePropagation before CRA's overlay handler.
     -->
     <script>
-      window.addEventListener('error', function(e) {
-        if (e.message === 'Script error.' || e.message === 'Script error') {
-          e.stopImmediatePropagation();
-          e.preventDefault();
+      (function () {
+        if (!document.getElementById('symphony-ecm')) {
+          return;
         }
-      }, true);
+
+        window.addEventListener(
+          'error',
+          function (e) {
+            if (
+              (e.message === 'Script error.' || e.message === 'Script error') &&
+              e.filename === ''
+            ) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+            }
+          },
+          true,
+        );
+      })();
     </script>
   </head>
   <body>

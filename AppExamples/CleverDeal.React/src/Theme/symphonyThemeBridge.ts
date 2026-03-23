@@ -1,9 +1,9 @@
+import { debugWealth, isWealthDebugFlagEnabled } from '../Components/WealthManagement/chat/wealthDebug';
+
 export interface SymphonyThemePayload {
   mode: string;
   theme: Record<string, unknown>;
 }
-
-const WEALTH_DEBUG_STORAGE_KEY = 'wealthDebugTheme';
 
 type SymphonyWindow = Window & {
   symphony?: {
@@ -12,26 +12,11 @@ type SymphonyWindow = Window & {
   };
 };
 
-function isWealthThemeDebugEnabled() {
-  try {
-    const query = new URLSearchParams(window.location.search);
-    return query.get(WEALTH_DEBUG_STORAGE_KEY) === '1' || window.localStorage.getItem(WEALTH_DEBUG_STORAGE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
 function debugWealthTheme(message: string, context?: Record<string, unknown>) {
-  if (!isWealthThemeDebugEnabled()) {
+  if (!isWealthDebugFlagEnabled()) {
     return;
   }
-
-  if (context) {
-    console.debug(`[WealthTheme] ${message}`, context);
-    return;
-  }
-
-  console.debug(`[WealthTheme] ${message}`);
+  debugWealth('WealthTheme', message, context);
 }
 
 class SymphonyThemeBridge {

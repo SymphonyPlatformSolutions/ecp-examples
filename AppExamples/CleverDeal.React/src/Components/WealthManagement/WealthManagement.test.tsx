@@ -2,7 +2,7 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ThemeContext, type ThemeState } from '../../Theme/ThemeProvider';
-import { wealthManagementData } from '../../Data/wealthManagement';
+import { wealthManagementData } from './data/wealthManagement';
 import { WEALTH_SYMPHONY_THEME } from './chat/wealthSymphonyTheme';
 import WealthManagement from './WealthManagement';
 
