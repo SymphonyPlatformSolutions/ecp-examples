@@ -25,7 +25,7 @@ type SheetContextValue = {
 
 const SheetContext = createContext<SheetContextValue | null>(null);
 
-type ElementWithRef<T extends HTMLElement> = ReactElement & {
+type ElementWithRef<T extends HTMLElement> = ReactElement<Record<string, unknown>> & {
   ref?: Ref<T>;
 };
 
