@@ -27,6 +27,36 @@ describe('SymphonySdkService', () => {
     });
   }
 
+  function createOpenStreamMock({
+    onOpen,
+  }: {
+    onOpen?: (iframe: HTMLIFrameElement, container: HTMLDivElement) => void;
+  } = {}) {
+    return jest.fn((streamId: string, containerSelector: string) => {
+      const container = document.querySelector(containerSelector) as HTMLDivElement | null;
+      if (!container) {
+        return Promise.reject(new Error(`missing container for ${streamId}`));
+      }
+
+      let iframe = container.querySelector('iframe') as HTMLIFrameElement | null;
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.src = `https://corporate.symphony.com/apps/client2/${streamId}`;
+        container.appendChild(iframe);
+      }
+
+      if (onOpen) {
+        onOpen(iframe, container);
+      } else {
+        window.setTimeout(() => {
+          iframe?.dispatchEvent(new Event('load'));
+        }, 0);
+      }
+
+      return Promise.resolve();
+    });
+  }
+
   beforeEach(() => {
     document.body.innerHTML = '<div class="slot-a"></div><div class="slot-b"></div>';
     delete (window as Window & { symphony?: unknown }).symphony;
@@ -35,11 +65,12 @@ describe('SymphonySdkService', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
+    jest.useRealTimers();
     delete (window as Window & { symphony?: unknown }).symphony;
     delete (window as Window & { __wealthManagementRenderEcp?: unknown }).__wealthManagementRenderEcp;
   });
 
-  test('injects the SDK script once without performing a hidden bootstrap render', async () => {
+test('injects the SDK script once in default focus mode without performing a hidden bootstrap render', async () => {
     const service = new SymphonySdkService();
     const renderMock = createRenderMock();
 
@@ -47,13 +78,15 @@ describe('SymphonySdkService', () => {
     const secondInit = service.init('corporate.symphony.com');
 
     expect(document.querySelectorAll('#symphony-ecm-sdk')).toHaveLength(1);
+    const script = document.getElementById('symphony-ecm-sdk') as HTMLScriptElement;
+    expect(script.getAttribute('render')).toBe('explicit');
+    expect(script.hasAttribute('data-mode')).toBe(false);
 
     (window as Window & { symphony?: unknown }).symphony = {
       render: renderMock,
       openStream: jest.fn(),
     } as any;
 
-    const script = document.getElementById('symphony-ecm-sdk') as HTMLScriptElement;
     script.onload?.(new Event('load') as any);
 
     await Promise.all([firstInit, secondInit]);
@@ -166,24 +199,40 @@ describe('SymphonySdkService', () => {
   test('opens a requested stream inside an existing collaboration iframe without re-rendering', async () => {
     const service = new SymphonySdkService();
     const renderMock = createRenderMock();
-    const openStreamMock = jest.fn(() => Promise.resolve());
+    const openStreamMock = createOpenStreamMock();
+    const updateSettingsMock = jest.fn();
+    const updateThemeMock = jest.fn();
 
     (window as Window & { symphony?: unknown }).symphony = {
       render: renderMock,
       openStream: openStreamMock,
+      updateSettings: updateSettingsMock,
+      updateTheme: updateThemeMock,
     } as any;
 
     await service.init('corporate.symphony.com');
     await service.renderChat('.slot-a', { mode: 'light' });
 
-    await service.openStream('stream-1', '.slot-a', { mode: 'light' });
+    await service.openStream('stream-1', '.slot-a', {
+      mode: 'light',
+      condensed: false,
+      showMembers: false,
+      theme: { primary: '#55b7ff' },
+    });
 
     expect(renderMock).toHaveBeenCalledTimes(1);
     expect(openStreamMock).toHaveBeenCalledWith('stream-1', '.slot-a');
+    expect(updateSettingsMock).toHaveBeenCalledWith({
+      mode: 'light',
+      condensed: false,
+      showMembers: false,
+      theme: { primary: '#55b7ff' },
+    });
+    expect(updateThemeMock).toHaveBeenCalledWith({ primary: '#55b7ff' });
     expect(service.getRenderedStreamId('.slot-a')).toBe('stream-1');
   });
 
-  test('falls back to a single render when a stream is requested before the slot has rendered', async () => {
+  test('adopts a preloaded rendered iframe into the mounted live slot', async () => {
     const service = new SymphonySdkService();
     const renderMock = createRenderMock();
 
@@ -193,10 +242,173 @@ describe('SymphonySdkService', () => {
     } as any;
 
     await service.init('corporate.symphony.com');
+    await service.renderChat('.slot-a', { mode: 'light', streamId: 'stream-1' });
+
+    expect(service.adoptRenderedContainer('.slot-a', '.slot-b')).toBe(true);
+    expect(document.querySelector('.slot-a iframe')).toBeNull();
+    expect(document.querySelector('.slot-b iframe')).not.toBeNull();
+    expect(service.hasRendered('.slot-a')).toBe(false);
+    expect(service.getRenderedStreamId('.slot-b')).toBe('stream-1');
+  });
+
+  test('opens a requested focus stream directly into an empty container without a bootstrap render', async () => {
+    const service = new SymphonySdkService();
+    const renderMock = createRenderMock();
+    const openStreamMock = createOpenStreamMock();
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: renderMock,
+      openStream: openStreamMock,
+      sendMessage: jest.fn(),
+    } as any;
+
+    await service.init('corporate.symphony.com');
     await service.openStream('stream-1', '.slot-a', { mode: 'light' });
 
-    expect(renderMock).toHaveBeenCalledTimes(1);
-    expect(renderMock).toHaveBeenCalledWith('slot-a', { mode: 'light', streamId: 'stream-1' });
+    expect(renderMock).not.toHaveBeenCalled();
+    expect(openStreamMock).toHaveBeenCalledWith('stream-1', '.slot-a');
+    expect(service.getRenderedStreamId('.slot-a')).toBe('stream-1');
+  });
+
+  test('waits for the warmed collaboration iframe to reload before resolving an openStream call', async () => {
+    const service = new SymphonySdkService();
+    const renderMock = createRenderMock();
+    let releaseFrameLoad: (() => void) | undefined;
+    const openStreamMock = createOpenStreamMock({
+      onOpen: (iframe) => {
+        releaseFrameLoad = () => iframe.dispatchEvent(new Event('load'));
+      },
+    });
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: renderMock,
+      openStream: openStreamMock,
+    } as any;
+
+    await service.init('corporate.symphony.com');
+    await service.renderChat('.slot-a', { mode: 'light' });
+
+    let resolved = false;
+    const openPromise = service.openStream('stream-1', '.slot-a', { mode: 'light' }).then(() => {
+      resolved = true;
+    });
+
+    await Promise.resolve();
+    expect(resolved).toBe(false);
+
+    releaseFrameLoad?.();
+    await openPromise;
+
+    expect(resolved).toBe(true);
+    expect(service.getRenderedStreamId('.slot-a')).toBe('stream-1');
+  });
+
+  test('settles a warmed collaboration iframe even when Symphony keeps the switch inside the existing iframe', async () => {
+    const service = new SymphonySdkService();
+    const renderMock = createRenderMock();
+    const openStreamMock = createOpenStreamMock({
+      onOpen: () => {
+        // The embed can complete a stream switch in-place without a new iframe load.
+      },
+    });
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: renderMock,
+      openStream: openStreamMock,
+    } as any;
+
+    await service.init('corporate.symphony.com');
+    await service.renderChat('.slot-a', { mode: 'light' });
+    jest.useFakeTimers();
+
+    let resolved = false;
+    const openPromise = service.openStream('stream-1', '.slot-a', { mode: 'light' }).then(() => {
+      resolved = true;
+    });
+
+    await Promise.resolve();
+    expect(resolved).toBe(false);
+
+    jest.advanceTimersByTime(1000);
+    await Promise.resolve();
+    await openPromise;
+
+    expect(openStreamMock).toHaveBeenCalledWith('stream-1', '.slot-a');
+    expect(resolved).toBe(true);
+    expect(service.getRenderedStreamId('.slot-a')).toBe('stream-1');
+  });
+
+  test('waits for a short cold settle before treating the first focus open as ready when no load event fires', async () => {
+    const service = new SymphonySdkService();
+    const openStreamMock = createOpenStreamMock({
+      onOpen: () => {
+        // The SDK injects the iframe immediately and finishes navigation later.
+      },
+    });
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: createRenderMock(),
+      openStream: openStreamMock,
+      sendMessage: jest.fn(),
+    } as any;
+
+    await service.init('corporate.symphony.com');
+    jest.useFakeTimers();
+
+    let resolved = false;
+    const openPromise = service.openStream('stream-1', '.slot-a', { mode: 'light' }).then(() => {
+      resolved = true;
+    });
+
+    await Promise.resolve();
+    expect(resolved).toBe(false);
+
+    jest.advanceTimersByTime(800);
+    await Promise.resolve();
+    await openPromise;
+
+    expect(openStreamMock).toHaveBeenCalledWith('stream-1', '.slot-a');
+    expect(document.querySelector('.slot-a iframe')).not.toBeNull();
+    expect(resolved).toBe(true);
+    expect(service.getRenderedStreamId('.slot-a')).toBe('stream-1');
+  });
+
+  test('sends a message through the initialized SDK using the provided container selector', async () => {
+    const service = new SymphonySdkService();
+    const sendMessageMock = jest.fn(() => Promise.resolve());
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: createRenderMock(),
+      openStream: jest.fn(),
+      sendMessage: sendMessageMock,
+    } as any;
+
+    await service.init('corporate.symphony.com');
+    await service.sendMessage(
+      {
+        text: {
+          'text/markdown': 'hello',
+        },
+      },
+      {
+        containerSelector: '.slot-a',
+        mode: 'blast',
+        streamIds: ['stream-1'],
+      },
+    );
+
+    expect(sendMessageMock).toHaveBeenCalledWith(
+      {
+        text: {
+          'text/markdown': 'hello',
+        },
+      },
+      {
+        container: '.slot-a',
+        mode: 'blast',
+        streamIds: ['stream-1'],
+      },
+    );
   });
 
   test('moves to error when visible-slot render fails', async () => {
@@ -214,6 +426,27 @@ describe('SymphonySdkService', () => {
       'Unable to render Symphony chat. render failed',
     );
     expect(service.status).toBe('error');
+  });
+
+  test('does not move to error when switching an existing stream fails', async () => {
+    const service = new SymphonySdkService();
+    const renderMock = createRenderMock();
+    const openStreamMock = jest.fn().mockRejectedValueOnce(new Error('stream failed'));
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: renderMock,
+      openStream: openStreamMock,
+    } as any;
+
+    await service.init('corporate.symphony.com');
+    await service.renderChat('.slot-a', { mode: 'light' });
+
+    await expect(service.openStream('stream-1', '.slot-a', { mode: 'light' })).rejects.toThrow(
+      'Unable to open Symphony stream. stream failed',
+    );
+
+    expect(service.status).toBe('ready');
+    expect(service.getRenderedStreamId('.slot-a')).toBeUndefined();
   });
 
   test('does not reset the SDK when no error state is active', async () => {

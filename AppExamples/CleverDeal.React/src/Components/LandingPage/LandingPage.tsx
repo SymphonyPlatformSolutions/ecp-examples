@@ -1,17 +1,29 @@
+import { useNavigate } from 'react-router-dom';
 import { routes, AppEntry } from '../../Data/routes';
 import './LandingPage.scss';
 
 export const LandingPage = () => {
-  const goto = (path : string) => {
-    window.location.href = path;
+  const navigate = useNavigate();
+
+  const goto = (path: string, enabled: boolean) => {
+    if (!enabled) {
+      return;
+    }
+
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    navigate(normalizedPath);
   };
 
-  const AppTile = ({ label, path, component, enabled } : AppEntry) => (
-    <div className="app-tile" data-enabled={enabled ?? !!component} onClick={() => goto(path)}>
-      <h3>{ label }</h3>
-      { !(enabled ?? !!component) && <h6>Coming Soon</h6>}
-    </div>
-  );
+  const AppTile = ({ label, path, component, enabled } : AppEntry) => {
+    const isEnabled = enabled ?? !!component;
+
+    return (
+      <div className="app-tile" data-enabled={isEnabled} onClick={() => goto(path, isEnabled)}>
+        <h3>{ label }</h3>
+        { !isEnabled && <h6>Coming Soon</h6>}
+      </div>
+    );
+  };
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   AlertTriangle,
   CalendarDays,
@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { wealthManagementData } from '../data/wealthManagement';
 import { SEGMENT_STYLES } from '../models/WealthManagementData';
-import { useEmbeddedClientChatHost, type ClientChatHostMessage } from '../chat/useEmbeddedClientChatHost';
+import { useClientChatSdkController } from '../chat/useClientChatSdkController';
 import { debugWealth } from '../chat/wealthDebug';
 import ChatLoadingOverlay from '../components/ChatLoadingOverlay';
 
@@ -44,7 +44,6 @@ interface ClientDetailPageProps {
   partnerId?: string;
 }
 
-const CLIENT_CHAT_IFRAME_ID = 'wealth-client-chat-host';
 const TILE_CLASSNAME = 'overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.06)]';
 const TILE_HEADER_CLASSNAME = 'flex h-[38px] items-center justify-between gap-3 bg-[linear-gradient(180deg,#082a60_0%,#113b7d_100%)] px-3 text-white';
 
@@ -121,69 +120,20 @@ export default function ClientDetailPage({
   partnerId,
 }: ClientDetailPageProps) {
   const { id = '' } = useParams<{ id: string }>();
-  const activeShareRequestIdRef = useRef<string | null>(null);
-  const shareRequestSequenceRef = useRef(0);
   const [sharingDocumentName, setSharingDocumentName] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
 
-  const handleClientChatHostMessage = useCallback((data: ClientChatHostMessage) => {
-    debugDocumentShare('Received message from client chat host.', {
-      type: data.type,
-      payload: data.payload ?? {},
-    });
-
-    if (data.type === 'share-success') {
-      if (data.payload?.requestId !== activeShareRequestIdRef.current) {
-        debugDocumentShare('Ignoring share-success for stale request.', {
-          activeRequestId: activeShareRequestIdRef.current,
-          requestId: data.payload?.requestId,
-        });
-        return;
-      }
-
-      debugDocumentShare('Client chat host confirmed document share.', {
-        requestId: data.payload?.requestId,
-        documentName: data.payload?.documentName,
-        streamId: data.payload?.streamId,
-      });
-      activeShareRequestIdRef.current = null;
-      setShareError(null);
-      setSharingDocumentName(null);
-      return;
-    }
-
-    if (data.type === 'share-error') {
-      if (data.payload?.requestId && data.payload.requestId !== activeShareRequestIdRef.current) {
-        debugDocumentShare('Ignoring share-error for stale request.', {
-          activeRequestId: activeShareRequestIdRef.current,
-          requestId: data.payload.requestId,
-        });
-        return;
-      }
-
-      console.error('[WealthClientShare] Client chat host reported document share failure.', {
-        requestId: data.payload?.requestId,
-        documentName: data.payload?.documentName,
-        message: data.payload?.message,
-        streamId: data.payload?.streamId,
-      });
-      activeShareRequestIdRef.current = null;
-      setSharingDocumentName(null);
-      setShareError(data.payload?.message ?? `Unable to share ${data.payload?.documentName ?? 'document'} to chat.`);
-    }
-  }, []);
-
   const {
     chatError,
-    chatHostUrl,
-    iframeRef,
     isChatReady,
+    isLoading,
+    sendMessageToChat,
     streamId,
-  } = useEmbeddedClientChatHost({
+    slotClassName,
+  } = useClientChatSdkController({
     contactId: id,
     ecpOrigin,
     partnerId,
-    onHostMessage: handleClientChatHostMessage,
   });
 
   const contact = (wealthManagementData.contacts ?? []).find((item) => item.id === id);
@@ -192,53 +142,33 @@ export default function ClientDetailPage({
     return <Navigate to="/wealth-management/clients" replace />;
   }
 
-  const shareDocumentToChat = (document: { name: string; type: string; updatedAt: string }) => {
-    const hostWindow = iframeRef.current?.contentWindow;
-    if (!hostWindow) {
-      console.error('[WealthClientShare] Client chat host window is unavailable.', {
-        streamId,
-        documentName: document.name,
-      });
-      setShareError('Client chat is not available right now.');
-      return;
-    }
-
-    if (!isChatReady) {
-      console.warn('[WealthClientShare] Client chat is not ready yet.', {
-        streamId,
-        documentName: document.name,
-      });
-      setShareError('Client chat is still connecting. Please try again in a moment.');
-      return;
-    }
-
-    const requestId = `client-share-${++shareRequestSequenceRef.current}`;
+  const shareDocumentToChat = async (document: { name: string; type: string; updatedAt: string }) => {
     const messagePayload = buildDocumentSharePayload(document, contact.name);
-
     setShareError(null);
     setSharingDocumentName(document.name);
-    activeShareRequestIdRef.current = requestId;
 
-    debugDocumentShare('Posting document share request to client chat host.', {
-      requestId,
+    debugDocumentShare('Sending document share request to Symphony client chat.', {
       documentName: document.name,
       streamId,
       messagePayload,
     });
 
-    hostWindow.postMessage(
-      {
-        source: 'wealth-client-chat-parent',
-        type: 'send-message',
-        payload: {
-          requestId,
-          documentName: document.name,
-          streamId,
-          message: messagePayload,
-        },
-      },
-      window.location.origin,
-    );
+    try {
+      await sendMessageToChat(messagePayload);
+      setShareError(null);
+    } catch (cause) {
+      const message = cause instanceof Error
+        ? cause.message
+        : `Unable to share ${document.name} to chat.`;
+      console.error('[WealthClientShare] Unable to share document to Symphony chat.', {
+        documentName: document.name,
+        message,
+        streamId,
+      });
+      setShareError(message);
+    } finally {
+      setSharingDocumentName(null);
+    }
   };
 
 
@@ -417,18 +347,17 @@ export default function ClientDetailPage({
                 </Badge>
               )}
             >
-              {!isChatReady ? <ChatLoadingOverlay /> : null}
+              {(isLoading || !isChatReady) && !chatError ? <ChatLoadingOverlay /> : null}
               {chatError ? (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#fbfcfe] p-6 text-center text-[13px] leading-6 text-rose-600">
                   {chatError}
                 </div>
               ) : null}
-              <iframe
-                id={CLIENT_CHAT_IFRAME_ID}
-                ref={iframeRef}
-                title="Wealth client chat"
-                src={chatHostUrl}
-                className="h-full w-full border-0"
+              <div
+                data-testid="wealth-client-chat-slot"
+                className={`${slotClassName} h-full w-full transition-opacity duration-200`}
+                style={{ opacity: isChatReady && !isLoading && !chatError ? 1 : 0, pointerEvents: isChatReady && !isLoading && !chatError ? 'auto' : 'none' }}
+                aria-hidden={Boolean(chatError) || isLoading || !isChatReady}
               />
             </ProfileTile>
 

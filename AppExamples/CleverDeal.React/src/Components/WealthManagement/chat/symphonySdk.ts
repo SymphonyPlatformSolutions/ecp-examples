@@ -1,7 +1,13 @@
+import { debugWealth } from './wealthDebug';
+
 const SDK_SCRIPT_ID = 'symphony-ecm-sdk';
 const SDK_ONLOAD_CALLBACK = '__wealthManagementRenderEcp';
 const DEFAULT_PARTNER_ID = 'symphony_internal_BYC-XXX';
 const DEFAULT_SDK_PATH = '/embed/sdk.js';
+
+function debugSdk(message: string, context?: Record<string, unknown>) {
+  debugWealth('SymphonySdk', message, context);
+}
 
 export type SymphonySdkStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -25,15 +31,22 @@ type InflightOperation = {
 type FrameWaitHandle = {
   promise: Promise<void>;
   cancel: () => void;
+  hadExistingFrame?: boolean;
 };
 
 const FRAME_READY_TIMEOUT_MS = 15000;
+const COLD_STREAM_SETTLE_MS = 800;
+const WARM_STREAM_SETTLE_MS = 300;
 
 declare global {
   interface Window {
     symphony?: {
       render: (container: string, options: Record<string, unknown>) => Promise<unknown>;
       openStream: (streamId: string, containerSelector: string) => Promise<unknown> | unknown;
+      sendMessage: (
+        message: Record<string, unknown>,
+        options: Record<string, unknown>,
+      ) => Promise<unknown> | unknown;
       listen?: (config: {
         type: string;
         params?: Record<string, unknown>;
@@ -142,6 +155,12 @@ export class SymphonySdkService {
       }
 
       window.setTimeout(resolve, 0);
+    });
+  }
+
+  private _waitForDuration(durationMs: number) {
+    return new Promise<void>((resolve) => {
+      window.setTimeout(resolve, durationMs);
     });
   }
 
@@ -268,17 +287,151 @@ export class SymphonySdkService {
         settled = true;
         cleanup();
       },
+      hadExistingFrame: false,
+    };
+  }
+
+  private _observeOpenedStream(containerSelector: string): FrameWaitHandle {
+    const container = this._getContainer(containerSelector);
+    if (!container) {
+      return {
+        promise: Promise.reject(this._createError(`Missing Symphony slot "${containerSelector}".`)),
+        cancel: () => {},
+      };
+    }
+
+    let settled = false;
+    let timeoutId: number | null = null;
+    let observer: MutationObserver | null = null;
+    let currentFrame: HTMLIFrameElement | null = null;
+    let handleFrameLoad = () => {};
+
+    const baselineFrame = container.querySelector('iframe') as HTMLIFrameElement | null;
+    const baselineSrc = baselineFrame ? this._getFrameSrc(baselineFrame) : '';
+
+    const cleanup = () => {
+      observer?.disconnect();
+      observer = null;
+      if (currentFrame) {
+        currentFrame.removeEventListener('load', handleFrameLoad);
+      }
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
+
+    const promise = new Promise<void>((resolve, reject) => {
+      const settle = () => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        cleanup();
+        void this._waitForNextPaint().then(resolve);
+      };
+
+      const fail = (message: string) => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        cleanup();
+        reject(this._createError(message));
+      };
+
+      handleFrameLoad = () => {
+        const frame = currentFrame;
+        if (!frame || !this._hasMeaningfulFrameSrc(frame)) {
+          return;
+        }
+
+        frame.dataset.wealthReady = 'true';
+        settle();
+      };
+
+      const watchFrame = (frame: HTMLIFrameElement) => {
+        if (currentFrame !== frame) {
+          if (currentFrame) {
+            currentFrame.removeEventListener('load', handleFrameLoad);
+          }
+          currentFrame = frame;
+          currentFrame.addEventListener('load', handleFrameLoad);
+        }
+
+        if (!baselineFrame) {
+          if (this._isFrameReady(frame)) {
+            settle();
+          }
+          return;
+        }
+
+        delete frame.dataset.wealthReady;
+
+        const didFrameChange = frame !== baselineFrame || this._getFrameSrc(frame) !== baselineSrc;
+        if (didFrameChange && this._isFrameReady(frame)) {
+          settle();
+        }
+      };
+
+      const syncFrame = () => {
+        const frame = container.querySelector('iframe') as HTMLIFrameElement | null;
+        if (!frame) {
+          return;
+        }
+
+        watchFrame(frame);
+      };
+
+      observer = new MutationObserver(syncFrame);
+      observer.observe(container, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src'],
+      });
+      syncFrame();
+
+      timeoutId = window.setTimeout(() => {
+        fail(`Timed out waiting for Symphony stream to open in "${containerSelector}".`);
+      }, FRAME_READY_TIMEOUT_MS);
+    });
+
+    return {
+      promise,
+      cancel: () => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        cleanup();
+      },
+      hadExistingFrame: Boolean(baselineFrame),
     };
   }
 
   init(ecpOrigin: string, partnerId?: string): Promise<void> {
     if (this._status === 'ready') {
+      debugSdk('init() skipped — already ready.');
       return Promise.resolve();
     }
 
     if (this._initPromise) {
+      debugSdk('init() skipped — already in progress.');
       return this._initPromise;
     }
+
+    const initStart = performance.now();
+    debugSdk('init() starting.', {
+      ecpOrigin,
+      partnerId,
+      hasSymphonyOnWindow: Boolean(window.symphony),
+      hasExistingScript: Boolean(document.getElementById(SDK_SCRIPT_ID)),
+      currentStatus: this._status,
+    });
 
     this._setStatus('loading');
 
@@ -291,6 +444,7 @@ export class SymphonySdkService {
         }
 
         completed = true;
+        debugSdk('init() ready.', { elapsedMs: Math.round(performance.now() - initStart) });
         this._setStatus('ready');
         resolve();
       };
@@ -301,6 +455,7 @@ export class SymphonySdkService {
         }
 
         completed = true;
+        debugSdk('init() failed.', { elapsedMs: Math.round(performance.now() - initStart), cause: String(cause) });
         const error = this._createError('Unable to initialize Symphony chat.', cause);
         this._setStatus('error', error);
         reject(error);
@@ -324,7 +479,6 @@ export class SymphonySdkService {
       script.src = `https://${ecpOrigin}${DEFAULT_SDK_PATH}`;
       script.id = SDK_SCRIPT_ID;
       script.setAttribute('render', 'explicit');
-      script.setAttribute('data-mode', 'full');
       script.setAttribute('data-onload', SDK_ONLOAD_CALLBACK);
       script.onload = complete;
       script.onerror = (event) => fail(event);
@@ -358,6 +512,7 @@ export class SymphonySdkService {
     }
 
     const run = async () => {
+      const renderStart = performance.now();
       const container = this._getContainer(containerSelector);
       if (!container) {
         throw this._createError(`Missing Symphony slot "${containerSelector}".`);
@@ -370,7 +525,14 @@ export class SymphonySdkService {
       const existingRender = this._renderedContainers.get(containerSelector);
       const hasIframe = Boolean(container.querySelector('iframe'));
 
+      debugSdk('renderChat() starting.', {
+        containerSelector,
+        streamId: requestedStreamId,
+        hasExistingIframe: hasIframe,
+      });
+
       if (hasIframe && existingRender?.streamId === requestedStreamId) {
+        debugSdk('renderChat() skipped — already rendered with same stream.');
         return;
       }
 
@@ -381,8 +543,18 @@ export class SymphonySdkService {
         await window.symphony.render(this._getRenderTarget(containerSelector), options);
         await frameWaitHandle.promise;
         this._renderedContainers.set(containerSelector, { streamId: requestedStreamId });
+        debugSdk('renderChat() completed.', {
+          containerSelector,
+          streamId: requestedStreamId,
+          elapsedMs: Math.round(performance.now() - renderStart),
+        });
       } catch (cause) {
         frameWaitHandle.cancel();
+        debugSdk('renderChat() failed.', {
+          containerSelector,
+          elapsedMs: Math.round(performance.now() - renderStart),
+          cause: String(cause),
+        });
         throw cause;
       }
     };
@@ -420,6 +592,7 @@ export class SymphonySdkService {
     }
 
     const run = async () => {
+      const openStart = performance.now();
       const container = this._getContainer(containerSelector);
       if (!container) {
         throw this._createError(`Missing Symphony slot "${containerSelector}".`);
@@ -429,26 +602,84 @@ export class SymphonySdkService {
         throw this._createError('Symphony SDK is not available on window.');
       }
 
+      if (renderOptions && typeof window.symphony.updateSettings === 'function') {
+        const { streamId: _ignoredStreamId, ...settings } = renderOptions;
+        window.symphony.updateSettings(settings);
+      }
+
+      if (
+        renderOptions &&
+        typeof renderOptions.theme === 'object' &&
+        renderOptions.theme !== null &&
+        typeof window.symphony.updateTheme === 'function'
+      ) {
+        window.symphony.updateTheme(renderOptions.theme as Record<string, unknown>);
+      }
+
       const existingRender = this._renderedContainers.get(containerSelector);
-      const hasIframe = Boolean(container.querySelector('iframe'));
-
-      if (!hasIframe) {
-        await this.renderChat(containerSelector, { ...(renderOptions ?? {}), streamId });
-        return;
-      }
-
       if (existingRender?.streamId === streamId) {
+        debugSdk('openStream() skipped — already showing this stream.', { streamId });
         return;
       }
 
-      await Promise.resolve(window.symphony.openStream(streamId, containerSelector));
+      debugSdk('openStream() starting.', {
+        streamId,
+        containerSelector,
+        hadExistingFrame: Boolean(container.querySelector('iframe')),
+      });
+
+      const frameWaitHandle = this._observeOpenedStream(containerSelector);
+      const sdkOpenPromise = Promise.resolve(window.symphony.openStream(streamId, containerSelector));
+      const waitForObservedOpen = frameWaitHandle.promise.then(() => sdkOpenPromise);
+
+      let resolvedPath: 'frame-observed' | 'cold-settle-timer' | 'settle-timer' = 'frame-observed';
+
+      try {
+        if (frameWaitHandle.hadExistingFrame) {
+          // Stream switches inside an existing iframe often complete without a
+          // new iframe load event, so allow a short settle once the SDK call returns.
+          await Promise.race([
+            waitForObservedOpen,
+            sdkOpenPromise.then(async () => {
+              await this._waitForDuration(WARM_STREAM_SETTLE_MS);
+              resolvedPath = 'settle-timer';
+            }),
+          ]);
+        } else {
+          await Promise.race([
+            waitForObservedOpen,
+            sdkOpenPromise.then(async () => {
+              await this._waitForDuration(COLD_STREAM_SETTLE_MS);
+              resolvedPath = 'cold-settle-timer';
+            }),
+          ]);
+        }
+      } catch (cause) {
+        frameWaitHandle.cancel();
+        debugSdk('openStream() failed.', {
+          streamId,
+          containerSelector,
+          elapsedMs: Math.round(performance.now() - openStart),
+          cause: String(cause),
+        });
+        throw cause;
+      } finally {
+        frameWaitHandle.cancel();
+      }
+
+      debugSdk('openStream() completed.', {
+        streamId,
+        containerSelector,
+        resolvedPath,
+        elapsedMs: Math.round(performance.now() - openStart),
+      });
+
       this._renderedContainers.set(containerSelector, { streamId });
     };
 
     const runWithErrorHandling = () =>
       run().catch((cause) => {
         const error = this._createError('Unable to open Symphony stream.', cause);
-        this._setStatus('error', error);
         throw error;
       });
 
@@ -462,12 +693,84 @@ export class SymphonySdkService {
     return this._trackInflight(containerSelector, requestKey, promise);
   }
 
+  sendMessage(
+    message: Record<string, unknown>,
+    options: Record<string, unknown> & { containerSelector?: string },
+  ): Promise<void> {
+    if (this._status === 'error') {
+      return Promise.reject(this._error ?? this._createError('Symphony is in an error state.'));
+    }
+
+    const run = async () => {
+      if (!window.symphony?.sendMessage) {
+        throw this._createError('Symphony sendMessage is not available on window.');
+      }
+
+      const { containerSelector, ...messageOptions } = options;
+      await Promise.resolve(
+        window.symphony.sendMessage(message, {
+          ...messageOptions,
+          ...(containerSelector ? { container: containerSelector } : {}),
+        }),
+      );
+    };
+
+    const runWithReadyCheck = () => run().catch((cause) => {
+      throw this._createError('Unable to send Symphony message.', cause);
+    });
+
+    return this._status === 'ready'
+      ? runWithReadyCheck()
+      : !this._initPromise
+        ? Promise.reject(this._createError('Symphony has not been initialized yet.'))
+        : this._initPromise.then(runWithReadyCheck);
+  }
+
   hasRendered(containerSelector: string) {
+    if (!this._getContainer(containerSelector)) {
+      return false;
+    }
+
     return this._renderedContainers.has(containerSelector);
   }
 
   getRenderedStreamId(containerSelector: string) {
+    if (!this._getContainer(containerSelector)) {
+      return undefined;
+    }
+
     return this._renderedContainers.get(containerSelector)?.streamId;
+  }
+
+  adoptRenderedContainer(sourceSelector: string, targetSelector: string) {
+    if (!sourceSelector || !targetSelector || sourceSelector === targetSelector) {
+      return false;
+    }
+
+    if (this._inflightOperations.has(sourceSelector) || this._inflightOperations.has(targetSelector)) {
+      return false;
+    }
+
+    const sourceContainer = this._getContainer(sourceSelector);
+    const targetContainer = this._getContainer(targetSelector);
+    const sourceState = this._renderedContainers.get(sourceSelector);
+
+    if (!sourceContainer || !targetContainer || !sourceState) {
+      return false;
+    }
+
+    if (!sourceContainer.querySelector('iframe')) {
+      return false;
+    }
+
+    targetContainer.innerHTML = '';
+    while (sourceContainer.firstChild) {
+      targetContainer.appendChild(sourceContainer.firstChild);
+    }
+
+    this._renderedContainers.set(targetSelector, sourceState);
+    this._renderedContainers.delete(sourceSelector);
+    return true;
   }
 
   markWorkspace(containerSelector: string) {

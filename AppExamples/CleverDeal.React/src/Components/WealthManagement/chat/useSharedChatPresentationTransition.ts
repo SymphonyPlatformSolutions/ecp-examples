@@ -1,5 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { refreshWealthSymphonyThemeAfterLayoutChange } from './wealthSymphonyTheme';
+import { debugWealth } from './wealthDebug';
+
+function debugTransition(message: string, context?: Record<string, unknown>) {
+  debugWealth('ChatPresentationTransition', message, context);
+}
 
 interface UseSharedChatPresentationTransitionOptions {
   mode: 'page' | 'drawer';
@@ -110,7 +115,13 @@ export function useSharedChatPresentationTransition({
       hasReadyRef.current = true;
       previousModeRef.current = mode;
       previousVisibleRef.current = isVisible;
-      setMaskFrame(false);
+      if (isVisible) {
+        debugTransition('First ready while visible — masking frame.', { mode, isVisible });
+        setMaskFrame(true);
+      } else {
+        debugTransition('First ready while hidden — unmask.', { mode, isVisible });
+        setMaskFrame(false);
+      }
       return;
     }
 
@@ -119,6 +130,7 @@ export function useSharedChatPresentationTransition({
     }
 
     previousModeRef.current = mode;
+    debugTransition('Mode changed — masking frame.', { mode, isVisible });
     setMaskFrame(true);
   }, [isReady, isVisible, mode]);
 
@@ -132,7 +144,8 @@ export function useSharedChatPresentationTransition({
     }
 
     previousVisibleRef.current = isVisible;
-    if (isVisible && mode === 'page') {
+    if (isVisible) {
+      debugTransition('Chat became visible — masking frame.', { mode });
       setMaskFrame(true);
     }
   }, [isReady, isVisible, mode]);
@@ -184,9 +197,13 @@ export function useSharedChatPresentationTransition({
     const waitHandle = waitForElementLayoutToSettle(shell);
 
     void waitHandle.promise
-      .then(() => refreshWealthSymphonyThemeAfterLayoutChange())
+      .then(() => {
+        debugTransition('Layout settled — refreshing theme.', { mode, isVisible });
+        return refreshWealthSymphonyThemeAfterLayoutChange();
+      })
       .finally(() => {
         if (!cancelled) {
+          debugTransition('Layout settle complete — unmasking.', { mode, isVisible });
           setMaskFrame(false);
         }
       });

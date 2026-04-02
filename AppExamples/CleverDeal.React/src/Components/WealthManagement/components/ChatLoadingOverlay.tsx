@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import Loading from '../../Loading';
 import { cn } from '../ui/utils';
 
 interface ChatLoadingOverlayProps {
@@ -29,7 +29,10 @@ export default function ChatLoadingOverlay({
         <div className="mt-2 text-[15px] leading-6 text-slate-600">{message}</div>
         <div className="mt-6 flex items-center justify-center">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-sky-300/35 bg-sky-400/10 text-sky-300 shadow-[0_0_18px_rgba(85,183,255,0.16)]">
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loading
+              animate={true}
+              className="h-4 w-5 [--primary-color:#55b7ff] [&_svg]:h-full [&_svg]:w-full"
+            />
           </span>
         </div>
       </div>

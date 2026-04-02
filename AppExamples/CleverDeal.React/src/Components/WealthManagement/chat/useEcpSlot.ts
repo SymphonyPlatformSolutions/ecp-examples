@@ -12,7 +12,6 @@ export function useEcpSlot({ slotName }: UseEcpSlotOptions) {
   const [ecpError, setEcpError] = useState<Error | null>(symphonySdk.error);
 
   useEffect(() => {
-    const slotEl = slotRef.current;
     const unsubscribe = symphonySdk.onStatusChange(({ isReady, error }) => {
       setEcpReady(isReady);
       setEcpError(error);
@@ -20,9 +19,6 @@ export function useEcpSlot({ slotName }: UseEcpSlotOptions) {
 
     return () => {
       unsubscribe();
-      if (slotEl) {
-        slotEl.innerHTML = '';
-      }
     };
   }, []);
 

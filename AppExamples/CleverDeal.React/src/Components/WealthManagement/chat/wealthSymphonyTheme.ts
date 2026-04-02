@@ -5,8 +5,10 @@ const WEALTH_ALLOWED_APPS =
 
 export const WEALTH_SHARED_CHAT_SELECTOR = '.wealth-symphony-shared';
 export const WEALTH_CLIENT_CHAT_SELECTOR = '.wealth-symphony-client-contact';
+export const WEALTH_CLIENT_DRAWER_CHAT_SELECTOR = '.wealth-symphony-client-drawer-contact';
 export const WEALTH_SYMPHONY_THEME_OWNER = 'wealth-management';
 export const WEALTH_SYMPHONY_MODE = 'light';
+export type WealthSymphonySharedIframeLayout = 'drawer' | 'page';
 
 export const WEALTH_SYMPHONY_THEME = {
   primary: '#55b7ff',
@@ -74,13 +76,29 @@ export function getWealthSymphonyRenderOptions(overrides: Record<string, unknown
   const payload = getWealthSymphonyThemePayload();
   return {
     showTitle: false,
+    showInfo: false,
     ecpLoginPopup: true,
     canAddPeople: true,
-    condensed: true,
+    condensed: false,
     allowedApps: WEALTH_ALLOWED_APPS,
     sound: false,
     ...payload,
     ...overrides,
+    showMembers: false,
+    symphonyLogo: false,
+  };
+}
+
+export function getWealthSymphonySharedIframeOptions(layout: WealthSymphonySharedIframeLayout) {
+  return {
+    embed: true,
+    allowChatCreation: true,
+    allowedApps: WEALTH_ALLOWED_APPS,
+    canAddPeople: true,
+    condensed: layout === 'drawer',
+    ecpLoginPopup: true,
+    mode: WEALTH_SYMPHONY_MODE,
+    sound: false,
   };
 }
 
@@ -111,23 +129,17 @@ function delay(ms: number) {
   return new Promise<void>((resolve) => window.setTimeout(resolve, ms));
 }
 
-const SYMPHONY_RESIZE_SETTLE_MS = 600;
-const SYMPHONY_THEME_RECONFIRM_MS = 400;
-
-const SYMPHONY_THEME_SETTLE_MS = 250;
+const SYMPHONY_THEME_RECONFIRM_MS = 500;
 
 export async function applyWealthSymphonyThemeWithSettle() {
   applyWealthSymphonyTheme();
-  await delay(SYMPHONY_THEME_SETTLE_MS);
+  await delay(SYMPHONY_THEME_RECONFIRM_MS);
   applyWealthSymphonyTheme();
-  await waitForNextAnimationFrame();
 }
 
 export async function refreshWealthSymphonyThemeAfterLayoutChange() {
   await waitForNextAnimationFrame();
-  await delay(SYMPHONY_RESIZE_SETTLE_MS);
   applyWealthSymphonyTheme();
   await delay(SYMPHONY_THEME_RECONFIRM_MS);
   applyWealthSymphonyTheme();
-  await waitForNextAnimationFrame();
 }

@@ -6,8 +6,9 @@ import ContentDistribution from './Components/ContentDistribution';
 import Loading from './Components/Loading';
 import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom';
+import { loadWealthManagementModule } from './Components/WealthManagement/loadWealthManagementModule';
 
-const WealthManagement = lazy(() => import('./Components/WealthManagement'));
+const WealthManagement = lazy(loadWealthManagementModule);
 
 const WealthManagementModuleLoading = () => (
   <div className="large-loading">
@@ -66,7 +67,7 @@ if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <ThemeProvider>
         <Routes>
           <Route path="wealth" element={<CleverWealth />} />

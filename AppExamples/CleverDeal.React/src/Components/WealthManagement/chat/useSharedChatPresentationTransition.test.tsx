@@ -45,6 +45,21 @@ describe('useSharedChatPresentationTransition', () => {
   });
 
   test('masks and refreshes the shared frame when switching from drawer to page mode', async () => {
+    const { rerender } = render(<HookHarness mode="drawer" isReady={true} />);
+
+    expect(screen.getByTestId('mask-state')).toHaveTextContent('masked');
+
+    await act(async () => {
+      jest.runAllTimers();
+    });
+
+    await waitFor(() => {
+      expect(mockRefreshWealthSymphonyThemeAfterLayoutChange).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
+    });
+
+    mockRefreshWealthSymphonyThemeAfterLayoutChange.mockClear();
+
     let resolveRefresh: (() => void) | undefined;
     mockRefreshWealthSymphonyThemeAfterLayoutChange.mockImplementationOnce(
       () =>
@@ -52,10 +67,6 @@ describe('useSharedChatPresentationTransition', () => {
           resolveRefresh = resolve;
         }),
     );
-
-    const { rerender } = render(<HookHarness mode="drawer" isReady={true} />);
-
-    expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
 
     rerender(<HookHarness mode="page" isReady={true} />);
 
@@ -98,20 +109,23 @@ describe('useSharedChatPresentationTransition', () => {
     });
   });
 
-  test('does not mask when the drawer chat becomes visible after being hidden', async () => {
+  test('masks and refreshes when the drawer chat becomes visible after being hidden', async () => {
     const { rerender } = render(<HookHarness mode="drawer" isReady={true} isVisible={false} />);
 
     expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
 
     rerender(<HookHarness mode="drawer" isReady={true} isVisible={true} />);
 
-    expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
+    expect(screen.getByTestId('mask-state')).toHaveTextContent('masked');
 
     await act(async () => {
       jest.runAllTimers();
     });
 
-    expect(mockRefreshWealthSymphonyThemeAfterLayoutChange).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockRefreshWealthSymphonyThemeAfterLayoutChange).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
+    });
   });
 
   test('masks and refreshes when a page chat becomes visible after being hidden', async () => {
@@ -120,6 +134,25 @@ describe('useSharedChatPresentationTransition', () => {
     expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
 
     rerender(<HookHarness mode="page" isReady={true} isVisible={true} />);
+
+    expect(screen.getByTestId('mask-state')).toHaveTextContent('masked');
+
+    await act(async () => {
+      jest.runAllTimers();
+    });
+
+    await waitFor(() => {
+      expect(mockRefreshWealthSymphonyThemeAfterLayoutChange).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
+    });
+  });
+
+  test('keeps the first visible ready state masked until layout settle and theme refresh complete', async () => {
+    const { rerender } = render(<HookHarness mode="drawer" isReady={false} isVisible={true} />);
+
+    expect(screen.getByTestId('mask-state')).toHaveTextContent('clear');
+
+    rerender(<HookHarness mode="drawer" isReady={true} isVisible={true} />);
 
     expect(screen.getByTestId('mask-state')).toHaveTextContent('masked');
 

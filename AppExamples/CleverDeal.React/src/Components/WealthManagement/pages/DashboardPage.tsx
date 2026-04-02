@@ -460,6 +460,7 @@ export default function DashboardPage() {
   const [liveHeroChange, setLiveHeroChange] = useState(wealthManagementData.dashboard.hero.changeLabel);
   const [heroPulse, setHeroPulse] = useState(false);
   const [liveUnreadCount, setLiveUnreadCount] = useState(symphonyNotifications.count);
+  const heroPulseTimeoutRef = useRef<number | null>(null);
   const { dashboard, portfolioAllocation } = wealthManagementData;
   const openConversationUnreadCount = liveUnreadCount;
   const allocationData = portfolioAllocation ?? [];
@@ -489,10 +490,24 @@ export default function DashboardPage() {
 
       setLiveHeroChange((current) => (current === '+4.5% QTD' ? '+4.7% QTD' : '+4.5% QTD'));
       setHeroPulse(true);
-      setTimeout(() => setHeroPulse(false), 1200);
+
+      if (heroPulseTimeoutRef.current !== null) {
+        window.clearTimeout(heroPulseTimeoutRef.current);
+      }
+
+      heroPulseTimeoutRef.current = window.setTimeout(() => {
+        setHeroPulse(false);
+        heroPulseTimeoutRef.current = null;
+      }, 1200);
     }, 4000);
 
-    return () => window.clearInterval(intervalId);
+    return () => {
+      window.clearInterval(intervalId);
+      if (heroPulseTimeoutRef.current !== null) {
+        window.clearTimeout(heroPulseTimeoutRef.current);
+        heroPulseTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   return (

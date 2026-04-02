@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
-import { AlertCircle, Bell, House, Menu, Search } from 'lucide-react';
+import { Bell, House, Menu, Search } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { getEcpParam } from '../../Utils/utils';
 import Loading from '../Loading';
@@ -20,11 +20,17 @@ import SymphonyChatShell from './components/SymphonyChatShell';
 import SymphonyMark from './components/SymphonyMark';
 import { symphonyNotifications } from './chat/symphonyNotifications';
 import { acquireWealthSymphonyThemeOwnership, applyWealthSymphonyTheme } from './chat/wealthSymphonyTheme';
+import { symphonySdk } from './chat/symphonySdk';
+import { useSharedIframeChatHost } from './chat/useSharedIframeChatHost';
 import { useSharedChatPresentationTransition } from './chat/useSharedChatPresentationTransition';
+import { debugWealth } from './chat/wealthDebug';
 import { wealthManagementShellData } from './data/wealthManagementShell';
-import { useSharedWealthChatController } from './chat/useSharedWealthChatController';
 import ModulePlaceholderPage from './pages/ModulePlaceholderPage';
 import './styles/wealthManagement.css';
+
+function debugWM(message: string, context?: Record<string, unknown>) {
+  debugWealth('WealthManagement', message, context);
+}
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const ContactsPage = lazy(() => import('./pages/ContactsPage'));
@@ -57,7 +63,11 @@ type NotificationToast = {
   avatarUrl?: string;
 };
 
-function LargeLoading() {
+function WealthPageFallback() {
+  return <div className="h-full bg-[#eef3f8]" />;
+}
+
+function WealthWorkspaceLoading() {
   return (
     <div
       role="status"
@@ -69,28 +79,6 @@ function LargeLoading() {
       </div>
     </div>
   );
-}
-
-function LargeErrorState({ message }: { message: string }) {
-  return (
-    <div
-      role="alert"
-      aria-label="Unable to load wealth workspace"
-      className="absolute inset-0 z-[80] flex items-center justify-center bg-[#e9edf3]/95 p-6"
-    >
-      <div className="max-w-sm rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-center shadow-sm">
-        <div className="flex items-center justify-center gap-2 text-[15px] font-semibold text-rose-700">
-          <AlertCircle className="h-4 w-4" />
-          Unable to load Symphony chat
-        </div>
-        <div className="mt-2 text-[13px] leading-6 text-rose-600">{message}</div>
-      </div>
-    </div>
-  );
-}
-
-function WealthPageFallback() {
-  return <div className="h-full bg-[#eef3f8]" />;
 }
 
 function withWealthPageSuspense(element: React.ReactElement) {
@@ -164,34 +152,89 @@ const WealthManagement = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSymphonyDrawerOpen, setIsSymphonyDrawerOpen] = useState(false);
+  const [isSdkReady, setIsSdkReady] = useState(false);
+  const [hasInitialWorkspaceRevealed, setHasInitialWorkspaceRevealed] = useState(false);
+
+  debugWM('Render.', {
+    pathname: location.pathname,
+    isSymphonyDrawerOpen,
+    isSdkReady,
+  });
   const [unreadCount, setUnreadCount] = useState(symphonyNotifications.count);
   const [recentNotifications, setRecentNotifications] = useState<NotificationToast[]>([]);
   const activeItem = getActiveItem(location.pathname);
   const isChatRoute = activeItem === 'chat';
   const chatContactId = new URLSearchParams(location.search).get('contactId');
-  const chatContact = (wealthManagementShellData.contacts ?? []).find((item) => item.id === chatContactId);
   const usesEmbeddedClientDrawer = activeItem === 'clients' && Boolean(chatContactId) && !isChatRoute;
-  const activeChatStreamId = chatContact?.streamId;
   const activeChatMode = isChatRoute ? 'page' : 'drawer';
   const {
-    bootstrapError,
-    isBootstrapping,
-    isSwitchingStream,
-    slotClassName,
-    streamError,
-  } = useSharedWealthChatController({
+    chatError: sharedChatError,
+    chatUrl: sharedChatUrl,
+    handleError: handleSharedChatError,
+    handleLoad: handleSharedChatLoad,
+    isChatReady: isSharedChatReady,
+  } = useSharedIframeChatHost({
     ecpOrigin,
+    layoutMode: activeChatMode,
     partnerId,
-    requestedStreamId: usesEmbeddedClientDrawer ? undefined : activeChatStreamId,
   });
-  const isSharedChatVisible = !isBootstrapping && (isChatRoute || isSymphonyDrawerOpen);
+  const isChatShellVisible = isChatRoute || isSymphonyDrawerOpen;
+  const isSharedChatVisible = !usesEmbeddedClientDrawer && isChatShellVisible;
+  const isInitialWorkspaceReady = hasInitialWorkspaceRevealed || (isSdkReady && (isSharedChatReady || Boolean(sharedChatError)));
   const { shellRef, maskFrame } = useSharedChatPresentationTransition({
     mode: activeChatMode,
-    isReady: !isBootstrapping && !bootstrapError,
+    isReady: isSharedChatReady && !sharedChatError,
     isVisible: isSharedChatVisible,
   });
 
+  useEffect(() => {
+    debugWM('Component mounted.');
+    return () => {
+      debugWM('Component unmounted.');
+    };
+  }, []);
+
   useEffect(() => symphonyNotifications.onCountChange(setUnreadCount), []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    debugWM('SDK init chain starting.', { ecpOrigin, partnerId });
+    void Promise.resolve(symphonySdk.init(ecpOrigin, partnerId))
+      .then(() => {
+        if (cancelled) return;
+        debugWM('SDK init complete.');
+        symphonyNotifications.init(ecpOrigin);
+
+        setIsSdkReady(true);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          debugWM('SDK init chain failed — setting isSdkReady=true anyway.', { error: String(err) });
+          setIsSdkReady(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (hasInitialWorkspaceRevealed || !isSdkReady) {
+      return;
+    }
+
+    if (!isSharedChatReady && !sharedChatError) {
+      return;
+    }
+
+    debugWM('Initial workspace reveal ready.', {
+      isSharedChatReady,
+      sharedChatError,
+    });
+    setHasInitialWorkspaceRevealed(true);
+  }, [hasInitialWorkspaceRevealed, isSdkReady, isSharedChatReady, sharedChatError]);
 
   useEffect(() => {
     const unsubscribe = symphonyNotifications.onNotificationEvent?.((event) => {
@@ -218,10 +261,8 @@ const WealthManagement = () => {
   }, [isSymphonyDrawerOpen, activeChatMode]);
 
   useEffect(() => {
-    if (!isBootstrapping && !bootstrapError) {
-      applyWealthSymphonyTheme();
-    }
-  }, [location.pathname, isBootstrapping, bootstrapError]);
+    applyWealthSymphonyTheme();
+  }, [location.pathname]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -251,6 +292,10 @@ const WealthManagement = () => {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        const activeElement = document.activeElement as HTMLElement | null;
+        if (activeElement && typeof activeElement.blur === 'function') {
+          activeElement.blur();
+        }
         setIsSymphonyDrawerOpen(false);
       }
     };
@@ -266,6 +311,18 @@ const WealthManagement = () => {
   }, [isChatRoute, isSymphonyDrawerOpen]);
 
   useEffect(() => {
+    if (isChatShellVisible) {
+      return;
+    }
+
+    const shell = shellRef.current;
+    const activeElement = document.activeElement as HTMLElement | null;
+    if (shell && activeElement && shell.contains(activeElement) && typeof activeElement.blur === 'function') {
+      activeElement.blur();
+    }
+  }, [isChatShellVisible, shellRef]);
+
+  useEffect(() => {
     if (isChatRoute) {
       return;
     }
@@ -277,14 +334,6 @@ const WealthManagement = () => {
 
     setIsSymphonyDrawerOpen(false);
   }, [activeItem, chatContactId, isChatRoute]);
-
-  useEffect(() => {
-    if (!isSharedChatVisible) {
-      return;
-    }
-
-    symphonyNotifications.markMessagesViewed?.(activeChatStreamId);
-  }, [activeChatStreamId, isSharedChatVisible]);
 
   const openClientQuickChat = useCallback((contactId: string) => {
     navigate(`/wealth-management/clients?contactId=${contactId}`);
@@ -338,22 +387,25 @@ const WealthManagement = () => {
                 }
               : {}),
           }}
-          aria-hidden={!isSharedChatVisible}
+          aria-hidden={!isChatShellVisible}
         >
           <SymphonyChatShell
             mode={activeChatMode}
-            slotClassName={slotClassName}
             contactId={chatContactId}
             ecpOrigin={ecpOrigin}
             partnerId={partnerId}
-            isLoading={Boolean(activeChatStreamId) && isSwitchingStream}
+            isLoading={!usesEmbeddedClientDrawer && !isSharedChatReady && !sharedChatError}
             maskFrame={maskFrame}
-            error={streamError}
+            onSharedChatError={handleSharedChatError}
+            onSharedChatLoad={handleSharedChatLoad}
+            sharedChatError={sharedChatError}
+            sharedChatUrl={sharedChatUrl}
             onClose={activeChatMode === 'drawer' ? closeSharedChat : undefined}
           />
         </div>
       </div>
 
+      {isInitialWorkspaceReady ? (
       <>
         <header className="border-b border-[#11346c] bg-[linear-gradient(90deg,#07285f_0%,#0f3d83_100%)] text-white">
             <div className="flex h-[72px] items-stretch gap-3 px-4 md:px-5">
@@ -612,8 +664,9 @@ const WealthManagement = () => {
           </button>
         )}
       </>
-      {isBootstrapping && <LargeLoading />}
-      {bootstrapError && <LargeErrorState message={bootstrapError.message} />}
+      ) : (
+        <WealthWorkspaceLoading />
+      )}
     </div>
   );
 };

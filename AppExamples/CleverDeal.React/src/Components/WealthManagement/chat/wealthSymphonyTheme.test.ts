@@ -54,7 +54,17 @@ describe('WEALTH_SYMPHONY_THEME', () => {
         mode: 'light',
         theme: WEALTH_SYMPHONY_THEME,
         showTitle: false,
-        condensed: true,
+        condensed: false,
+        showMembers: false,
+        symphonyLogo: false,
+      }),
+    );
+  });
+
+  test('keeps members hidden even if a caller tries to override the render options', () => {
+    expect(getWealthSymphonyRenderOptions({ showMembers: true })).toEqual(
+      expect.objectContaining({
+        showMembers: false,
       }),
     );
   });

@@ -1,7 +1,8 @@
 import { AlertCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
-import { useEmbeddedClientChatHost } from '../chat/useEmbeddedClientChatHost';
+import { useClientChatSdkController } from '../chat/useClientChatSdkController';
+import { WEALTH_CLIENT_DRAWER_CHAT_SELECTOR } from '../chat/wealthSymphonyTheme';
 import ChatLoadingOverlay from './ChatLoadingOverlay';
 import SymphonyMark from './SymphonyMark';
 
@@ -20,46 +21,66 @@ function EcpErrorState({ message }: { message: string }) {
 }
 
 interface SymphonyChatShellProps {
-  slotClassName: string;
   contactId?: string | null;
   ecpOrigin?: string;
   partnerId?: string;
   mode?: 'page' | 'drawer';
   isLoading?: boolean;
   maskFrame?: boolean;
-  error?: Error | null;
+  onSharedChatError?: () => void;
+  onSharedChatLoad?: () => void;
+  sharedChatError?: string | null;
+  sharedChatUrl?: string;
   onClose?: () => void;
 }
 
 export default function SymphonyChatShell({
-  slotClassName,
   contactId,
   ecpOrigin,
   partnerId,
   mode = 'page',
   isLoading = false,
   maskFrame = false,
-  error = null,
+  onSharedChatError,
+  onSharedChatLoad,
+  sharedChatError = null,
+  sharedChatUrl,
   onClose,
 }: SymphonyChatShellProps) {
   const navigate = useNavigate();
-  const { chatError, chatHostUrl, contact, iframeRef, isChatReady } = useEmbeddedClientChatHost({
+  const useDrawerClientShell = mode === 'drawer';
+  const showDrawerClientChat = useDrawerClientShell && Boolean(contactId);
+  const {
+    chatError: clientChatError,
+    contact,
+    isChatReady: isClientChatReady,
+    isLoading: isClientChatLoading,
+    slotClassName: clientSlotClassName,
+  } = useClientChatSdkController({
     contactId,
+    containerSelector: WEALTH_CLIENT_DRAWER_CHAT_SELECTOR,
     ecpOrigin,
+    enabled: showDrawerClientChat,
     partnerId,
+    preload: useDrawerClientShell,
   });
-  const subheading = contact ? contact.name : 'Symphony';
+  const subheading = showDrawerClientChat && contact ? contact.name : 'Symphony';
   const showBlockingLoader = isLoading;
-  const useEmbeddedClientChat = mode === 'drawer' && Boolean(contactId);
-  const hideSharedFrame = !useEmbeddedClientChat && (showBlockingLoader || maskFrame || Boolean(error));
+  const hideSharedFrame = showDrawerClientChat || showBlockingLoader || maskFrame || Boolean(sharedChatError);
+  const hideClientFrame = !showDrawerClientChat;
+  const showClientLoader =
+    showDrawerClientChat && (isClientChatLoading || !isClientChatReady) && !clientChatError;
+  const revealClientChat = showDrawerClientChat && !showClientLoader && !clientChatError;
 
-  const frameOverlay = error
-    ? <EcpErrorState message={error.message} />
-    : showBlockingLoader
-      ? <ChatLoadingOverlay />
-      : maskFrame
-        ? <ChatLoadingOverlay testId="wealth-chat-frame-mask" />
-        : null;
+  const frameOverlay = showDrawerClientChat
+    ? null
+    : sharedChatError
+      ? <EcpErrorState message={sharedChatError} />
+      : showBlockingLoader
+        ? <ChatLoadingOverlay />
+        : maskFrame
+          ? <ChatLoadingOverlay testId="wealth-chat-frame-mask" />
+          : null;
 
   return (
     <div
@@ -88,7 +109,10 @@ export default function SymphonyChatShell({
           {onClose && (
             <button
               type="button"
-              onClick={onClose}
+              onClick={(event) => {
+                event.currentTarget.blur();
+                onClose();
+              }}
               className="appearance-none rounded-md border-0 bg-transparent p-1.5 text-white shadow-none outline-none transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/70"
               aria-label="Close Symphony drawer"
             >
@@ -99,38 +123,42 @@ export default function SymphonyChatShell({
       </div>
 
       <div className={mode === 'page' ? 'min-h-0 flex-1 p-6' : 'min-h-0 flex-1 p-4'}>
-        {useEmbeddedClientChat ? (
-          <div className="relative h-full overflow-hidden rounded-[18px] border border-slate-200 bg-[#fbfcfe]">
+        <div
+          className={
+            mode === 'page'
+              ? 'relative h-full overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_55px_rgba(15,23,42,0.08)]'
+              : 'relative h-full overflow-hidden rounded-[18px] border border-slate-200 bg-white'
+          }
+        >
+          {frameOverlay}
+          <iframe
+            data-testid="wealth-shared-chat-frame"
+            title="Wealth shared chat"
+            src={sharedChatUrl}
+            onLoad={onSharedChatLoad}
+            onError={onSharedChatError}
+            allow="clipboard-read; clipboard-write"
+            className="h-full w-full border-0"
+            style={{ opacity: hideSharedFrame ? 0 : 1 }}
+            aria-hidden={hideSharedFrame}
+          />
+          {useDrawerClientShell ? (
             <div
-              className={slotClassName}
-              style={{ position: 'absolute', inset: 0, opacity: 0, pointerEvents: 'none' }}
-              aria-hidden="true"
-            />
-            {!isChatReady && !chatError ? <ChatLoadingOverlay /> : null}
-            {chatError ? <EcpErrorState message={chatError} /> : null}
-            <iframe
-              ref={iframeRef}
-              title="Wealth client chat"
-              src={chatHostUrl}
-              className="h-full w-full border-0"
-            />
-          </div>
-        ) : (
-          <div
-            className={
-              mode === 'page'
-                ? 'relative h-full overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_55px_rgba(15,23,42,0.08)]'
-                : 'relative h-full overflow-hidden rounded-[18px] border border-slate-200 bg-white'
-            }
-          >
-            {frameOverlay}
-            <div
-              className={slotClassName}
-              style={{ width: '100%', height: '100%', opacity: hideSharedFrame ? 0 : 1 }}
-              aria-hidden={hideSharedFrame}
-            />
-          </div>
-        )}
+              className="absolute inset-0 bg-[#fbfcfe]"
+              style={{ opacity: hideClientFrame ? 0 : 1, pointerEvents: hideClientFrame ? 'none' : 'auto' }}
+              aria-hidden={hideClientFrame}
+            >
+              {showClientLoader ? <ChatLoadingOverlay /> : null}
+              {(showDrawerClientChat && clientChatError) ? <EcpErrorState message={clientChatError} /> : null}
+              <div
+                data-testid="wealth-client-drawer-chat-slot"
+                className={`${clientSlotClassName} h-full w-full transition-opacity duration-200`}
+                style={{ opacity: revealClientChat ? 1 : 0, pointerEvents: revealClientChat ? 'auto' : 'none' }}
+                aria-hidden={hideClientFrame || Boolean(clientChatError) || !revealClientChat}
+              />
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

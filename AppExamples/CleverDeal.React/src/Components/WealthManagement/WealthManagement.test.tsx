@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ThemeContext, type ThemeState } from '../../Theme/ThemeProvider';
 import { wealthManagementData } from './data/wealthManagement';
-import { WEALTH_SYMPHONY_THEME } from './chat/wealthSymphonyTheme';
 import WealthManagement from './WealthManagement';
 
 type CountChangeCallback = (count: number) => void;
@@ -20,8 +19,6 @@ const defaultNotificationDebugSnapshot = {
   lastEventAt: null,
 };
 
-const mockWindowSymphonyOpenStream = jest.fn();
-const mockWindowSymphonySendMessage = jest.fn(() => Promise.resolve());
 const mockSdkInit = jest.fn(() => Promise.resolve()) as unknown as jest.Mock<
   Promise<void>,
   [string, string | undefined]
@@ -66,8 +63,8 @@ const mockOnDebugChange = jest.fn((callback: (snapshot: typeof defaultNotificati
   callback(defaultNotificationDebugSnapshot);
   return () => {};
 }) as unknown as jest.Mock<() => void, [(snapshot: typeof defaultNotificationDebugSnapshot) => void]>;
-const mockUseEcpSlot = jest.fn();
-const mockUseSharedWealthChatController = jest.fn();
+const mockUseClientChatSdkController = jest.fn();
+const mockUseSharedIframeChatHost = jest.fn();
 const mockUseSharedChatPresentationTransition = jest.fn();
 let mockNotificationCount = 0;
 let mockStreamUnreadCounts: Record<string, number> = {};
@@ -89,13 +86,18 @@ jest.mock('recharts', () => {
   };
 });
 
-jest.mock('./chat/useSharedWealthChatController', () => ({
-  useSharedWealthChatController: (options: Record<string, unknown>) => mockUseSharedWealthChatController(options),
+jest.mock('./chat/useSharedIframeChatHost', () => ({
+  useSharedIframeChatHost: (options: Record<string, unknown>) => mockUseSharedIframeChatHost(options),
 }));
 
 jest.mock('./chat/useSharedChatPresentationTransition', () => ({
   useSharedChatPresentationTransition: (options: Record<string, unknown>) =>
     mockUseSharedChatPresentationTransition(options),
+}));
+
+jest.mock('./chat/useClientChatSdkController', () => ({
+  useClientChatSdkController: (options: Record<string, unknown>) =>
+    mockUseClientChatSdkController(options),
 }));
 
 jest.mock('./chat/symphonyNotifications', () => ({
@@ -116,10 +118,6 @@ jest.mock('./chat/symphonyNotifications', () => ({
       return mockNotificationCount;
     },
   },
-}));
-
-jest.mock('./chat/useEcpSlot', () => ({
-  useEcpSlot: (options: { slotName?: string }) => mockUseEcpSlot(options),
 }));
 
 jest.mock('./chat/symphonySdk', () => ({
@@ -179,7 +177,10 @@ const themeValue: ThemeState = {
 function renderWealth(path: string) {
   return render(
     <ThemeContext.Provider value={themeValue}>
-      <MemoryRouter initialEntries={[path]}>
+      <MemoryRouter
+        future={{ v7_relativeSplatPath: true, v7_startTransition: true }}
+        initialEntries={[path]}
+      >
         <Routes>
           <Route path="/wealth-management/*" element={<WealthManagement />} />
           <Route path="/" element={<div>Root Home</div>} />
@@ -199,12 +200,6 @@ beforeEach(() => {
   mockSdkInit.mockClear();
   mockRenderChat.mockClear();
   mockOpenStream.mockClear();
-  mockWindowSymphonyOpenStream.mockClear();
-  mockWindowSymphonySendMessage.mockClear();
-  (window as any).symphony = {
-    openStream: mockWindowSymphonyOpenStream,
-    sendMessage: mockWindowSymphonySendMessage,
-  };
   mockNotificationsInit.mockClear();
   mockOnNotificationEvent.mockClear();
   mockOnStreamUnreadChange.mockClear();
@@ -214,33 +209,39 @@ beforeEach(() => {
   mockReleaseWealthSymphonyThemeOwnership.mockClear();
   mockAcquireWealthSymphonyThemeOwnership.mockClear();
   mockAcquireWealthSymphonyThemeOwnership.mockImplementation(() => mockReleaseWealthSymphonyThemeOwnership);
-  mockUseSharedWealthChatController.mockReset();
-  mockUseSharedWealthChatController.mockReturnValue({
-    bootstrapError: null,
-    isBootstrapping: false,
-    isReady: true,
-    isSwitchingStream: false,
-    slotClassName: 'wealth-symphony-shared',
-    streamError: null,
+  mockUseClientChatSdkController.mockReset();
+  mockUseClientChatSdkController.mockImplementation((options: { contactId?: string | null; containerSelector?: string; enabled?: boolean; preload?: boolean }) => {
+    const contact = (wealthManagementData.contacts ?? []).find((item) => item.id === options.contactId);
+    const slotClassName = options.containerSelector?.startsWith('.')
+      ? options.containerSelector.slice(1)
+      : options.containerSelector ?? 'wealth-symphony-client-contact';
+    return {
+      chatError: null,
+      contact,
+      isChatReady: options.enabled !== false || options.preload === true,
+      isLoading: false,
+      sendMessageToChat: jest.fn(() => Promise.resolve()),
+      slotClassName,
+      streamId: contact?.streamId ?? 'wealth-room-default',
+    };
+  });
+  mockUseSharedIframeChatHost.mockReset();
+  mockUseSharedIframeChatHost.mockReturnValue({
+    chatError: null,
+    chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
+    handleError: jest.fn(),
+    handleLoad: jest.fn(),
+    isChatReady: true,
   });
   mockUseSharedChatPresentationTransition.mockReset();
   mockUseSharedChatPresentationTransition.mockImplementation(() => ({
     shellRef: { current: null },
     maskFrame: false,
   }));
-  mockUseEcpSlot.mockReset();
-  mockUseEcpSlot.mockImplementation((options: { slotName?: string }) => ({
-    slotClassName: options?.slotName ?? 'wealth-symphony-client-contact',
-    slotRef: { current: null },
-    ecpReady: true,
-    ecpError: null,
-    containerSelector: options?.slotName ? `.${options.slotName}` : '.wealth-symphony-client-contact',
-  }));
 });
 
 afterEach(() => {
   jest.useRealTimers();
-  delete (window as any).symphony;
 });
 
 test('renders the wealth dashboard shell and key KPI tiles', async () => {
@@ -255,22 +256,35 @@ test('renders the wealth dashboard shell and key KPI tiles', async () => {
   expect(screen.getByRole('button', { name: 'Open Symphony chat' })).toBeInTheDocument();
   expect(screen.getByTestId('wealth-shared-chat-shell')).toBeInTheDocument();
   expect(screen.queryByText('Connecting to Symphony...')).not.toBeInTheDocument();
+  const latestClientControllerArgs = mockUseClientChatSdkController.mock.calls.at(-1)?.[0] as {
+    containerSelector?: string;
+    enabled?: boolean;
+    preload?: boolean;
+  };
+  expect(latestClientControllerArgs).toMatchObject({
+    containerSelector: '.wealth-symphony-client-drawer-contact',
+    enabled: false,
+    preload: true,
+  });
 });
 
-test('shows the workspace loading overlay while Symphony bootstraps', async () => {
-  mockUseSharedWealthChatController.mockReturnValue({
-    bootstrapError: null,
-    isBootstrapping: true,
-    isReady: false,
-    isSwitchingStream: false,
-    slotClassName: 'wealth-symphony-shared',
-    streamError: null,
+test('keeps the full-page workspace loader visible while the hidden shared chat frame is still loading', async () => {
+  mockUseSharedIframeChatHost.mockReturnValue({
+    chatError: null,
+    chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
+    handleError: jest.fn(),
+    handleLoad: jest.fn(),
+    isChatReady: false,
   });
   const { container } = renderWealth('/wealth-management');
 
+  await waitFor(() => {
+    expect(mockSdkInit).toHaveBeenCalled();
+  });
   expect(screen.getByLabelText('Loading wealth workspace')).toBeInTheDocument();
+  expect(screen.queryByText('Active Clients')).not.toBeInTheDocument();
   expect(container.querySelector('[data-testid="wealth-shared-chat-shell"]')).toBeInTheDocument();
-  expect(container.querySelector('.wealth-symphony-shared')).toBeInTheDocument();
+  expect(container.querySelector('[data-testid="wealth-shared-chat-frame"]')).toBeInTheDocument();
   expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
 });
 
@@ -286,8 +300,13 @@ test('routes to the shared chat page from the advisor menu and hides the floatin
   await userEvent.click(screen.getByText('Open Symphony chat'));
 
   expect(await screen.findByRole('heading', { name: 'Wealth Chat' })).toBeInTheDocument();
+  expect(screen.getByTestId('wealth-shared-chat-frame')).toBeInTheDocument();
   expect(screen.getByTestId('wealth-chat-frame-mask')).toBeInTheDocument();
   expect(screen.getByText('Loading chat')).toBeInTheDocument();
+  const latestSharedChatArgs = mockUseSharedIframeChatHost.mock.calls.at(-1)?.[0] as {
+    layoutMode?: 'drawer' | 'page';
+  };
+  expect(latestSharedChatArgs.layoutMode).toBe('page');
   expect(screen.queryByText('Active Clients')).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Open Symphony chat' })).not.toBeInTheDocument();
 });
@@ -308,8 +327,6 @@ test('shows the mounted drawer instantly without the first-open loader when shar
 });
 
 test('opens the embedded client chat drawer when launching from the client list', async () => {
-  const evelynStreamId = (wealthManagementData.contacts ?? []).find((contact) => contact.name === 'Evelyn Reed')?.streamId;
-
   renderWealth('/wealth-management/clients');
 
   expect(await screen.findByText(/Advisor coverage, relationship health/i)).toBeInTheDocument();
@@ -322,114 +339,50 @@ test('opens the embedded client chat drawer when launching from the client list'
   await userEvent.click(within(clientRow as HTMLElement).getByRole('button', { name: /chat/i }));
 
   expect(await screen.findByRole('heading', { name: 'Wealth Chat' })).toBeInTheDocument();
-  const iframe = screen.getByTitle('Wealth client chat') as HTMLIFrameElement;
-  const iframeUrl = new URL(iframe.src);
-  expect(iframe).toBeInTheDocument();
-  expect(iframe.src).toContain('/wealth-client-chat-host.html');
-  expect(iframe.src).toContain(`streamId=${encodeURIComponent(evelynStreamId ?? '')}`);
-  expect(iframeUrl.searchParams.get('mode')).toBe('light');
-  expect(JSON.parse(iframeUrl.searchParams.get('theme') ?? '{}')).toEqual(WEALTH_SYMPHONY_THEME);
-  expect(document.querySelector('.wealth-symphony-shared')).toBeInTheDocument();
-  const latestControllerArgs = mockUseSharedWealthChatController.mock.calls.at(-1)?.[0] as {
-    requestedStreamId?: string;
+  expect(screen.getByTestId('wealth-client-drawer-chat-slot')).toHaveClass('wealth-symphony-client-drawer-contact');
+  expect(screen.queryByTitle('Wealth client chat')).not.toBeInTheDocument();
+  const latestSharedChatArgs = mockUseSharedIframeChatHost.mock.calls.at(-1)?.[0] as {
+    layoutMode?: 'drawer' | 'page';
   };
-  expect(latestControllerArgs.requestedStreamId).toBeUndefined();
+  expect(latestSharedChatArgs.layoutMode).toBe('drawer');
+  const latestClientControllerArgs = mockUseClientChatSdkController.mock.calls.at(-1)?.[0] as {
+    containerSelector?: string;
+    contactId?: string | null;
+    enabled?: boolean;
+    preload?: boolean;
+  };
+  expect(latestClientControllerArgs).toMatchObject({
+    containerSelector: '.wealth-symphony-client-drawer-contact',
+    contactId: '1',
+    enabled: true,
+    preload: true,
+  });
   expect(screen.getAllByRole('button', { name: 'Close Symphony drawer' }).length).toBeGreaterThanOrEqual(2);
   expect(screen.getByText(/Advisor coverage, relationship health/i)).toBeInTheDocument();
 });
 
 test('renders the client detail page and opens the dedicated client slot stream', async () => {
-  const evelynStreamId = (wealthManagementData.contacts ?? []).find((contact) => contact.name === 'Evelyn Reed')?.streamId;
   renderWealth('/wealth-management/clients/1');
 
   expect(await screen.findByRole('heading', { name: 'Evelyn Reed' })).toBeInTheDocument();
   expect(screen.getByText('Embedded Communication Panel')).toBeInTheDocument();
   expect(screen.getByText('Recent Activity')).toBeInTheDocument();
-  const iframe = screen.getByTitle('Wealth client chat') as HTMLIFrameElement;
-  const iframeUrl = new URL(iframe.src);
-  expect(iframe).toBeInTheDocument();
-  expect(iframe.src).toContain('/wealth-client-chat-host.html');
-  expect(iframe.src).toContain('ecpOrigin=corporate.symphony.com');
-  expect(iframe.src).toContain(`streamId=${encodeURIComponent(evelynStreamId ?? '')}`);
-  expect(iframeUrl.searchParams.get('mode')).toBe('light');
-  expect(JSON.parse(iframeUrl.searchParams.get('theme') ?? '{}')).toEqual(WEALTH_SYMPHONY_THEME);
-  expect(mockRenderChat).not.toHaveBeenCalledWith(
-    '.wealth-symphony-client-contact',
-    expect.objectContaining({
-      streamId: evelynStreamId,
-    }),
-  );
+  expect(screen.getByTestId('wealth-client-chat-slot')).toHaveClass('wealth-symphony-client-contact');
+  expect(screen.queryByTitle('Wealth client chat')).not.toBeInTheDocument();
+  const latestClientControllerArgs = mockUseClientChatSdkController.mock.calls.at(-1)?.[0] as {
+    contactId?: string | null;
+  };
+  expect(latestClientControllerArgs.contactId).toBe('1');
   expect(screen.getByTestId('wealth-shared-chat-shell')).toBeInTheDocument();
 });
 
-test('shares client documents into the shared Symphony chat as PDF attachments', async () => {
-  const evelynStreamId = (wealthManagementData.contacts ?? []).find((contact) => contact.name === 'Evelyn Reed')?.streamId;
-  renderWealth('/wealth-management/clients/1');
-
-  expect(await screen.findByRole('heading', { name: 'Evelyn Reed' })).toBeInTheDocument();
-
-   const iframe = screen.getByTitle('Wealth client chat') as HTMLIFrameElement;
-   const postMessage = jest.fn();
-   Object.defineProperty(iframe, 'contentWindow', {
-     configurable: true,
-     value: { postMessage },
-   });
-
-   act(() => {
-     window.dispatchEvent(
-       new MessageEvent('message', {
-         origin: window.location.origin,
-         data: {
-           source: 'wealth-client-chat-host',
-           type: 'ready',
-           payload: {
-             streamId: evelynStreamId,
-           },
-         },
-       }),
-     );
-   });
-
-  await userEvent.click(screen.getByRole('button', { name: 'Share Q1 Allocation Memo.pdf to chat' }));
-
-  await waitFor(() => {
-    expect(postMessage).toHaveBeenCalledWith(
-      {
-        source: 'wealth-client-chat-parent',
-        type: 'send-message',
-        payload: {
-          requestId: 'client-share-1',
-          documentName: 'Q1 Allocation Memo.pdf',
-          streamId: evelynStreamId,
-          message: {
-            text: {
-              'text/markdown': 'Shared *Q1 Allocation Memo.pdf* with Evelyn Reed.\n\nType: Investment Memo\nUpdated: Mar 11',
-            },
-            entities: {
-              report: {
-                type: 'fdc3.fileAttachment',
-                data: {
-                  name: 'Q1 Allocation Memo.pdf',
-                  dataUri: wealthManagementData.pdfFile,
-                },
-              },
-            },
-          },
-        },
-      },
-      window.location.origin,
-    );
-  });
-});
-
-test('surfaces the shared chat bootstrap error as a workspace overlay', async () => {
-  mockUseSharedWealthChatController.mockReturnValue({
-    bootstrapError: new Error('Shared collaboration render failed.'),
-    isBootstrapping: false,
-    isReady: false,
-    isSwitchingStream: false,
-    slotClassName: 'wealth-symphony-shared',
-    streamError: null,
+test('surfaces the shared chat iframe error inside the shared chat shell', async () => {
+  mockUseSharedIframeChatHost.mockReturnValue({
+    chatError: 'Shared collaboration render failed.',
+    chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
+    handleError: jest.fn(),
+    handleLoad: jest.fn(),
+    isChatReady: false,
   });
 
   renderWealth('/wealth-management/chat');
