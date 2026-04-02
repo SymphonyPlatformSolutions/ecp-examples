@@ -1,12 +1,12 @@
 import { App } from './Components/App';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from './Theme/ThemeProvider';
-import CleverWealth from './Components/CleverWealth';
 import ContentDistribution from './Components/ContentDistribution';
 import Loading from './Components/Loading';
 import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom';
 import { loadWealthManagementModule } from './Components/WealthManagement/loadWealthManagementModule';
+import LegacyWealthRoute from './LegacyWealthRoute';
 
 const WealthManagement = lazy(loadWealthManagementModule);
 
@@ -70,7 +70,7 @@ ReactDOM.render(
     <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <ThemeProvider>
         <Routes>
-          <Route path="wealth" element={<CleverWealth />} />
+          <Route path="wealth" element={<LegacyWealthRoute />} />
           <Route
             path="wealth-management/*"
             element={(

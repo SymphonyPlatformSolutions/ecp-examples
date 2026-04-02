@@ -113,7 +113,7 @@ export function useSharedIframeChatHost({
       }
 
       const iframeWindow = iframeRef.current?.contentWindow;
-      if (iframeWindow && event.source !== iframeWindow) {
+        if (!iframeWindow || event.source !== iframeWindow) {
         return;
       }
 

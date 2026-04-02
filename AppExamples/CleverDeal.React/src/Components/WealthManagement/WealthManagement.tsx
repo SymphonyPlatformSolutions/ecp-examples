@@ -153,12 +153,14 @@ const WealthManagement = () => {
   const navigate = useNavigate();
   const [isSymphonyDrawerOpen, setIsSymphonyDrawerOpen] = useState(false);
   const [isSdkReady, setIsSdkReady] = useState(false);
+  const [isSdkStartupComplete, setIsSdkStartupComplete] = useState(false);
   const [hasInitialWorkspaceRevealed, setHasInitialWorkspaceRevealed] = useState(false);
 
   debugWM('Render.', {
     pathname: location.pathname,
     isSymphonyDrawerOpen,
     isSdkReady,
+    isSdkStartupComplete,
   });
   const [unreadCount, setUnreadCount] = useState(symphonyNotifications.count);
   const [recentNotifications, setRecentNotifications] = useState<NotificationToast[]>([]);
@@ -182,7 +184,7 @@ const WealthManagement = () => {
   });
   const isChatShellVisible = isChatRoute || isSymphonyDrawerOpen;
   const isSharedChatVisible = !usesEmbeddedClientDrawer && isChatShellVisible;
-  const isInitialWorkspaceReady = hasInitialWorkspaceRevealed || (isSdkReady && (isSharedChatPrimed || Boolean(sharedChatError)));
+  const isInitialWorkspaceReady = hasInitialWorkspaceRevealed || (isSdkStartupComplete && (isSharedChatPrimed || Boolean(sharedChatError)));
   const { shellRef, maskFrame } = useSharedChatPresentationTransition({
     mode: activeChatMode,
     isReady: isSharedChatReady && !sharedChatError,
@@ -209,11 +211,12 @@ const WealthManagement = () => {
         symphonyNotifications.init(ecpOrigin);
 
         setIsSdkReady(true);
+        setIsSdkStartupComplete(true);
       })
       .catch((err) => {
         if (!cancelled) {
-          debugWM('SDK init chain failed — setting isSdkReady=true anyway.', { error: String(err) });
-          setIsSdkReady(true);
+          debugWM('SDK init chain failed — continuing with degraded shell.', { error: String(err) });
+          setIsSdkStartupComplete(true);
         }
       });
 
@@ -223,7 +226,7 @@ const WealthManagement = () => {
   }, []);
 
   useEffect(() => {
-    if (hasInitialWorkspaceRevealed || !isSdkReady) {
+    if (hasInitialWorkspaceRevealed || !isSdkStartupComplete) {
       return;
     }
 
@@ -232,12 +235,14 @@ const WealthManagement = () => {
     }
 
     debugWM('Initial workspace reveal ready.', {
+      isSdkReady,
+      isSdkStartupComplete,
       isSharedChatPrimed,
       isSharedChatReady,
       sharedChatError,
     });
     setHasInitialWorkspaceRevealed(true);
-  }, [hasInitialWorkspaceRevealed, isSdkReady, isSharedChatPrimed, isSharedChatReady, sharedChatError]);
+  }, [hasInitialWorkspaceRevealed, isSdkReady, isSdkStartupComplete, isSharedChatPrimed, isSharedChatReady, sharedChatError]);
 
   useEffect(() => {
     const unsubscribe = symphonyNotifications.onNotificationEvent?.((event) => {
@@ -258,14 +263,12 @@ const WealthManagement = () => {
   }, []);
 
   useEffect(() => {
-    if (isSymphonyDrawerOpen && activeChatMode === 'drawer') {
-      applyWealthSymphonyTheme();
+    if (activeChatMode !== 'page' && !isSymphonyDrawerOpen) {
+      return;
     }
-  }, [isSymphonyDrawerOpen, activeChatMode]);
 
-  useEffect(() => {
     applyWealthSymphonyTheme();
-  }, [location.pathname]);
+  }, [activeChatMode, isSymphonyDrawerOpen, location.pathname]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {

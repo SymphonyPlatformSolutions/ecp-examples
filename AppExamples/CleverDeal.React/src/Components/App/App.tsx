@@ -40,10 +40,8 @@ export const App = () => {
 
   useEffect(() => {
     if ((window as any).symphony) {
-      console.debug('[App] useEffect: window.symphony already exists — skipping script injection.', { pathname: location.pathname });
       return;
     }
-    console.debug('[App] useEffect: Injecting SDK script.', { ecpOrigin: ecpOriginParam, sdkPath, pathname: location.pathname });
     const sdkScriptNode = document.createElement("script");
     sdkScriptNode.src = `https://${ecpOriginParam}${sdkPath}`;
     sdkScriptNode.id = "symphony-ecm-sdk";
@@ -58,15 +56,9 @@ export const App = () => {
 
     (window as any).renderRoom = () => {
       const target = document.getElementById('symphony-ecm');
-      console.debug('[App] renderRoom callback fired.', {
-        pathname: location.pathname,
-        hasSymphonyEcm: Boolean(target),
-      });
       if (!target) {
-        console.debug('[App] renderRoom — guard blocked (no #symphony-ecm).');
         return;
       }
-      console.debug('[App] renderRoom — calling window.symphony.render("symphony-ecm").');
 
       (window as any).symphony
         .render("symphony-ecm", {
@@ -77,14 +69,12 @@ export const App = () => {
           sound: false,
         })
         .then(() => {
-          console.debug('[App] renderRoom — symphony.render() completed.');
           applyTheme();
           setLoading(false);
         });
     };
 
     return () => {
-      console.debug('[App] useEffect cleanup — deleting window.renderRoom.', { pathname: location.pathname });
       delete (window as any).renderRoom;
     };
   }, [ applyTheme, location.pathname ]);

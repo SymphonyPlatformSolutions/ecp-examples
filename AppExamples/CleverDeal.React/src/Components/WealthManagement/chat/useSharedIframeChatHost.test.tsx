@@ -104,6 +104,25 @@ test('waits for the shared iframe clientReady message before marking the chat re
   expect(screen.getByTestId('error').textContent).toBe('');
 });
 
+test('ignores shared iframe clientReady messages until the iframe window is attached', () => {
+  render(<HookHarness layoutMode="drawer" />);
+
+  dispatchClientReadyMessage({ name: 'shared-frame' } as unknown as Window);
+  expect(screen.getByTestId('primed-status').textContent).toBe('cold');
+  expect(screen.getByTestId('status').textContent).toBe('waiting');
+
+  const iframe = screen.getByTitle('Shared iframe') as HTMLIFrameElement;
+  const iframeWindow = { name: 'shared-frame' } as unknown as Window;
+  Object.defineProperty(iframe, 'contentWindow', {
+    configurable: true,
+    value: iframeWindow,
+  });
+
+  dispatchClientReadyMessage(iframeWindow);
+  expect(screen.getByTestId('primed-status').textContent).toBe('primed');
+  expect(screen.getByTestId('status').textContent).toBe('ready');
+});
+
 test('treats iframe load as primed without declaring the chat ready yet', () => {
   render(<HookHarness layoutMode="drawer" />);
 

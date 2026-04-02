@@ -1,3 +1,5 @@
+import { debugWealth } from './wealthDebug';
+
 type CountListener = (count: number) => void;
 type DebugListener = (snapshot: SymphonyNotificationDebugSnapshot) => void;
 type UnreadEventListener = (event: SymphonyUnreadNotificationEvent) => void;
@@ -82,16 +84,7 @@ export class SymphonyNotificationsService {
   private _lastEventAt: number | null = null;
 
   private _debug(message: string, context?: Record<string, unknown>) {
-    if (process.env.NODE_ENV === 'production') {
-      return;
-    }
-
-    if (context) {
-      console.info(`[Wealth Symphony] ${message}`, context);
-      return;
-    }
-
-    console.info(`[Wealth Symphony] ${message}`);
+    debugWealth('WealthNotifications', message, context);
   }
 
   private _recomputeCount() {

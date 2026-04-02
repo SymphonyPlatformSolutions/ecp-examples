@@ -112,6 +112,28 @@ test('injects the SDK script once in default focus mode without performing a hid
     expect(service.getRenderedStreamId('.slot-a')).toBeUndefined();
   });
 
+  test('reset clears tracked state and returns the service to idle', async () => {
+    const service = new SymphonySdkService();
+    const renderMock = createRenderMock();
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: renderMock,
+      openStream: jest.fn(),
+    } as any;
+
+    await service.init('corporate.symphony.com');
+    await service.renderChat('.slot-a', { mode: 'light' });
+
+    delete (window as Window & { symphony?: unknown }).symphony;
+    service.reset();
+
+    expect(service.status).toBe('idle');
+    expect(service.error).toBeNull();
+    expect(service.getRenderedStreamId('.slot-a')).toBeUndefined();
+    expect(document.querySelector('.slot-a')?.innerHTML).toBe('');
+    expect(document.getElementById('symphony-ecm-sdk')).toBeNull();
+  });
+
   test('does not render the same collaboration container twice when the iframe is already mounted', async () => {
     const service = new SymphonySdkService();
     const renderMock = createRenderMock();

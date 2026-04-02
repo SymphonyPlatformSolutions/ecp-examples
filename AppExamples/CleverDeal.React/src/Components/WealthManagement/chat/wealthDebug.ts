@@ -10,7 +10,7 @@ export function isWealthDebugFlagEnabled() {
 }
 
 export function shouldLogWealthDebug() {
-  return process.env.NODE_ENV !== 'production' || isWealthDebugFlagEnabled();
+  return isWealthDebugFlagEnabled();
 }
 
 export function debugWealth(scope: string, message: string, context?: Record<string, unknown>) {

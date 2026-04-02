@@ -777,6 +777,10 @@ export class SymphonySdkService {
     this._renderedContainers.set(containerSelector, { streamId: undefined });
   }
 
+  reset() {
+    this._resetState();
+  }
+
   resetIfError() {
     if (this._status !== 'error') {
       return false;
