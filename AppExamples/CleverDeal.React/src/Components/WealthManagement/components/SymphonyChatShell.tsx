@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { AlertCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
@@ -29,6 +30,7 @@ interface SymphonyChatShellProps {
   maskFrame?: boolean;
   onSharedChatError?: () => void;
   onSharedChatLoad?: () => void;
+  sharedChatRef?: Ref<HTMLIFrameElement>;
   sharedChatError?: string | null;
   sharedChatUrl?: string;
   onClose?: () => void;
@@ -43,6 +45,7 @@ export default function SymphonyChatShell({
   maskFrame = false,
   onSharedChatError,
   onSharedChatLoad,
+  sharedChatRef,
   sharedChatError = null,
   sharedChatUrl,
   onClose,
@@ -132,6 +135,7 @@ export default function SymphonyChatShell({
         >
           {frameOverlay}
           <iframe
+            ref={sharedChatRef}
             data-testid="wealth-shared-chat-frame"
             title="Wealth shared chat"
             src={sharedChatUrl}

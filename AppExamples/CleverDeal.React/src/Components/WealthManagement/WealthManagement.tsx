@@ -172,6 +172,8 @@ const WealthManagement = () => {
     chatUrl: sharedChatUrl,
     handleError: handleSharedChatError,
     handleLoad: handleSharedChatLoad,
+    iframeRef: sharedChatRef,
+    isChatPrimed: isSharedChatPrimed,
     isChatReady: isSharedChatReady,
   } = useSharedIframeChatHost({
     ecpOrigin,
@@ -180,7 +182,7 @@ const WealthManagement = () => {
   });
   const isChatShellVisible = isChatRoute || isSymphonyDrawerOpen;
   const isSharedChatVisible = !usesEmbeddedClientDrawer && isChatShellVisible;
-  const isInitialWorkspaceReady = hasInitialWorkspaceRevealed || (isSdkReady && (isSharedChatReady || Boolean(sharedChatError)));
+  const isInitialWorkspaceReady = hasInitialWorkspaceRevealed || (isSdkReady && (isSharedChatPrimed || Boolean(sharedChatError)));
   const { shellRef, maskFrame } = useSharedChatPresentationTransition({
     mode: activeChatMode,
     isReady: isSharedChatReady && !sharedChatError,
@@ -225,16 +227,17 @@ const WealthManagement = () => {
       return;
     }
 
-    if (!isSharedChatReady && !sharedChatError) {
+    if (!isSharedChatPrimed && !sharedChatError) {
       return;
     }
 
     debugWM('Initial workspace reveal ready.', {
+      isSharedChatPrimed,
       isSharedChatReady,
       sharedChatError,
     });
     setHasInitialWorkspaceRevealed(true);
-  }, [hasInitialWorkspaceRevealed, isSdkReady, isSharedChatReady, sharedChatError]);
+  }, [hasInitialWorkspaceRevealed, isSdkReady, isSharedChatPrimed, isSharedChatReady, sharedChatError]);
 
   useEffect(() => {
     const unsubscribe = symphonyNotifications.onNotificationEvent?.((event) => {
@@ -398,6 +401,7 @@ const WealthManagement = () => {
             maskFrame={maskFrame}
             onSharedChatError={handleSharedChatError}
             onSharedChatLoad={handleSharedChatLoad}
+            sharedChatRef={sharedChatRef}
             sharedChatError={sharedChatError}
             sharedChatUrl={sharedChatUrl}
             onClose={activeChatMode === 'drawer' ? closeSharedChat : undefined}

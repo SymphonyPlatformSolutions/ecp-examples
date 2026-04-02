@@ -231,6 +231,7 @@ beforeEach(() => {
     chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
     handleError: jest.fn(),
     handleLoad: jest.fn(),
+    isChatPrimed: true,
     isChatReady: true,
   });
   mockUseSharedChatPresentationTransition.mockReset();
@@ -274,6 +275,7 @@ test('keeps the full-page workspace loader visible while the hidden shared chat 
     chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
     handleError: jest.fn(),
     handleLoad: jest.fn(),
+    isChatPrimed: false,
     isChatReady: false,
   });
   const { container } = renderWealth('/wealth-management');
@@ -382,6 +384,7 @@ test('surfaces the shared chat iframe error inside the shared chat shell', async
     chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
     handleError: jest.fn(),
     handleLoad: jest.fn(),
+    isChatPrimed: false,
     isChatReady: false,
   });
 
