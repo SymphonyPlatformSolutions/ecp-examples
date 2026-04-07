@@ -426,7 +426,7 @@ test('injects the SDK script once in default focus mode without performing a hid
         },
       },
       {
-        container: '.slot-a',
+        container: 'slot-a',
         mode: 'blast',
         streamIds: ['stream-1'],
       },

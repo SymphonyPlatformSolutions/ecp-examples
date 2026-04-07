@@ -144,6 +144,7 @@ export default function ClientDetailPage({
 
   const shareDocumentToChat = async (document: { name: string; type: string; updatedAt: string }) => {
     const messagePayload = buildDocumentSharePayload(document, contact.name);
+
     setShareError(null);
     setSharingDocumentName(document.name);
 

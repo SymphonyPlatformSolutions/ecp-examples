@@ -135,6 +135,10 @@ export class SymphonySdkService {
     return containerSelector.slice(1);
   }
 
+  private _getSendTarget(containerSelector: string) {
+    return containerSelector.replace(/^[.#]/, '');
+  }
+
   private _trackInflight(containerSelector: string, key: string, promise: Promise<void>) {
     const trackedPromise = promise.finally(() => {
       const inflight = this._inflightOperations.get(containerSelector);
@@ -710,7 +714,7 @@ export class SymphonySdkService {
       await Promise.resolve(
         window.symphony.sendMessage(message, {
           ...messageOptions,
-          ...(containerSelector ? { container: containerSelector } : {}),
+          ...(containerSelector ? { container: this._getSendTarget(containerSelector) } : {}),
         }),
       );
     };

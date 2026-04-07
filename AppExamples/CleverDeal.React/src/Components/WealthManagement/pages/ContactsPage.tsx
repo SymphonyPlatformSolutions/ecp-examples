@@ -181,6 +181,35 @@ export default function ContactsPage({ onOpenChat }: ContactsPageProps) {
         },
       },
       {
+        id: 'actions',
+        header: 'Chat',
+        cell: ({ row }) => {
+          const contact = row.original;
+          const unreadCount = contact.streamId ? streamUnreadCounts[contact.streamId] ?? 0 : 0;
+          return (
+            <div className="flex items-center justify-start">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 rounded-full border-sky-200 px-2.5 text-[11px] text-sky-700 hover:bg-sky-50"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onOpenChat?.(contact.id);
+                }}
+              >
+                <MessageSquare className="h-3 w-3" />
+                Chat
+                {unreadCount > 0 && (
+                  <span className="ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </div>
+          );
+        },
+      },
+      {
         accessorKey: 'lastContact',
         header: 'Last Contact',
         cell: ({ getValue }) => <span className="text-[13px] text-slate-700">{String(getValue())}</span>,
@@ -213,35 +242,6 @@ export default function ContactsPage({ onOpenChat }: ContactsPageProps) {
         accessorKey: 'advisorOwner',
         header: 'Advisor',
         cell: ({ getValue }) => <span className="text-[13px] text-slate-700">{String(getValue())}</span>,
-      },
-      {
-        id: 'actions',
-        header: '',
-        cell: ({ row }) => {
-          const contact = row.original;
-          const unreadCount = contact.streamId ? streamUnreadCounts[contact.streamId] ?? 0 : 0;
-          return (
-            <div className="flex items-center justify-end">
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 rounded-full border-sky-200 px-2.5 text-[11px] text-sky-700 hover:bg-sky-50"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onOpenChat?.(contact.id);
-                }}
-              >
-                <MessageSquare className="h-3 w-3" />
-                Chat
-                {unreadCount > 0 && (
-                  <span className="ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
-              </Button>
-            </div>
-          );
-        },
       },
     ],
     [onOpenChat, streamUnreadCounts],

@@ -366,9 +366,9 @@ export function useClientChatSdkController({
     }
 
     await symphonySdk.sendMessage(message, {
+      containerSelector,
       mode: 'blast',
       streamIds: [streamId],
-      containerSelector,
       users: [],
     });
   }, [containerSelector, enabled, isChatReady, isLoading, streamId]);
