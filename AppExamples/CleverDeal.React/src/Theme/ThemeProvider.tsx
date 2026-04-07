@@ -1,5 +1,6 @@
 import { useEffect, useState, createContext } from 'react';
 import defaultThemes from './default.json';
+import { symphonyThemeBridge } from './symphonyThemeBridge';
 
 export interface Theme {
   id: string;
@@ -40,10 +41,9 @@ export const ThemeProvider = ({ children } : any) => {
     document.documentElement.style.setProperty('--on-surface-color', theme.colors.onSurface);
     document.documentElement.style.setProperty('--on-error-color', theme.colors.onError);
 
-    const symphony = (window as any).symphony;
-    if (symphony) {
-      symphony.updateSettings({mode: theme.colors.symphonyMode});
-      symphony.updateTheme({
+    symphonyThemeBridge.applyGlobalTheme({
+      mode: theme.colors.symphonyMode,
+      theme: {
         primary: theme.colors.primary,
         secondary: theme.colors.secondary,
         accent: theme.colors.primary,
@@ -57,8 +57,8 @@ export const ThemeProvider = ({ children } : any) => {
         textAccent: theme.colors.onPrimary,
         textSuccess: theme.colors.onPrimary,
         textError: theme.colors.onError,
-      });
-    }
+      },
+    });
   };
 
   useEffect(applyTheme, [ theme ]);
