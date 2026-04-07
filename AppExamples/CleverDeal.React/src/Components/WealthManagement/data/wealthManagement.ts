@@ -1,12 +1,21 @@
 import {
+  ClientDocument,
   Contact,
   WealthManagementData,
 } from '../models/WealthManagementData';
+import AmeliaChenOnboardingChecklistPdf from '../assets/Amelia_Chen_Onboarding_Checklist.pdf';
 import AmeliaChenProfile from '../assets/Amelia_Chen.png';
+import EvelynReedCustodialStatementPdf from '../assets/Evelyn_Reed_Custodial_Statement.pdf';
+import EvelynReedEstatePlanningBriefPdf from '../assets/Evelyn_Reed_Estate_Planning_Brief.pdf';
+import EvelynReedQ1AllocationMemoPdf from '../assets/Evelyn_Reed_Q1_Allocation_Memo.pdf';
 import EvelynReedProfile from '../assets/Evelyn_Reed.png';
+import FayeZhangApacTaxPackPdf from '../assets/Faye_Zhang_APAC_Tax_Pack.pdf';
 import FayeZhangProfile from '../assets/Faye_Zhang.png';
 import HansGruberProfile from '../assets/Hans_Gruber.png';
+import JonathanSmithLiquidityReviewPdf from '../assets/Jonathan_Smith_Liquidity_Review.pdf';
+import JonathanSmithMacroOutlookPdf from '../assets/Jonathan_Smith_Macro_Outlook.pdf';
 import JonathanSmithProfile from '../assets/Jonathan_Smith.png';
+import RajPatelIncomeStrategyPdf from '../assets/Raj_Patel_Income_Strategy.pdf';
 import RajPatelProfile from '../assets/Raj_Patel.png';
 
 const sharedAllocation = [
@@ -16,6 +25,35 @@ const sharedAllocation = [
   { name: 'Cash', value: 12, color: '#94b8dd' },
   { name: 'Other', value: 8, color: '#d8e4f2' },
 ];
+
+const documentAssetByKey: Record<string, string> = {
+  'Amelia Chen::Onboarding Checklist.pdf': AmeliaChenOnboardingChecklistPdf,
+  'Evelyn Reed::Custodian Statement.pdf': EvelynReedCustodialStatementPdf,
+  'Evelyn Reed::Estate Planning Brief.pdf': EvelynReedEstatePlanningBriefPdf,
+  'Evelyn Reed::Q1 Allocation Memo.pdf': EvelynReedQ1AllocationMemoPdf,
+  'Faye Zhang::APAC Tax Pack.pdf': FayeZhangApacTaxPackPdf,
+  'Jonathan Smith::Liquidity Review.pdf': JonathanSmithLiquidityReviewPdf,
+  'Jonathan Smith::Macro Outlook.pdf': JonathanSmithMacroOutlookPdf,
+  'Raj Patel::Income Strategy.pdf': RajPatelIncomeStrategyPdf,
+};
+
+function attachDocumentAssets(
+  contactName: string,
+  documents: Array<Omit<ClientDocument, 'assetUrl'>>,
+): ClientDocument[] {
+  return documents.map((document) => {
+    const assetUrl = documentAssetByKey[`${contactName}::${document.name}`];
+
+    if (!assetUrl) {
+      throw new Error(`Missing document asset for ${contactName}: ${document.name}`);
+    }
+
+    return {
+      ...document,
+      assetUrl,
+    };
+  });
+}
 
 const createClient = (contact: Contact): Contact => contact;
 
@@ -51,11 +89,11 @@ const contacts: Contact[] = [
       { name: 'Reed Family Trust', role: 'Trust Entity', entity: 'Private Trust' },
       { name: 'Nadia Collins', role: 'Tax Counsel', entity: 'Hollis Advisory' },
     ],
-    documents: [
+    documents: attachDocumentAssets('Evelyn Reed', [
       { name: 'Q1 Allocation Memo.pdf', type: 'Investment Memo', updatedAt: 'Mar 11' },
       { name: 'Estate Planning Brief.pdf', type: 'Legal', updatedAt: 'Mar 08' },
       { name: 'Custodian Statement.pdf', type: 'Statement', updatedAt: 'Mar 01' },
-    ],
+    ]),
     recentActivity: [
       {
         id: 'reed-activity-1',
@@ -118,10 +156,10 @@ const contacts: Contact[] = [
       { name: 'Northgate Trust', role: 'Trust Entity', entity: 'Northgate' },
       { name: 'Leo Patel', role: 'CIO', entity: 'Independent Advisor' },
     ],
-    documents: [
+    documents: attachDocumentAssets('Jonathan Smith', [
       { name: 'Macro Outlook.pdf', type: 'Research', updatedAt: 'Mar 12' },
       { name: 'Liquidity Review.pdf', type: 'Memo', updatedAt: 'Mar 09' },
-    ],
+    ]),
     recentActivity: [
       {
         id: 'smith-activity-1',
@@ -183,7 +221,9 @@ const contacts: Contact[] = [
       { name: 'Marcus Chen', role: 'COO', entity: 'Orbital Holdings' },
       { name: 'Aster Trustee', role: 'Trust Entity', entity: 'Singapore Trust' },
     ],
-    documents: [{ name: 'Onboarding Checklist.pdf', type: 'Compliance', updatedAt: 'Mar 10' }],
+    documents: attachDocumentAssets('Amelia Chen', [
+      { name: 'Onboarding Checklist.pdf', type: 'Compliance', updatedAt: 'Mar 10' },
+    ]),
     recentActivity: [
       {
         id: 'chen-activity-1',
@@ -242,7 +282,9 @@ const contacts: Contact[] = [
     ],
     portfolioAllocation: sharedAllocation,
     relationships: [{ name: 'Lila Patel', role: 'Family Office', entity: 'Patel Capital' }],
-    documents: [{ name: 'Income Strategy.pdf', type: 'Portfolio', updatedAt: 'Mar 06' }],
+    documents: attachDocumentAssets('Raj Patel', [
+      { name: 'Income Strategy.pdf', type: 'Portfolio', updatedAt: 'Mar 06' },
+    ]),
     recentActivity: [
       {
         id: 'patel-activity-1',
@@ -301,7 +343,9 @@ const contacts: Contact[] = [
     ],
     portfolioAllocation: sharedAllocation,
     relationships: [{ name: 'Victor Wong', role: 'Operating Partner', entity: 'Zhang Investments' }],
-    documents: [{ name: 'APAC Tax Pack.pdf', type: 'Tax', updatedAt: 'Mar 04' }],
+    documents: attachDocumentAssets('Faye Zhang', [
+      { name: 'APAC Tax Pack.pdf', type: 'Tax', updatedAt: 'Mar 04' },
+    ]),
     recentActivity: [
       {
         id: 'zhang-activity-1',
@@ -569,6 +613,4 @@ export const wealthManagementData: WealthManagementData = {
     { month: 'Dec', value: 140 },
   ],
   contacts,
-  pdfFile:
-    'data:application/pdf;base64,JVBERi0xLjQKJcTl8uXrPgoxIDAgb2JqCjw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+CmVuZG9iagoyIDAgb2JqCjw8L1R5cGUvUGFnZXMvS2lkc1szIDAgUl0vQ291bnQgMT4+CmVuZG9iagozIDAgb2JqCjw8L1R5cGUvUGFnZS9QYXJlbnQgMiAwIFIvTWVkaWFCb3hbMCAwIDIwMCAyMDBdL0NvbnRlbnRzIDQgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA1IDAgUj4+Pj4+CmVuZG9iago0IDAgb2JqCjw8L0xlbmd0aCA1NT4+CnN0cmVhbQpCVAovRjEgMTIgVGYKNzIgMTIwIFRkCihXZWx0aCBtYW5hZ2VtZW50IHNhbXBsZSBQREYpIFRqCkVUCmVuZHN0cmVhbQplbmRvYmoKNSAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9IZWx2ZXRpY2E+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAwNjQgMDAwMDAgbiAKMDAwMDAwMDExOCAwMDAwMCBuIAowMDAwMDAwMjQ0IDAwMDAwIG4gCjAwMDAwMDAzNDkgMDAwMDAgbiAKdHJhaWxlcgo8PC9Sb290IDEgMCBSL1NpemUgNj4+CnN0YXJ0eHJlZgo0MTgKJSVFT0Y=',
 };

@@ -158,6 +158,7 @@ export interface ClientDocument {
   name: string;
   type: string;
   updatedAt: string;
+  assetUrl: string;
 }
 
 export interface ClientActivity {
@@ -198,7 +199,6 @@ export interface WealthManagementData {
   customer: Customer;
   wealthRoom: RoomIdMap;
   reports: Report[];
-  pdfFile: string;
   dashboard: DashboardData;
   activityTimeline?: ActivityEntry[];
   portfolioAllocation?: PortfolioAllocation[];

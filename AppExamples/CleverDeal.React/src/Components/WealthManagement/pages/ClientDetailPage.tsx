@@ -16,7 +16,7 @@ import { Navigate, useParams } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { wealthManagementData } from '../data/wealthManagement';
-import { SEGMENT_STYLES } from '../models/WealthManagementData';
+import { SEGMENT_STYLES, type ClientDocument } from '../models/WealthManagementData';
 import { useClientChatSdkController } from '../chat/useClientChatSdkController';
 import { debugWealth } from '../chat/wealthDebug';
 import ChatLoadingOverlay from '../components/ChatLoadingOverlay';
@@ -26,6 +26,53 @@ import ChatLoadingOverlay from '../components/ChatLoadingOverlay';
 
 function debugDocumentShare(message: string, context?: Record<string, unknown>) {
   debugWealth('WealthClientShare', message, context);
+}
+
+const documentDataUriCache = new Map<string, Promise<string>>();
+
+function readBlobAsDataUri(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') {
+        reject(new Error('Unable to read the PDF asset.'));
+        return;
+      }
+
+      resolve(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(reader.error ?? new Error('Unable to read the PDF asset.'));
+    };
+
+    reader.readAsDataURL(blob);
+  });
+}
+
+function getDocumentDataUri(document: ClientDocument) {
+  const cachedDataUri = documentDataUriCache.get(document.assetUrl);
+  if (cachedDataUri) {
+    return cachedDataUri;
+  }
+
+  const dataUriPromise = fetch(document.assetUrl)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Unable to load ${document.name}.`);
+      }
+
+      return response.blob();
+    })
+    .then((blob) => readBlobAsDataUri(blob))
+    .catch((error) => {
+      documentDataUriCache.delete(document.assetUrl);
+      throw error;
+    });
+
+  documentDataUriCache.set(document.assetUrl, dataUriPromise);
+  return dataUriPromise;
 }
 
 function getInitials(name: string) {
@@ -98,7 +145,9 @@ const ACTIVITY_STYLES = {
   },
 } as const;
 
-function buildDocumentSharePayload(document: { name: string; type: string; updatedAt: string }, contactName: string) {
+async function buildDocumentSharePayload(document: ClientDocument, contactName: string) {
+  const dataUri = await getDocumentDataUri(document);
+
   return {
     text: {
       'text/markdown': `Shared *${document.name}* with ${contactName}.\n\nType: ${document.type}\nUpdated: ${document.updatedAt}`,
@@ -108,7 +157,7 @@ function buildDocumentSharePayload(document: { name: string; type: string; updat
         type: 'fdc3.fileAttachment',
         data: {
           name: document.name,
-          dataUri: wealthManagementData.pdfFile,
+          dataUri,
         },
       },
     },
@@ -142,19 +191,19 @@ export default function ClientDetailPage({
     return <Navigate to="/wealth-management/clients" replace />;
   }
 
-  const shareDocumentToChat = async (document: { name: string; type: string; updatedAt: string }) => {
-    const messagePayload = buildDocumentSharePayload(document, contact.name);
-
+  const shareDocumentToChat = async (document: ClientDocument) => {
     setShareError(null);
     setSharingDocumentName(document.name);
 
-    debugDocumentShare('Sending document share request to Symphony client chat.', {
-      documentName: document.name,
-      streamId,
-      messagePayload,
-    });
-
     try {
+      const messagePayload = await buildDocumentSharePayload(document, contact.name);
+
+      debugDocumentShare('Sending document share request to Symphony client chat.', {
+        documentName: document.name,
+        streamId,
+        messagePayload,
+      });
+
       await sendMessageToChat(messagePayload);
       setShareError(null);
     } catch (cause) {

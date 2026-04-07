@@ -7,6 +7,8 @@ import ClientDetailPage from './ClientDetailPage';
 
 const mockSendMessageToChat = jest.fn();
 const mockUseClientChatSdkController = jest.fn();
+const mockFetch = jest.fn();
+const originalFetch = global.fetch;
 
 jest.mock('recharts', () => {
   const Wrapper = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
@@ -77,6 +79,7 @@ function renderClientDetail() {
 beforeEach(() => {
   mockSendMessageToChat.mockReset();
   mockUseClientChatSdkController.mockReset();
+  mockFetch.mockReset();
   mockUseClientChatSdkController.mockImplementation(() => ({
     chatError: null,
     isChatReady: true,
@@ -85,17 +88,30 @@ beforeEach(() => {
     streamId: 'stream-1',
     slotClassName: 'wealth-symphony-client-contact',
   }));
+  global.fetch = mockFetch as unknown as typeof fetch;
+  mockFetch.mockResolvedValue({
+    ok: true,
+    blob: () => Promise.resolve(new Blob(['sample-pdf'], { type: 'application/pdf' })),
+  });
   jest.spyOn(console, 'debug').mockImplementation(() => {});
   jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
+  if (originalFetch) {
+    global.fetch = originalFetch;
+  } else {
+    delete (global as typeof globalThis & { fetch?: typeof fetch }).fetch;
+  }
   jest.restoreAllMocks();
 });
 
 test('renders the dedicated Symphony client slot and keeps sharing in progress until the SDK send resolves', async () => {
   const deferred = createDeferred<void>();
   mockSendMessageToChat.mockReturnValueOnce(deferred.promise);
+  const sharedDocument = wealthManagementData.contacts?.find((contact) => contact.id === '1')?.documents[0];
+
+  expect(sharedDocument).toBeDefined();
 
   renderClientDetail();
 
@@ -106,19 +122,22 @@ test('renders the dedicated Symphony client slot and keeps sharing in progress u
   await userEvent.click(shareButton);
 
   expect(screen.getByRole('button', { name: 'Share Q1 Allocation Memo.pdf to chat' })).toHaveTextContent('Sharing...');
-  expect(mockSendMessageToChat).toHaveBeenCalledWith({
-    text: {
-      'text/markdown': 'Shared *Q1 Allocation Memo.pdf* with Evelyn Reed.\n\nType: Investment Memo\nUpdated: Mar 11',
-    },
-    entities: {
-      report: {
-        type: 'fdc3.fileAttachment',
-        data: {
-          name: 'Q1 Allocation Memo.pdf',
-          dataUri: wealthManagementData.pdfFile,
+  await waitFor(() => {
+    expect(mockFetch).toHaveBeenCalledWith(sharedDocument?.assetUrl);
+    expect(mockSendMessageToChat).toHaveBeenCalledWith({
+      text: {
+        'text/markdown': 'Shared *Q1 Allocation Memo.pdf* with Evelyn Reed.\n\nType: Investment Memo\nUpdated: Mar 11',
+      },
+      entities: {
+        report: {
+          type: 'fdc3.fileAttachment',
+          data: {
+            name: 'Q1 Allocation Memo.pdf',
+            dataUri: 'data:application/pdf;base64,c2FtcGxlLXBkZg==',
+          },
         },
       },
-    },
+    });
   });
 
   deferred.resolve();

@@ -16,6 +16,7 @@ import {
   YAxis,
 } from 'recharts';
 import { wealthManagementData } from '../data/wealthManagement';
+import type { ActivityEntry } from '../models/WealthManagementData';
 import { symphonyNotifications } from '../chat/symphonyNotifications';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
@@ -431,6 +432,25 @@ function getNextBusinessDay(date: Date) {
   return next;
 }
 
+function normalizeRenderDate(date: Date) {
+  const normalized = new Date(date);
+  normalized.setHours(12, 0, 0, 0);
+  return normalized;
+}
+
+export function getUpcomingTimelineItems(items: ActivityEntry[], baseDate: Date) {
+  let currentDate = normalizeRenderDate(baseDate);
+
+  return items.map((item) => {
+    currentDate = getNextBusinessDay(currentDate);
+
+    return {
+      ...item,
+      date: currentDate.toISOString(),
+    };
+  });
+}
+
 function getUpcomingTaskDueLabel(index: number, baseDate: Date) {
   if (index === 0) {
     return 'Today';
@@ -465,9 +485,10 @@ export default function DashboardPage() {
   const openConversationUnreadCount = liveUnreadCount;
   const allocationData = portfolioAllocation ?? [];
   const primaryAllocation = allocationData[0];
-  const timelineItems = (wealthManagementData.activityTimeline ?? []).slice(0, 6);
+  const renderDate = new Date();
+  const timelineItems = getUpcomingTimelineItems((wealthManagementData.activityTimeline ?? []).slice(0, 6), renderDate);
   const marketStatusLabel = 'Market Open';
-  const taskBaseDate = new Date();
+  const taskBaseDate = renderDate;
   const tasksWithDynamicDueLabels = dashboard.tasks.map((task, index) => ({
     ...task,
     dueLabel: getUpcomingTaskDueLabel(index, taskBaseDate),
