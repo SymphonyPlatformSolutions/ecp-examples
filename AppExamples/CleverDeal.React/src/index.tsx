@@ -2,19 +2,9 @@ import { App } from './Components/App';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from './Theme/ThemeProvider';
 import ContentDistribution from './Components/ContentDistribution';
-import Loading from './Components/Loading';
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import { loadWealthManagementModule } from './Components/WealthManagement/loadWealthManagementModule';
 import LegacyWealthRoute from './LegacyWealthRoute';
-
-const WealthManagement = lazy(loadWealthManagementModule);
-
-const WealthManagementModuleLoading = () => (
-  <div className="large-loading">
-    <Loading animate={true} className="logo" />
-  </div>
-);
 
 declare global {
   interface Window {
@@ -71,14 +61,6 @@ ReactDOM.render(
       <ThemeProvider>
         <Routes>
           <Route path="wealth" element={<LegacyWealthRoute />} />
-          <Route
-            path="wealth-management/*"
-            element={(
-              <Suspense fallback={<WealthManagementModuleLoading />}>
-                <WealthManagement />
-              </Suspense>
-            )}
-          />
           <Route path="*" element={<App />} />
           <Route path="content/*" element={<ContentDistribution />} />
         </Routes>

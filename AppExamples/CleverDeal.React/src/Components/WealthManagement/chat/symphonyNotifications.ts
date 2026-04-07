@@ -430,6 +430,31 @@ export class SymphonyNotificationsService {
     this._clearAllStreamUnread();
   }
 
+  reset() {
+    this._retryTimers.forEach((timerId) => {
+      window.clearTimeout(timerId);
+    });
+
+    this._count = 0;
+    this._globalUnreadCount = 0;
+    this._fallbackUnreadCount = 0;
+    this._hasGlobalUnreadBaseline = false;
+    this._listeners.clear();
+    this._debugListeners.clear();
+    this._unreadEventListeners.clear();
+    this._notificationEventListeners.clear();
+    this._streamUnreadListeners.clear();
+    this._initializedOrigins.clear();
+    this._originDebug.clear();
+    this._subscriptionDebug.clear();
+    this._retryCounts.clear();
+    this._retryTimers.clear();
+    this._streamUnreadCounts.clear();
+    this._recentNotifications = [];
+    this._lastEventSummary = null;
+    this._lastEventAt = null;
+  }
+
   get count() {
     return this._count;
   }

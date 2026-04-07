@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Bell, House, Menu, Search } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { getEcpParam } from '../../Utils/utils';
@@ -184,7 +184,7 @@ const WealthManagement = () => {
   });
   const isChatShellVisible = isChatRoute || isSymphonyDrawerOpen;
   const isSharedChatVisible = !usesEmbeddedClientDrawer && isChatShellVisible;
-  const isInitialWorkspaceReady = hasInitialWorkspaceRevealed || (isSdkStartupComplete && (isSharedChatPrimed || Boolean(sharedChatError)));
+  const isInitialWorkspaceReady = hasInitialWorkspaceRevealed || (isSdkStartupComplete && (isSharedChatReady || Boolean(sharedChatError)));
   const { shellRef, maskFrame } = useSharedChatPresentationTransition({
     mode: activeChatMode,
     isReady: isSharedChatReady && !sharedChatError,
@@ -196,6 +196,11 @@ const WealthManagement = () => {
     return () => {
       debugWM('Component unmounted.');
     };
+  }, []);
+
+  useLayoutEffect(() => () => {
+    debugWM('Resetting Wealth-local state on unmount.');
+    symphonyNotifications.reset();
   }, []);
 
   useEffect(() => symphonyNotifications.onCountChange(setUnreadCount), []);
@@ -230,7 +235,7 @@ const WealthManagement = () => {
       return;
     }
 
-    if (!isSharedChatPrimed && !sharedChatError) {
+    if (!isSharedChatReady && !sharedChatError) {
       return;
     }
 

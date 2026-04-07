@@ -37,6 +37,7 @@ export const App = () => {
   const location = useLocation();
   const ecpProps = { ecpOrigin: ecpOriginParam, partnerId: partnerIdParam };
   const { applyTheme } = useContext(ThemeContext) as ThemeState;
+  const isWealthManagementRoute = location.pathname.startsWith('/wealth-management');
 
   useEffect(() => {
     if ((window as any).symphony) {
@@ -80,7 +81,11 @@ export const App = () => {
   }, [ applyTheme, location.pathname ]);
 
   const getAppLabel = () => {
-    const route = routes.find(({ path }) => `/${path}` === location.pathname);
+    const topLevelPath = location.pathname.split('/')[1] ?? '';
+    const route = routes.find(({ path, routePath }) => {
+      const basePath = (routePath ?? path).replace(/\/\*$/, '');
+      return basePath === topLevelPath;
+    });
     return route ? `: ${route.label}` : "";
   };
 
@@ -88,21 +93,23 @@ export const App = () => {
     <LargeLoading />
   ) : (
     <div className="App">
-      <div className="app-header">
-        <div className="brand" onClick={() => navigate("/")}>
-          <FaHome />
-          <Loading animate={false} className="logo"></Loading>
-          <h1>
-            Clever Deal 2.0
-            {getAppLabel()}
-          </h1>
+      {!isWealthManagementRoute ? (
+        <div className="app-header">
+          <div className="brand" onClick={() => navigate("/")}>
+            <FaHome />
+            <Loading animate={false} className="logo"></Loading>
+            <h1>
+              Clever Deal 2.0
+              {getAppLabel()}
+            </h1>
+          </div>
+          <div className="app-header-settings">
+            <PodPicker />
+            <ThemePicker />
+            <HelpButton disabled={loading} ecpOrigin={ecpProps.ecpOrigin} />
+          </div>
         </div>
-        <div className="app-header-settings">
-          <PodPicker />
-          <ThemePicker />
-          <HelpButton disabled={loading} ecpOrigin={ecpProps.ecpOrigin} />
-        </div>
-      </div>
+      ) : null}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         {routes
@@ -110,7 +117,7 @@ export const App = () => {
           .map((route) => (
             <Route
               key={route.path}
-              {...route}
+              path={route.routePath ?? route.path}
               element={createElement(route.component, ecpProps)}
             />
           ))}

@@ -32,6 +32,7 @@ const mockOpenStream = jest.fn(() => Promise.resolve()) as unknown as jest.Mock<
   [string, string, Record<string, unknown> | undefined]
 >;
 const mockNotificationsInit = jest.fn();
+const mockNotificationsReset = jest.fn();
 const mockApplyWealthSymphonyTheme = jest.fn();
 const mockRefreshWealthSymphonyThemeAfterLayoutChange = jest.fn(() => Promise.resolve());
 const mockReleaseWealthSymphonyThemeOwnership = jest.fn();
@@ -103,6 +104,7 @@ jest.mock('./chat/useClientChatSdkController', () => ({
 jest.mock('./chat/symphonyNotifications', () => ({
   symphonyNotifications: {
     init: (ecpOrigin: string) => mockNotificationsInit(ecpOrigin),
+    reset: () => mockNotificationsReset(),
     onCountChange: (callback: CountChangeCallback) => mockOnCountChange(callback),
     onNotificationEvent: (callback: (event: { type: string; summary: string; receivedAt: number; payload: Record<string, unknown> }) => void) => mockOnNotificationEvent(callback),
     onStreamUnreadChange: (callback: StreamUnreadChangeCallback) => mockOnStreamUnreadChange(callback),
@@ -174,8 +176,8 @@ const themeValue: ThemeState = {
   applyTheme: jest.fn(),
 };
 
-function renderWealth(path: string) {
-  return render(
+function renderWealthTree(path: string) {
+  return (
     <ThemeContext.Provider value={themeValue}>
       <MemoryRouter
         future={{ v7_relativeSplatPath: true, v7_startTransition: true }}
@@ -187,8 +189,12 @@ function renderWealth(path: string) {
           <Route path="/wealth" element={<div>Legacy Wealth Home</div>} />
         </Routes>
       </MemoryRouter>
-    </ThemeContext.Provider>,
+    </ThemeContext.Provider>
   );
+}
+
+function renderWealth(path: string) {
+  return render(renderWealthTree(path));
 }
 
 beforeEach(() => {
@@ -201,6 +207,7 @@ beforeEach(() => {
   mockRenderChat.mockClear();
   mockOpenStream.mockClear();
   mockNotificationsInit.mockClear();
+  mockNotificationsReset.mockClear();
   mockOnNotificationEvent.mockClear();
   mockOnStreamUnreadChange.mockClear();
   mockOnDebugChange.mockClear();
@@ -269,13 +276,23 @@ test('renders the wealth dashboard shell and key KPI tiles', async () => {
   });
 });
 
-test('keeps the full-page workspace loader visible while the hidden shared chat frame is still loading', async () => {
+test('resets Wealth-local notification state when the module unmounts', async () => {
+  const { unmount } = renderWealth('/wealth-management');
+
+  expect(await screen.findByText('Active Clients')).toBeInTheDocument();
+
+  unmount();
+
+  expect(mockNotificationsReset).toHaveBeenCalledTimes(1);
+});
+
+test('keeps the full-page workspace loader visible while the hidden shared chat frame is only primed', async () => {
   mockUseSharedIframeChatHost.mockReturnValue({
     chatError: null,
     chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
     handleError: jest.fn(),
     handleLoad: jest.fn(),
-    isChatPrimed: false,
+    isChatPrimed: true,
     isChatReady: false,
   });
   const { container } = renderWealth('/wealth-management');
@@ -288,6 +305,40 @@ test('keeps the full-page workspace loader visible while the hidden shared chat 
   expect(container.querySelector('[data-testid="wealth-shared-chat-shell"]')).toBeInTheDocument();
   expect(container.querySelector('[data-testid="wealth-shared-chat-frame"]')).toBeInTheDocument();
   expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+});
+
+test('keeps hard-refresh client drawer entry blocked until shared chat is ready', async () => {
+  let sharedChatState = {
+    chatError: null,
+    chatUrl: 'https://corporate.symphony.com/client-bff/index.html?embed=true&mode=light',
+    handleError: jest.fn(),
+    handleLoad: jest.fn(),
+    iframeRef: { current: null },
+    isChatPrimed: true,
+    isChatReady: false,
+  };
+
+  mockUseSharedIframeChatHost.mockImplementation(() => sharedChatState);
+
+  const { rerender } = render(renderWealthTree('/wealth-management/clients?contactId=1'));
+
+  await waitFor(() => {
+    expect(mockSdkInit).toHaveBeenCalled();
+  });
+
+  expect(screen.getByLabelText('Loading wealth workspace')).toBeInTheDocument();
+  expect(screen.queryByText(/Advisor coverage, relationship health/i)).not.toBeInTheDocument();
+
+  sharedChatState = {
+    ...sharedChatState,
+    isChatReady: true,
+  };
+
+  rerender(renderWealthTree('/wealth-management/clients?contactId=1'));
+
+  expect(await screen.findByText(/Advisor coverage, relationship health/i)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Wealth Chat' })).toBeInTheDocument();
+  expect(screen.getByTestId('wealth-client-drawer-chat-slot')).toHaveClass('wealth-symphony-client-drawer-contact');
 });
 
 test('routes to the shared chat page from the advisor menu and hides the floating launcher', async () => {
