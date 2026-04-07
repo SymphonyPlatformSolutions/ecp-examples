@@ -29,7 +29,7 @@ export const wealthManagementShellData = {
       id: '2',
       name: 'Jonathan Smith',
       avatarUrl: JonathanSmithProfile,
-      streamId: 'DToErkq9AAp8b9Psw6srMX///mLo7M1AdA==',
+      streamId: 'cO/+x1Uz5Up1hshZZqmkWH///mKXxcyfdA==',
     },
     {
       id: '3',
@@ -47,7 +47,7 @@ export const wealthManagementShellData = {
       id: '5',
       name: 'Faye Zhang',
       avatarUrl: FayeZhangProfile,
-      streamId: 'Ze5LqRP0RgLww6lWUqBjIX///mL0CWI9dA==',
+      streamId: 'HnKT/x6dMRyS7qSePNBMtH///mKXzmcSdA==',
     },
   ] as ShellContact[],
 };
