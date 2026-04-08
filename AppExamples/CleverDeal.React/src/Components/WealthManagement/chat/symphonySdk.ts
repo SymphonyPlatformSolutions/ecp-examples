@@ -127,6 +127,38 @@ export class SymphonySdkService {
     return document.querySelector(containerSelector) as HTMLElement | null;
   }
 
+  private _getMountedFrame(containerSelector: string) {
+    const container = this._getContainer(containerSelector);
+    if (!container) {
+      return null;
+    }
+
+    return container.querySelector('iframe') as HTMLIFrameElement | null;
+  }
+
+  private _getLiveRenderedState(containerSelector: string) {
+    const trackedState = this._renderedContainers.get(containerSelector);
+    if (!trackedState) {
+      return undefined;
+    }
+
+    const container = this._getContainer(containerSelector);
+    const frame = container?.querySelector('iframe') as HTMLIFrameElement | null;
+
+    if (container && frame) {
+      return trackedState;
+    }
+
+    debugSdk('Clearing stale rendered container state.', {
+      containerSelector,
+      trackedStreamId: trackedState.streamId ?? null,
+      hasContainer: Boolean(container),
+      hasIframe: Boolean(frame),
+    });
+    this._renderedContainers.delete(containerSelector);
+    return undefined;
+  }
+
   private _getRenderTarget(containerSelector: string) {
     if (!containerSelector.startsWith('.')) {
       throw this._createError(`Symphony slot "${containerSelector}" must be a class selector.`);
@@ -526,13 +558,14 @@ export class SymphonySdkService {
         throw this._createError('Symphony SDK is not available on window.');
       }
 
-      const existingRender = this._renderedContainers.get(containerSelector);
-      const hasIframe = Boolean(container.querySelector('iframe'));
+      const existingRender = this._getLiveRenderedState(containerSelector);
+      const hasIframe = Boolean(this._getMountedFrame(containerSelector));
 
       debugSdk('renderChat() starting.', {
         containerSelector,
         streamId: requestedStreamId,
         hasExistingIframe: hasIframe,
+        trackedStreamId: existingRender?.streamId ?? null,
       });
 
       if (hasIframe && existingRender?.streamId === requestedStreamId) {
@@ -620,7 +653,7 @@ export class SymphonySdkService {
         window.symphony.updateTheme(renderOptions.theme as Record<string, unknown>);
       }
 
-      const existingRender = this._renderedContainers.get(containerSelector);
+      const existingRender = this._getLiveRenderedState(containerSelector);
       if (existingRender?.streamId === streamId) {
         debugSdk('openStream() skipped — already showing this stream.', { streamId });
         return;
@@ -629,7 +662,8 @@ export class SymphonySdkService {
       debugSdk('openStream() starting.', {
         streamId,
         containerSelector,
-        hadExistingFrame: Boolean(container.querySelector('iframe')),
+        hadExistingFrame: Boolean(this._getMountedFrame(containerSelector)),
+        trackedStreamId: existingRender?.streamId ?? null,
       });
 
       const frameWaitHandle = this._observeOpenedStream(containerSelector);
@@ -731,19 +765,11 @@ export class SymphonySdkService {
   }
 
   hasRendered(containerSelector: string) {
-    if (!this._getContainer(containerSelector)) {
-      return false;
-    }
-
-    return this._renderedContainers.has(containerSelector);
+    return Boolean(this._getLiveRenderedState(containerSelector));
   }
 
   getRenderedStreamId(containerSelector: string) {
-    if (!this._getContainer(containerSelector)) {
-      return undefined;
-    }
-
-    return this._renderedContainers.get(containerSelector)?.streamId;
+    return this._getLiveRenderedState(containerSelector)?.streamId;
   }
 
   adoptRenderedContainer(sourceSelector: string, targetSelector: string) {

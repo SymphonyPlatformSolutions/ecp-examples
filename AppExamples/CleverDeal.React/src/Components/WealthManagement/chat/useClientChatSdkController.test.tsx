@@ -26,6 +26,38 @@ let mockRenderedStreamId: string | undefined;
 let mockHasRendered = false;
 let mockIsReady = false;
 
+function mockGetSlot(containerSelector = '.wealth-symphony-client-contact') {
+  return document.querySelector(containerSelector) as HTMLDivElement | null;
+}
+
+function mockEnsureIframe(containerSelector: string, streamId?: string) {
+  const slot = mockGetSlot(containerSelector);
+  if (!slot) {
+    return;
+  }
+
+  let iframe = slot.querySelector('iframe') as HTMLIFrameElement | null;
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    slot.appendChild(iframe);
+  }
+
+  iframe.src = `https://corporate.symphony.com/apps/client2/${streamId ?? 'default'}`;
+}
+
+function mockSyncRenderedState(containerSelector = '.wealth-symphony-client-contact') {
+  const slot = mockGetSlot(containerSelector);
+  const iframe = slot?.querySelector('iframe') as HTMLIFrameElement | null;
+
+  if (!slot || !iframe) {
+    mockHasRendered = false;
+    mockRenderedStreamId = undefined;
+    return null;
+  }
+
+  return iframe;
+}
+
 jest.mock('./symphonySdk', () => ({
   symphonySdk: {
     init: async (ecpOrigin: string, partnerId?: string) => {
@@ -34,18 +66,26 @@ jest.mock('./symphonySdk', () => ({
     },
     renderChat: async (containerSelector: string, options: Record<string, unknown>) => {
       await mockRenderChat(containerSelector, options);
+      mockEnsureIframe(containerSelector, typeof options.streamId === 'string' ? options.streamId : undefined);
       mockHasRendered = true;
       mockRenderedStreamId = typeof options.streamId === 'string' ? options.streamId : undefined;
     },
     openStream: async (streamId: string, containerSelector: string, options?: Record<string, unknown>) => {
       await mockOpenStream(streamId, containerSelector, options);
+      mockEnsureIframe(containerSelector, streamId);
       mockHasRendered = true;
       mockRenderedStreamId = streamId;
     },
     sendMessage: (message: Record<string, unknown>, options: Record<string, unknown>) =>
       mockSendMessage(message, options),
-    hasRendered: () => mockHasRendered,
-    getRenderedStreamId: () => mockRenderedStreamId,
+    hasRendered: (containerSelector = '.wealth-symphony-client-contact') => {
+      return Boolean(mockSyncRenderedState(containerSelector) && mockHasRendered);
+    },
+    getRenderedStreamId: (containerSelector = '.wealth-symphony-client-contact') => {
+      return mockSyncRenderedState(containerSelector) && mockHasRendered
+        ? mockRenderedStreamId
+        : undefined;
+    },
     resetIfError: () => {
       const didReset = mockResetIfError();
       if (didReset) {
@@ -277,6 +317,39 @@ test('reuses the mounted client container when the drawer closes and reopens on 
   });
 
   expect(mockOpenStream).not.toHaveBeenCalled();
+});
+
+test('reopens the client stream when tracked state survives but the mounted slot lost its iframe', async () => {
+  const { rerender } = render(<HookHarness contactId="1" preload />);
+
+  await waitFor(() => {
+    expect(screen.getByTestId('status')).toHaveTextContent('ready');
+  });
+
+  const slot = document.querySelector('.wealth-symphony-client-contact') as HTMLDivElement | null;
+  expect(slot?.querySelector('iframe')).not.toBeNull();
+
+  slot?.replaceChildren();
+  mockOpenStream.mockClear();
+
+  rerender(<HookHarness contactId="1" enabled={false} preload />);
+  rerender(<HookHarness contactId="1" preload />);
+
+  await waitFor(() => {
+    expect(mockOpenStream).toHaveBeenCalledWith(
+      screen.getByTestId('stream-id').textContent ?? '',
+      '.wealth-symphony-client-contact',
+      expect.objectContaining({
+        condensed: false,
+        showMembers: false,
+        symphonyLogo: false,
+      }),
+    );
+  });
+
+  await waitFor(() => {
+    expect(screen.getByTestId('status')).toHaveTextContent('ready');
+  });
 });
 
 test('switches quickly to a new contact stream and sends messages through the active client slot', async () => {

@@ -209,8 +209,13 @@ export function useClientChatSdkController({
       return;
     }
 
-    if (symphonySdk.getRenderedStreamId(containerSelector) === streamId) {
-      debugClientChat('Already showing requested stream — marking ready.', { streamId, containerSelector });
+    const renderedStreamId = symphonySdk.getRenderedStreamId(containerSelector);
+    if (renderedStreamId === streamId) {
+      debugClientChat('Already showing requested stream — marking ready.', {
+        streamId,
+        renderedStreamId,
+        containerSelector,
+      });
       setChatError(null);
       setIsChatReady(true);
       setIsLoading(false);
@@ -229,12 +234,14 @@ export function useClientChatSdkController({
       const startedAt = getNow();
 
       try {
+        const currentRenderedStreamId = symphonySdk.getRenderedStreamId(containerSelector);
         const hasWarmRenderedContainer = symphonySdk.hasRendered(containerSelector);
         debugClientChat('Opening client Symphony chat stream.', {
           attempt: attempt + 1,
           contactId,
           containerSelector,
           ecpOrigin,
+          currentRenderedStreamId: currentRenderedStreamId ?? null,
           hasWarmRenderedContainer,
           streamId,
         });

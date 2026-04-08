@@ -292,6 +292,28 @@ test('injects the SDK script once in default focus mode without performing a hid
     expect(service.getRenderedStreamId('.slot-a')).toBe('stream-1');
   });
 
+  test('clears stale rendered state when the tracked client slot loses its iframe', async () => {
+    const service = new SymphonySdkService();
+    const openStreamMock = createOpenStreamMock();
+
+    (window as Window & { symphony?: unknown }).symphony = {
+      render: createRenderMock(),
+      openStream: openStreamMock,
+      sendMessage: jest.fn(),
+    } as any;
+
+    await service.init('corporate.symphony.com');
+    await service.openStream('stream-1', '.slot-a', { mode: 'light' });
+
+    expect(service.getRenderedStreamId('.slot-a')).toBe('stream-1');
+
+    const slot = document.querySelector('.slot-a') as HTMLDivElement;
+    slot.replaceChildren();
+
+    expect(service.hasRendered('.slot-a')).toBe(false);
+    expect(service.getRenderedStreamId('.slot-a')).toBeUndefined();
+  });
+
   test('waits for the warmed collaboration iframe to reload before resolving an openStream call', async () => {
     const service = new SymphonySdkService();
     const renderMock = createRenderMock();
