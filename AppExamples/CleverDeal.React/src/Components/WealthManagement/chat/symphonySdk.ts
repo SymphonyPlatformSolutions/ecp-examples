@@ -1,4 +1,5 @@
 import { debugWealth } from './wealthDebug';
+import { validateEcpOrigin } from '../../../Utils/originAllowlist';
 
 const SDK_SCRIPT_ID = 'symphony-ecm-sdk';
 const SDK_ONLOAD_CALLBACK = '__wealthManagementRenderEcp';
@@ -450,6 +451,7 @@ export class SymphonySdkService {
   }
 
   init(ecpOrigin: string, partnerId?: string): Promise<void> {
+    const validatedOrigin = validateEcpOrigin(ecpOrigin);
     if (this._status === 'ready') {
       debugSdk('init() skipped — already ready.');
       return Promise.resolve();
@@ -462,7 +464,7 @@ export class SymphonySdkService {
 
     const initStart = performance.now();
     debugSdk('init() starting.', {
-      ecpOrigin,
+      ecpOrigin: validatedOrigin,
       partnerId,
       hasSymphonyOnWindow: Boolean(window.symphony),
       hasExistingScript: Boolean(document.getElementById(SDK_SCRIPT_ID)),
@@ -512,7 +514,7 @@ export class SymphonySdkService {
       }
 
       const script = document.createElement('script');
-      script.src = `https://${ecpOrigin}${DEFAULT_SDK_PATH}`;
+      script.src = `https://${validatedOrigin}${DEFAULT_SDK_PATH}`;
       script.id = SDK_SCRIPT_ID;
       script.setAttribute('render', 'explicit');
       script.setAttribute('data-onload', SDK_ONLOAD_CALLBACK);
@@ -521,7 +523,7 @@ export class SymphonySdkService {
 
       if (partnerId) {
         script.setAttribute('data-partner-id', partnerId);
-      } else if (ecpOrigin !== 'st3.dev.symphony.com') {
+      } else if (validatedOrigin !== 'st3.dev.symphony.com') {
         script.setAttribute('data-partner-id', DEFAULT_PARTNER_ID);
       }
 

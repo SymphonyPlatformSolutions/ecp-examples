@@ -1,6 +1,7 @@
 <html>
   <head>
     <title>ECP Demo</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://*.symphony.com 'unsafe-inline'; frame-src https://*.symphony.com;" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -107,8 +108,10 @@
 
       const loadScript = () => {
         const DEFAULT_ORIGIN = "develop2.symphony.com";
+        const ALLOWED_ORIGINS = ["develop2.symphony.com", "corporate.symphony.com", "preview.symphony.com", "st3.dev.symphony.com"];
         const locationUrl = new URL(location.href);
-        const sdkOrigin = locationUrl.searchParams.get("origin");
+        const rawOrigin = locationUrl.searchParams.get("origin");
+        const sdkOrigin = ALLOWED_ORIGINS.includes(rawOrigin) ? rawOrigin : null;
         const script = document.createElement("script");
         script.id = "symphony-ecm-sdk";
         script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;

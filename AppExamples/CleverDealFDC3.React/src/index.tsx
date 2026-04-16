@@ -5,7 +5,9 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const DEFAULT_ORIGIN: string = "corporate.symphony.com";
-const originInParams = (new URL(window.location.href)).searchParams.get('ecpOrigin');
+const ALLOWED_ORIGINS = ['corporate.symphony.com', 'preview.symphony.com', 'st3.dev.symphony.com', 'develop2.symphony.com'];
+const rawOrigin = (new URL(window.location.href)).searchParams.get('ecpOrigin');
+const originInParams = rawOrigin && ALLOWED_ORIGINS.includes(rawOrigin) ? rawOrigin : null;
 
 const loadSdk = (
 ): Promise<void> => {

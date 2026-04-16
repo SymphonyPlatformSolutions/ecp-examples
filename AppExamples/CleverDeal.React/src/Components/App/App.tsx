@@ -8,6 +8,7 @@ import {
 import { createElement, useEffect, useState, useContext } from "react";
 import { FaHome } from "react-icons/fa";
 import { getEcpParam } from "../../Utils/utils";
+import { validateEcpOrigin } from "../../Utils/originAllowlist";
 import { routes } from "../../Data/routes";
 import { ThemeState, ThemeContext } from '../../Theme/ThemeProvider';
 import HelpButton from "../HelpButton";
@@ -17,13 +18,11 @@ import ThemePicker from "../ThemePicker";
 import "./app.scss";
 import PodPicker from "../PodPicker";
 
-const DEFAULT_ORIGIN: string = "corporate.symphony.com";
 const DEFAULT_PARTNER_ID: string = "symphony_internal_BYC-XXX";
-const ecpOriginParam = getEcpParam("ecpOrigin") || DEFAULT_ORIGIN;
+const ecpOriginParam = validateEcpOrigin(getEcpParam("ecpOrigin"));
 const partnerIdParam = getEcpParam("partnerId");
 
 const DEFAULT_SDK_PATH: string = "/embed/sdk.js";
-const sdkPath = getEcpParam("sdkPath") || DEFAULT_SDK_PATH;
 
 const LargeLoading = () => (
   <div className="large-loading">
@@ -44,7 +43,7 @@ export const App = () => {
       return;
     }
     const sdkScriptNode = document.createElement("script");
-    sdkScriptNode.src = `https://${ecpOriginParam}${sdkPath}`;
+    sdkScriptNode.src = `https://${ecpOriginParam}${DEFAULT_SDK_PATH}`;
     sdkScriptNode.id = "symphony-ecm-sdk";
     sdkScriptNode.setAttribute("render", "explicit");
     sdkScriptNode.setAttribute("data-onload", "renderRoom");
