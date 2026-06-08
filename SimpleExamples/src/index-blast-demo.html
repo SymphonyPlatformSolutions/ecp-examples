@@ -6,64 +6,380 @@
       content="script-src 'self' https://*.symphony.com 'unsafe-inline'; frame-src https://*.symphony.com;"
     />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        color: #182333;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f6f9;
+      }
+
+      .blast-app {
+        box-sizing: border-box;
+        height: auto;
+        min-height: 100vh;
+        padding: 24px;
+      }
+
+      .blast-shell {
+        --blast-chat-width: 450px;
+        --blast-chat-height: 800px;
+        --preview-header-height: 56px;
+        --blast-card-height: calc(
+          var(--blast-chat-height) + var(--preview-header-height) + 2px
+        );
+        max-width: 1040px;
+        margin: 0 auto;
+      }
+
+      .blast-header {
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .blast-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .blast-header p {
+        max-width: 640px;
+        margin: 8px 0 0;
+        color: #536176;
+        line-height: 1.45;
+      }
+
+      .sdk-state {
+        min-width: 130px;
+        padding: 7px 10px;
+        color: #12415f;
+        background: #e5f2f8;
+        border: 1px solid #b9d9e8;
+        border-radius: 8px;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .blast-grid {
+        display: grid;
+        grid-template-columns: minmax(360px, 1fr) calc(var(--blast-chat-width) + 2px);
+        gap: 16px;
+        align-items: stretch;
+        overflow-x: auto;
+      }
+
+      .blast-card {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        height: var(--blast-card-height);
+        min-height: var(--blast-card-height);
+        padding: 18px;
+        background: #ffffff;
+        border: 1px solid #d9dee8;
+        border-radius: 8px;
+        box-shadow: 0 12px 30px rgba(24, 35, 51, 0.08);
+      }
+
+      .blast-card h2 {
+        margin: 0 0 14px;
+        font-size: 17px;
+      }
+
+      .blast-card p {
+        margin: 0 0 14px;
+        color: #536176;
+        line-height: 1.45;
+      }
+
+      .blast-controls {
+        overflow: auto;
+      }
+
+      .form-field {
+        margin-bottom: 16px;
+      }
+
+      .blast-app label {
+        display: block;
+        width: auto;
+        margin-bottom: 7px;
+        color: #344055;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .form-control {
+        box-sizing: border-box;
+        width: 100%;
+        color: #182333;
+        background: #ffffff;
+        border: 1px solid #c7ceda;
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      .message-box {
+        min-height: 110px;
+        padding: 11px;
+        line-height: 1.45;
+        resize: vertical;
+      }
+
+      .helper-text,
+      .availability-note {
+        margin: -8px 0 16px;
+        color: #66758a;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .availability-note {
+        margin: 12px 0 0;
+        color: #6a4b0d;
+      }
+
+      .code-sample {
+        margin: 0 0 16px;
+        overflow: auto;
+        color: #182333;
+        background: #f8fafc;
+        border: 1px solid #d9dee8;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .code-sample code {
+        display: block;
+        padding: 12px;
+        white-space: pre;
+      }
+
+      .send-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: auto;
+        padding-top: 18px;
+      }
+
+      .btn {
+        min-height: 38px;
+        padding: 0 13px;
+        color: #ffffff;
+        background: #215a77;
+        border: 1px solid #1b4a62;
+        border-radius: 6px;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .btn:hover {
+        background: #18475f;
+      }
+
+      .btn:disabled {
+        color: #7a8494;
+        background: #e5e9ef;
+        border-color: #d1d7e0;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        color: #243044;
+        background: #ffffff;
+        border-color: #b7c0cd;
+      }
+
+      .btn-secondary:hover {
+        background: #eef3f7;
+      }
+
+      .status {
+        min-height: 18px;
+        margin-top: 12px;
+        color: #536176;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .status.success {
+        color: #17633a;
+      }
+
+      .status.error {
+        color: #9b1c31;
+      }
+
+      .preview-card {
+        justify-self: start;
+        width: calc(var(--blast-chat-width) + 2px);
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .preview-header {
+        display: flex;
+        align-items: center;
+        flex: 0 0 var(--preview-header-height);
+        padding: 16px 18px;
+        border-bottom: 1px solid #d9dee8;
+        box-sizing: border-box;
+      }
+
+      .preview-header h2 {
+        margin: 0;
+      }
+
+      .blast-ecp-frame {
+        position: static;
+        right: auto;
+        bottom: auto;
+        flex: 0 0 var(--blast-chat-height);
+        width: 100%;
+        height: var(--blast-chat-height);
+        min-height: var(--blast-chat-height);
+        background: #eef1f5;
+        transition: none;
+      }
+
+      .blast-ecp-frame iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      @media (max-width: 920px) {
+        .blast-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .preview-card {
+          width: calc(var(--blast-chat-width) + 2px);
+        }
+      }
+
+      @media (max-width: 560px) {
+        .blast-app {
+          padding: 14px;
+        }
+
+        .blast-header {
+          display: block;
+        }
+
+        .sdk-state {
+          display: inline-block;
+          margin-top: 12px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="app">
-      <div class="description">
-        <h1>Send blast messages with ECP</h1>
-        <p>
-          This example renders ECP in explicit mode and uses the SDK
-          <code>sendMessage</code> method to send blast messages to a configured
-          stream.
-        </p>
-        <p>
-          Add an ECP container and load the SDK in explicit mode:
-        </p>
-        <pre>
-          <code>
-            &lt;div class="ecp-frame symphony-ecm" id="symphony-ecm"&gt;&lt;/div&gt;
+    <div class="app blast-app">
+      <main class="blast-shell">
+        <header class="blast-header">
+          <div>
+            <h1>Blast Demo</h1>
+            <p>
+              Send a blast message to one or more room stream IDs through
+              Embedded Mode.
+            </p>
+          </div>
+          <div class="sdk-state" id="sdk-state">Loading Symphony</div>
+        </header>
 
-            &lt;script
-              id="symphony-ecm-sdk"
-              data-onload="onSdkLoaded"
-              data-mode="full"
-              render="explicit"
-              src="{ECP-SDK-URL}"&gt;
-            &lt;/script&gt;
-          </code>
-        </pre>
-        <p>
-          Once ECP is ready, call <code>sendMessage</code> with
-          <code>mode: "blast"</code>. The <code>silent</code> option controls
-          whether the blast sends a notification.
-        </p>
-        <pre>
-          <code>
-            window.symphony.sendMessage(
-              {
-                text: {
-                  "text/markdown": "Testing non silent blast.",
-                },
-              },
-              {
-                mode: "blast",
-                silent: false,
-                users: [],
-                streamIds: ["trJ1BEjB2OIGsZVsF3s0d3///nzEkpvDdA=="],
-              }
-            );
-          </code>
-        </pre>
-        <button id="blast" class="btn" style="display: none">
-          Send non silent blast
-        </button>
-        <button id="silent-blast" class="btn" style="display: none">
-          Send silent blast
-        </button>
-      </div>
-      <div class="ecp-frame symphony-ecm" id="symphony-ecm">
-        <!-- ECP iframe will be loaded here by the SDK -->
-      </div>
+        <section class="blast-grid" aria-label="Blast message workflow">
+          <section class="blast-card blast-controls">
+            <h2>1. Message</h2>
+            <p>
+              This example renders ECP in explicit mode and calls
+              <code>sendMessage</code> with <code>mode: "blast"</code>.
+            </p>
+
+            <div class="form-field">
+              <label for="blast-message">Message text</label>
+              <textarea
+                class="form-control message-box"
+                id="blast-message"
+                placeholder="Testing non-silent blast."
+              >Testing non-silent blast.</textarea>
+            </div>
+
+            <div class="form-field">
+              <label for="blast-stream-ids">Room stream IDs</label>
+              <textarea
+                class="form-control message-box"
+                id="blast-stream-ids"
+                placeholder="room-stream-id-1, room-stream-id-2"
+              ></textarea>
+            </div>
+            <p class="helper-text">
+              Separate multiple stream IDs with commas, semicolons, or new
+              lines.
+            </p>
+
+            <pre class="code-sample"><code>&lt;script
+  id="symphony-ecm-sdk"
+  data-onload="onSdkLoaded"
+  data-mode="full"
+  render="explicit"
+  src="{ECP-SDK-URL}"&gt;
+&lt;/script&gt;</code></pre>
+
+            <pre class="code-sample"><code>window.symphony.sendMessage(
+  {
+    text: {
+      "text/markdown": "Testing non-silent blast.",
+    },
+  },
+  {
+    mode: "blast",
+    silent: false,
+    users: [],
+    streamIds: ["{ROOM_STREAM_ID}"],
+  }
+);</code></pre>
+
+            <div class="send-actions">
+              <button class="btn" id="blast" type="button" disabled>
+                Send non-silent blast
+              </button>
+              <!--
+                Silent blast support is expected at the end of June.
+                Uncomment this button when it is available.
+              <button
+                class="btn btn-secondary"
+                id="silent-blast"
+                type="button"
+                disabled
+              >
+                Send silent blast
+              </button>
+              -->
+            </div>
+            <p class="availability-note">
+              Silent blast support is expected at the end of June; the code path
+              is present and the button is commented out for now.
+            </p>
+            <div class="status" id="blast-status" role="status"></div>
+          </section>
+
+          <section class="blast-card preview-card">
+            <div class="preview-header">
+              <h2>2. Symphony</h2>
+            </div>
+            <div class="blast-ecp-frame symphony-ecm" id="symphony-ecm">
+              <!-- ECP iframe will be loaded here by the SDK -->
+            </div>
+          </section>
+        </section>
+      </main>
     </div>
     <script type="text/javascript">
       const DEFAULT_ORIGIN = "develop2.symphony.com";
@@ -73,7 +389,20 @@
         "preview.symphony.com",
         "st3.dev.symphony.com",
       ];
-      const BLAST_STREAM_IDS = ["trJ1BEjB2OIGsZVsF3s0d3///nzEkpvDdA=="];
+
+      const state = {
+        sdkReady: false,
+        sending: false,
+        statusToken: 0,
+        statusTimeout: undefined,
+      };
+
+      const streamIdsInput = document.getElementById("blast-stream-ids");
+      const messageInput = document.getElementById("blast-message");
+      const blastButton = document.getElementById("blast");
+      const silentBlastButton = document.getElementById("silent-blast");
+      const blastStatus = document.getElementById("blast-status");
+      const sdkState = document.getElementById("sdk-state");
 
       const renderOptions = {
         canAddPeople: false,
@@ -105,48 +434,118 @@
         showXPod: true,
       };
 
-      window.onSdkLoaded = async () => {
-        const initialRendering = await window.symphony.render(
-          "symphony-ecm",
-          renderOptions
-        );
-        console.log("symphony.render response", initialRendering);
+      function setStatus(message, type) {
+        window.clearTimeout(state.statusTimeout);
+        state.statusToken += 1;
+        blastStatus.textContent = message;
+        blastStatus.className = type ? `status ${type}` : "status";
+        return state.statusToken;
+      }
 
-        document.getElementById("blast").addEventListener("click", () => {
-          window.symphony.sendMessage(
+      function clearStatusAfter(delay, token) {
+        window.clearTimeout(state.statusTimeout);
+        state.statusTimeout = window.setTimeout(() => {
+          if (state.statusToken === token) {
+            setStatus("");
+          }
+        }, delay);
+      }
+
+      function setSdkState(message) {
+        sdkState.textContent = message;
+      }
+
+      function updateSendControls() {
+        const disabled = !state.sdkReady || state.sending;
+        blastButton.disabled = disabled;
+        if (silentBlastButton) {
+          silentBlastButton.disabled = disabled;
+        }
+      }
+
+      function setSending(sending) {
+        state.sending = sending;
+        updateSendControls();
+      }
+
+      function getBlastStreamIds() {
+        return streamIdsInput.value
+          .split(/[\n,;]+/)
+          .map((streamId) => streamId.trim())
+          .filter(Boolean);
+      }
+
+      async function sendBlast(silent) {
+        if (!state.sdkReady) {
+          setStatus("Symphony is still loading.", "error");
+          return;
+        }
+
+        if (state.sending) {
+          return;
+        }
+
+        const streamIds = getBlastStreamIds();
+        const text = messageInput.value.trim();
+
+        if (!streamIds.length) {
+          setStatus("Enter at least one room stream ID.", "error");
+          return;
+        }
+
+        if (!text) {
+          setStatus("Enter message text.", "error");
+          return;
+        }
+
+        setSending(true);
+        setStatus("Sending blast...");
+
+        try {
+          await window.symphony.sendMessage(
             {
               text: {
-                "text/markdown": "Testing non silent blast.",
+                "text/markdown": text,
               },
             },
             {
               mode: "blast",
-              silent: false,
+              silent,
               users: [],
-              streamIds: BLAST_STREAM_IDS,
+              streamIds,
             }
           );
-        });
-        document.getElementById("blast").style.display = "inline";
 
-        document
-          .getElementById("silent-blast")
-          .addEventListener("click", () => {
-            window.symphony.sendMessage(
-              {
-                text: {
-                  "text/markdown": "Testing silent blast.",
-                },
-              },
-              {
-                mode: "blast",
-                silent: true,
-                users: [],
-                streamIds: BLAST_STREAM_IDS,
-              }
-            );
-          });
-        document.getElementById("silent-blast").style.display = "inline";
+          const successToken = setStatus(
+            silent ? "Silent blast sent." : "Non-silent blast sent.",
+            "success"
+          );
+          clearStatusAfter(3500, successToken);
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message || "Unable to send blast.", "error");
+        } finally {
+          setSending(false);
+        }
+      }
+
+      window.onSdkLoaded = async () => {
+        try {
+          const initialRendering = await window.symphony.render(
+            "symphony-ecm",
+            renderOptions
+          );
+          console.log("symphony.render response", initialRendering);
+          state.sdkReady = true;
+          setSdkState("Symphony ready");
+          updateSendControls();
+          const readyToken = setStatus("Blast demo ready.");
+          clearStatusAfter(2500, readyToken);
+        } catch (error) {
+          console.error(error);
+          setSdkState("Load failed");
+          setStatus("Unable to load Symphony.", "error");
+        }
       };
 
       const loadScript = () => {
@@ -159,9 +558,17 @@
         script.setAttribute("render", "explicit");
         script.setAttribute("data-onload", "onSdkLoaded");
         script.setAttribute("data-mode", "full");
+        setSdkState("Loading Symphony");
         document.body.appendChild(script);
       };
 
+      blastButton.addEventListener("click", () => sendBlast(false));
+      if (silentBlastButton) {
+        // The button is commented out until silent send is available.
+        silentBlastButton.addEventListener("click", () => sendBlast(true));
+      }
+
+      updateSendControls();
       loadScript();
     </script>
   </body>
