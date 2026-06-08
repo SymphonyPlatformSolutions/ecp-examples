@@ -1,0 +1,168 @@
+<html>
+  <head>
+    <title>ECP Blast Demo</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' https://*.symphony.com 'unsafe-inline'; frame-src https://*.symphony.com;"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="description">
+        <h1>Send blast messages with ECP</h1>
+        <p>
+          This example renders ECP in explicit mode and uses the SDK
+          <code>sendMessage</code> method to send blast messages to a configured
+          stream.
+        </p>
+        <p>
+          Add an ECP container and load the SDK in explicit mode:
+        </p>
+        <pre>
+          <code>
+            &lt;div class="ecp-frame symphony-ecm" id="symphony-ecm"&gt;&lt;/div&gt;
+
+            &lt;script
+              id="symphony-ecm-sdk"
+              data-onload="onSdkLoaded"
+              data-mode="full"
+              render="explicit"
+              src="{ECP-SDK-URL}"&gt;
+            &lt;/script&gt;
+          </code>
+        </pre>
+        <p>
+          Once ECP is ready, call <code>sendMessage</code> with
+          <code>mode: "blast"</code>. The <code>silent</code> option controls
+          whether the blast sends a notification.
+        </p>
+        <pre>
+          <code>
+            window.symphony.sendMessage(
+              {
+                text: {
+                  "text/markdown": "Testing non silent blast.",
+                },
+              },
+              {
+                mode: "blast",
+                silent: false,
+                users: [],
+                streamIds: ["trJ1BEjB2OIGsZVsF3s0d3///nzEkpvDdA=="],
+              }
+            );
+          </code>
+        </pre>
+        <button id="blast" class="btn" style="display: none">
+          Send non silent blast
+        </button>
+        <button id="silent-blast" class="btn" style="display: none">
+          Send silent blast
+        </button>
+      </div>
+      <div class="ecp-frame symphony-ecm" id="symphony-ecm">
+        <!-- ECP iframe will be loaded here by the SDK -->
+      </div>
+    </div>
+    <script type="text/javascript">
+      const DEFAULT_ORIGIN = "develop2.symphony.com";
+      const ALLOWED_ORIGINS = [
+        "develop2.symphony.com",
+        "corporate.symphony.com",
+        "preview.symphony.com",
+        "st3.dev.symphony.com",
+      ];
+      const BLAST_STREAM_IDS = ["trJ1BEjB2OIGsZVsF3s0d3///nzEkpvDdA=="];
+
+      const renderOptions = {
+        canAddPeople: false,
+        showChatSearch: true,
+        showHashTagPopover: false,
+        showCashTagPopover: true,
+        showProfilePopover: true,
+        showSystemMessages: false,
+        sound: false,
+        symphonyLogo: true,
+        ecpLoginPopup: true,
+        storageAccessPrompt: false,
+        allowChatCreation: true,
+        canClickExternalLinks: false,
+        canClickInternalLinks: false,
+        mode: "light",
+        condensed: true,
+        condensedMessageBelowName: true,
+        showTitle: true,
+        showInfo: true,
+        showMembers: true,
+        showBookmarkMessage: true,
+        showSuppressMessage: true,
+        showEditor: true,
+        showCompose: true,
+        showAttach: true,
+        showEmoji: true,
+        showDisableInput: true,
+        showXPod: true,
+      };
+
+      window.onSdkLoaded = async () => {
+        const initialRendering = await window.symphony.render(
+          "symphony-ecm",
+          renderOptions
+        );
+        console.log("symphony.render response", initialRendering);
+
+        document.getElementById("blast").addEventListener("click", () => {
+          window.symphony.sendMessage(
+            {
+              text: {
+                "text/markdown": "Testing non silent blast.",
+              },
+            },
+            {
+              mode: "blast",
+              silent: false,
+              users: [],
+              streamIds: BLAST_STREAM_IDS,
+            }
+          );
+        });
+        document.getElementById("blast").style.display = "inline";
+
+        document
+          .getElementById("silent-blast")
+          .addEventListener("click", () => {
+            window.symphony.sendMessage(
+              {
+                text: {
+                  "text/markdown": "Testing silent blast.",
+                },
+              },
+              {
+                mode: "blast",
+                silent: true,
+                users: [],
+                streamIds: BLAST_STREAM_IDS,
+              }
+            );
+          });
+        document.getElementById("silent-blast").style.display = "inline";
+      };
+
+      const loadScript = () => {
+        const locationUrl = new URL(location.href);
+        const rawOrigin = locationUrl.searchParams.get("origin");
+        const sdkOrigin = ALLOWED_ORIGINS.includes(rawOrigin) ? rawOrigin : null;
+        const script = document.createElement("script");
+        script.id = "symphony-ecm-sdk";
+        script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
+        script.setAttribute("render", "explicit");
+        script.setAttribute("data-onload", "onSdkLoaded");
+        script.setAttribute("data-mode", "full");
+        document.body.appendChild(script);
+      };
+
+      loadScript();
+    </script>
+  </body>
+</html>
