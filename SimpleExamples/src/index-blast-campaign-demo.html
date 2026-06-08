@@ -1,0 +1,918 @@
+<html>
+  <head>
+    <title>ECP Blast Campaign Demo</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' https://*.symphony.com 'unsafe-inline'; frame-src https://*.symphony.com;"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        color: #182333;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f6f9;
+      }
+
+      .campaign-app {
+        box-sizing: border-box;
+        height: auto;
+        min-height: 100vh;
+        padding: 24px;
+      }
+
+      .campaign-shell {
+        --campaign-chat-width: 450px;
+        --campaign-chat-height: 800px;
+        --preview-header-height: 56px;
+        --campaign-card-height: calc(
+          var(--campaign-chat-height) + var(--preview-header-height) + 2px
+        );
+        max-width: 1440px;
+        margin: 0 auto;
+      }
+
+      .campaign-header {
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .campaign-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .campaign-header p {
+        max-width: 680px;
+        margin: 8px 0 0;
+        color: #536176;
+        line-height: 1.45;
+      }
+
+      .sdk-state {
+        min-width: 130px;
+        padding: 7px 10px;
+        color: #12415f;
+        background: #e5f2f8;
+        border: 1px solid #b9d9e8;
+        border-radius: 8px;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .campaign-grid {
+        display: grid;
+        grid-template-columns:
+          minmax(280px, 0.9fr) minmax(320px, 1.15fr)
+          calc(var(--campaign-chat-width) + 2px);
+        gap: 16px;
+        align-items: stretch;
+        overflow-x: auto;
+      }
+
+      .campaign-card {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        height: var(--campaign-card-height);
+        min-height: var(--campaign-card-height);
+        padding: 18px;
+        background: #ffffff;
+        border: 1px solid #d9dee8;
+        border-radius: 8px;
+        box-shadow: 0 12px 30px rgba(24, 35, 51, 0.08);
+      }
+
+      .campaign-card h2 {
+        margin: 0 0 14px;
+        font-size: 17px;
+      }
+
+      .campaign-app label {
+        display: block;
+        width: auto;
+        margin-bottom: 7px;
+        color: #344055;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .form-field {
+        margin-bottom: 16px;
+      }
+
+      .form-control,
+      .message-box {
+        box-sizing: border-box;
+        width: 100%;
+        color: #182333;
+        background: #ffffff;
+        border: 1px solid #c7ceda;
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      .form-control {
+        height: 42px;
+        padding: 0 11px;
+      }
+
+      .message-box {
+        min-height: 190px;
+        padding: 11px;
+        line-height: 1.45;
+        resize: none;
+      }
+
+      .segmented-control {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        overflow: hidden;
+        border: 1px solid #b9c4d3;
+        border-radius: 8px;
+      }
+
+      .segmented-control input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .segmented-control label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        margin: 0;
+        padding: 0 10px;
+        color: #415066;
+        background: #f8fafc;
+        border-right: 1px solid #b9c4d3;
+        cursor: pointer;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .segmented-control label:last-child {
+        border-right: 0;
+      }
+
+      .segmented-control input:checked + label {
+        color: #ffffff;
+        background: #215a77;
+      }
+
+      .recipient-input {
+        min-height: 230px;
+      }
+
+      .helper-text,
+      .availability-note {
+        margin: -6px 0 16px;
+        color: #66758a;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .availability-note {
+        margin: 12px 0 0;
+        color: #6a4b0d;
+      }
+
+      .file-toolbar {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        min-height: 38px;
+        padding: 0 13px;
+        color: #ffffff;
+        background: #215a77;
+        border: 1px solid #1b4a62;
+        border-radius: 6px;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .btn:hover {
+        background: #18475f;
+      }
+
+      .btn:disabled {
+        color: #7a8494;
+        background: #e5e9ef;
+        border-color: #d1d7e0;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        color: #243044;
+        background: #ffffff;
+        border-color: #b7c0cd;
+      }
+
+      .btn-secondary:hover {
+        background: #eef3f7;
+      }
+
+      .file-list {
+        min-height: 62px;
+        max-height: 150px;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        list-style: none;
+        border: 1px solid #d9dee8;
+        border-radius: 6px;
+      }
+
+      .file-list li {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 11px;
+        border-bottom: 1px solid #edf0f5;
+      }
+
+      .file-list li:last-child {
+        border-bottom: 0;
+      }
+
+      .file-name {
+        min-width: 0;
+        overflow: hidden;
+        font-size: 13px;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .file-size,
+      .empty-files {
+        color: #66758a;
+        font-size: 12px;
+      }
+
+      .remove-file {
+        min-width: 32px;
+        height: 32px;
+        color: #7b2832;
+        background: #fff7f7;
+        border: 1px solid #efc7cd;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .send-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: auto;
+        padding-top: 18px;
+      }
+
+      .status {
+        min-height: 18px;
+        margin-top: 12px;
+        color: #536176;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .status.success {
+        color: #17633a;
+      }
+
+      .status.error {
+        color: #9b1c31;
+      }
+
+      .preview-card {
+        justify-self: start;
+        width: calc(var(--campaign-chat-width) + 2px);
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .preview-header {
+        display: flex;
+        align-items: center;
+        flex: 0 0 var(--preview-header-height);
+        padding: 16px 18px;
+        border-bottom: 1px solid #d9dee8;
+        box-sizing: border-box;
+      }
+
+      .preview-header h2 {
+        margin: 0;
+      }
+
+      .campaign-ecp-frame {
+        flex: 0 0 var(--campaign-chat-height);
+        height: var(--campaign-chat-height);
+        min-height: var(--campaign-chat-height);
+        width: 100%;
+        background: #eef1f5;
+      }
+
+      .campaign-ecp-frame iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      @media (max-width: 1100px) {
+        .campaign-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .preview-card {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .campaign-app {
+          padding: 14px;
+        }
+
+        .campaign-header {
+          display: block;
+        }
+
+        .sdk-state {
+          display: inline-block;
+          margin-top: 12px;
+        }
+
+        .campaign-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .campaign-card {
+          height: var(--campaign-card-height);
+          min-height: var(--campaign-card-height);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app campaign-app">
+      <main class="campaign-shell">
+        <header class="campaign-header">
+          <div>
+            <h1>Blast Campaign Demo</h1>
+            <p>
+              Prepare a targeted Symphony campaign, attach supporting material,
+              and send it through Embedded Mode.
+            </p>
+          </div>
+          <div class="sdk-state" id="sdk-state">Loading Symphony</div>
+        </header>
+
+        <section class="campaign-grid" aria-label="Campaign blast workflow">
+          <form class="campaign-card" id="campaign-form">
+            <h2>1. Recipients</h2>
+
+            <div class="form-field">
+              <label>Recipient type</label>
+              <div class="segmented-control">
+                <input
+                  type="radio"
+                  id="recipient-email"
+                  name="recipient-type"
+                  value="email"
+                  checked
+                />
+                <label for="recipient-email">Email</label>
+                <input
+                  type="radio"
+                  id="recipient-stream"
+                  name="recipient-type"
+                  value="stream"
+                />
+                <label for="recipient-stream">Room ID</label>
+                <input
+                  type="radio"
+                  id="recipient-user"
+                  name="recipient-type"
+                  value="user"
+                />
+                <label for="recipient-user">User ID</label>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="recipient-values" id="recipient-label">
+                Email addresses
+              </label>
+              <textarea
+                class="form-control message-box recipient-input"
+                id="recipient-values"
+                placeholder="name@example.com, second@example.com"
+              ></textarea>
+            </div>
+            <p class="helper-text" id="recipient-helper">
+              Separate multiple recipients with commas, semicolons, or new
+              lines.
+            </p>
+          </form>
+
+          <section class="campaign-card">
+            <h2>2. Message</h2>
+
+            <div class="form-field">
+              <label for="message-text">Campaign text</label>
+              <textarea
+                class="message-box"
+                id="message-text"
+                placeholder="Write the markdown message to send."
+              ></textarea>
+            </div>
+
+            <div class="form-field">
+              <label>Attachments</label>
+              <div class="file-toolbar">
+                <button class="btn btn-secondary" id="attach-button" type="button">
+                  Attach document
+                </button>
+                <input id="attachment-input" type="file" multiple hidden />
+              </div>
+              <ul class="file-list" id="attachment-list"></ul>
+            </div>
+
+            <div class="send-actions">
+              <button class="btn" id="send-non-silent" type="button" disabled>
+                Send non-silent blast
+              </button>
+              <!--
+                Silent blast support is expected at the end of June.
+                Uncomment this button when it is available.
+                <button class="btn btn-secondary" id="send-silent" type="button" disabled>
+                  Send silent blast
+                </button>
+              -->
+            </div>
+            <p class="availability-note">
+              Silent blast support is expected at the end of June; the code path
+              is present and the button is commented out for now.
+            </p>
+            <div class="status" id="campaign-status" role="status"></div>
+          </section>
+
+          <section class="campaign-card preview-card">
+            <div class="preview-header">
+              <h2>3. Symphony</h2>
+            </div>
+            <div class="campaign-ecp-frame symphony-ecm" id="symphony-ecm">
+              <!-- ECP iframe will be loaded here by the SDK -->
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script type="text/javascript">
+      const DEFAULT_ORIGIN = "develop2.symphony.com";
+      const ALLOWED_ORIGINS = [
+        "develop2.symphony.com",
+        "corporate.symphony.com",
+        "preview.symphony.com",
+        "st3.dev.symphony.com",
+      ];
+
+      const renderOptions = {
+        canAddPeople: false,
+        showChatSearch: true,
+        showHashTagPopover: false,
+        showCashTagPopover: true,
+        showProfilePopover: true,
+        showSystemMessages: false,
+        sound: false,
+        symphonyLogo: true,
+        ecpLoginPopup: true,
+        storageAccessPrompt: false,
+        allowChatCreation: true,
+        canClickExternalLinks: false,
+        canClickInternalLinks: false,
+        mode: "light",
+        condensed: true,
+        condensedMessageBelowName: true,
+        showTitle: true,
+        showInfo: true,
+        showMembers: true,
+        showBookmarkMessage: true,
+        showSuppressMessage: true,
+        showEditor: true,
+        showCompose: true,
+        showAttach: true,
+        showEmoji: true,
+        showDisableInput: true,
+        showXPod: true,
+      };
+
+      const state = {
+        sdkReady: false,
+        sending: false,
+        sendCount: 0,
+        statusToken: 0,
+        statusTimeout: undefined,
+        attachments: [],
+      };
+
+      const recipientCopy = {
+        email: {
+          label: "Email addresses",
+          placeholder: "name@example.com, second@example.com",
+          helper:
+            "Use email addresses here. Separate multiple recipients with commas, semicolons, or new lines.",
+        },
+        stream: {
+          label: "Room or group stream IDs",
+          placeholder: "room-stream-id-1, room-stream-id-2",
+          helper:
+            "Use room or group chat stream IDs here. For people, use Email or User ID mode.",
+        },
+        user: {
+          label: "Symphony user IDs",
+          placeholder: "123456789, 987654321",
+          helper:
+            "Use numeric Symphony user IDs here. Use the Email tab for email addresses.",
+        },
+      };
+
+      const attachButton = document.getElementById("attach-button");
+      const attachmentInput = document.getElementById("attachment-input");
+      const attachmentList = document.getElementById("attachment-list");
+      const campaignStatus = document.getElementById("campaign-status");
+      const sdkState = document.getElementById("sdk-state");
+      const sendNonSilentButton = document.getElementById("send-non-silent");
+      const silentButton = document.getElementById("send-silent");
+      const recipientValues = document.getElementById("recipient-values");
+      const recipientLabel = document.getElementById("recipient-label");
+      const recipientHelper = document.getElementById("recipient-helper");
+      const messageText = document.getElementById("message-text");
+
+      function setStatus(message, type) {
+        window.clearTimeout(state.statusTimeout);
+        state.statusToken += 1;
+        campaignStatus.textContent = message;
+        campaignStatus.className = type ? `status ${type}` : "status";
+        return state.statusToken;
+      }
+
+      function clearStatusAfter(delay, token) {
+        window.clearTimeout(state.statusTimeout);
+        state.statusTimeout = window.setTimeout(() => {
+          if (state.statusToken === token) {
+            setStatus("");
+          }
+        }, delay);
+      }
+
+      function setSdkState(message) {
+        sdkState.textContent = message;
+      }
+
+      function setSendButtonsDisabled(disabled) {
+        sendNonSilentButton.disabled = disabled;
+        if (silentButton) {
+          silentButton.disabled = disabled;
+        }
+      }
+
+      function updateSendControls() {
+        setSendButtonsDisabled(!state.sdkReady || state.sending);
+      }
+
+      function setSending(sending) {
+        state.sending = sending;
+        updateSendControls();
+      }
+
+      function getRecipientType() {
+        return document.querySelector("input[name='recipient-type']:checked")
+          .value;
+      }
+
+      function updateRecipientCopy() {
+        const selectedType = getRecipientType();
+        recipientLabel.textContent = recipientCopy[selectedType].label;
+        recipientValues.placeholder = recipientCopy[selectedType].placeholder;
+        recipientHelper.textContent = recipientCopy[selectedType].helper;
+      }
+
+      function parseRecipientValues() {
+        return recipientValues.value
+          .split(/[\n,;]+/)
+          .map((value) => value.trim())
+          .filter(Boolean);
+      }
+
+      function isEmailAddress(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      }
+
+      function isNumericUserId(value) {
+        return /^\d+$/.test(value);
+      }
+
+      function validateRecipients(recipientType, recipients) {
+        if (recipientType === "stream") {
+          const emailValue = recipients.find(isEmailAddress);
+          const userIdValue = recipients.find(isNumericUserId);
+
+          if (emailValue) {
+            throw new Error(
+              `Switch to Email mode for ${emailValue}, or enter a conversation stream ID.`
+            );
+          }
+          if (userIdValue) {
+            throw new Error(
+              `Switch to User ID mode for ${userIdValue}, or enter a conversation stream ID.`
+            );
+          }
+        }
+
+        if (recipientType === "email") {
+          const invalidEmail = recipients.find((value) => !isEmailAddress(value));
+
+          if (invalidEmail) {
+            throw new Error(`${invalidEmail} does not look like an email address.`);
+          }
+        }
+
+        if (recipientType === "user") {
+          const invalidUserId = recipients.find(
+            (value) => !isNumericUserId(value)
+          );
+
+          if (invalidUserId) {
+            throw new Error(
+              `${invalidUserId} does not look like a Symphony user ID.`
+            );
+          }
+        }
+      }
+
+      function formatBytes(bytes) {
+        if (bytes < 1024) {
+          return `${bytes} B`;
+        }
+        if (bytes < 1024 * 1024) {
+          return `${(bytes / 1024).toFixed(1)} KB`;
+        }
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+
+      function renderAttachmentList() {
+        attachmentList.replaceChildren();
+
+        if (!state.attachments.length) {
+          const emptyItem = document.createElement("li");
+          emptyItem.className = "empty-files";
+          emptyItem.textContent = "No documents attached";
+          attachmentList.appendChild(emptyItem);
+          return;
+        }
+
+        state.attachments.forEach((attachment) => {
+          const item = document.createElement("li");
+          const detail = document.createElement("div");
+          const name = document.createElement("div");
+          const size = document.createElement("div");
+          const remove = document.createElement("button");
+
+          name.className = "file-name";
+          name.textContent = attachment.file.name;
+          size.className = "file-size";
+          size.textContent = formatBytes(attachment.file.size);
+
+          detail.appendChild(name);
+          detail.appendChild(size);
+
+          remove.className = "remove-file";
+          remove.type = "button";
+          remove.textContent = "x";
+          remove.setAttribute("aria-label", `Remove ${attachment.file.name}`);
+          remove.addEventListener("click", () => {
+            state.attachments = state.attachments.filter(
+              (itemToKeep) => itemToKeep.id !== attachment.id
+            );
+            renderAttachmentList();
+          });
+
+          item.appendChild(detail);
+          item.appendChild(remove);
+          attachmentList.appendChild(item);
+        });
+      }
+
+      function readFileAsDataUri(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+
+          reader.addEventListener("load", () => {
+            resolve(reader.result);
+          });
+          reader.addEventListener("error", () => {
+            reject(new Error(`Unable to read ${file.name}.`));
+          });
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function buildMessagePayload() {
+        const text = messageText.value.trim();
+
+        if (!text && !state.attachments.length) {
+          throw new Error("Add campaign text or attach at least one document.");
+        }
+
+        const message = {
+          text: {
+            "text/markdown": text,
+          },
+        };
+
+        if (state.attachments.length) {
+          const fileEntities = await Promise.all(
+            state.attachments.map(async (attachment) => ({
+              name: attachment.file.name,
+              dataUri: await readFileAsDataUri(attachment.file),
+            }))
+          );
+
+          message.entities = fileEntities.reduce((entities, file, index) => {
+            entities[`attachment${index + 1}`] = {
+              type: "fdc3.fileAttachment",
+              data: {
+                name: file.name,
+                dataUri: file.dataUri,
+              },
+            };
+            return entities;
+          }, {});
+        }
+
+        return message;
+      }
+
+      function buildSendOptions(silent) {
+        const recipients = parseRecipientValues();
+        const recipientType = getRecipientType();
+
+        if (!recipients.length) {
+          throw new Error("Add at least one recipient.");
+        }
+
+        validateRecipients(recipientType, recipients);
+
+        const options = {
+          mode: "blast",
+          silent,
+        };
+
+        if (recipientType === "stream") {
+          options.users = [];
+          options.streamIds = recipients;
+        } else {
+          options.users = recipients;
+          options.streamIds = [];
+        }
+
+        return options;
+      }
+
+      async function sendBlast(silent) {
+        if (!state.sdkReady) {
+          setStatus("Symphony is still loading.", "error");
+          return;
+        }
+
+        if (state.sending) {
+          return;
+        }
+
+        const sendId = state.sendCount + 1;
+        state.sendCount = sendId;
+        setSending(true);
+        setStatus("Preparing campaign blast...");
+
+        try {
+          const message = await buildMessagePayload();
+          const options = buildSendOptions(silent);
+          setStatus("Opening Symphony send dialog...");
+
+          const sendPromise = Promise.resolve(
+            window.symphony.sendMessage(message, options)
+          );
+
+          setSending(false);
+          const handoffToken = setStatus(
+            "Campaign submitted to Symphony.",
+            "success"
+          );
+          clearStatusAfter(2500, handoffToken);
+
+          await sendPromise;
+
+          if (sendId === state.sendCount) {
+            const successToken = setStatus(
+              silent
+                ? "Silent blast sent."
+                : "Non-silent blast sent.",
+              "success"
+            );
+            clearStatusAfter(3500, successToken);
+          }
+        } catch (error) {
+          console.error(error);
+          if (sendId === state.sendCount) {
+            setStatus(
+              error.message || "Unable to send campaign blast.",
+              "error"
+            );
+          }
+        } finally {
+          if (sendId === state.sendCount) {
+            setSending(false);
+          }
+        }
+      }
+
+      window.onSdkLoaded = async () => {
+        try {
+          await window.symphony.render("symphony-ecm", renderOptions);
+          state.sdkReady = true;
+          setSdkState("Symphony ready");
+          updateSendControls();
+          const readyToken = setStatus("Campaign ready.");
+          clearStatusAfter(2500, readyToken);
+        } catch (error) {
+          console.error(error);
+          setSdkState("Load failed");
+          setStatus("Unable to load Symphony.", "error");
+        }
+      };
+
+      function loadScript() {
+        const locationUrl = new URL(location.href);
+        const rawOrigin = locationUrl.searchParams.get("origin");
+        const sdkOrigin = ALLOWED_ORIGINS.includes(rawOrigin) ? rawOrigin : null;
+        const script = document.createElement("script");
+        script.id = "symphony-ecm-sdk";
+        script.src = `https://${sdkOrigin || DEFAULT_ORIGIN}/embed/sdk.js`;
+        script.setAttribute("render", "explicit");
+        script.setAttribute("data-onload", "onSdkLoaded");
+        script.setAttribute("data-mode", "full");
+        setSdkState("Loading Symphony");
+        document.body.appendChild(script);
+      }
+
+      Array.from(document.querySelectorAll("input[name='recipient-type']")).forEach(
+        (input) => {
+          input.addEventListener("change", updateRecipientCopy);
+        }
+      );
+
+      attachButton.addEventListener("click", () => attachmentInput.click());
+
+      attachmentInput.addEventListener("change", () => {
+        const files = Array.from(attachmentInput.files || []);
+        const timestamp = Date.now();
+
+        state.attachments = state.attachments.concat(
+          files.map((file, index) => ({
+            id: `${file.name}-${file.size}-${file.lastModified}-${timestamp}-${index}`,
+            file,
+          }))
+        );
+        attachmentInput.value = "";
+        renderAttachmentList();
+      });
+
+      sendNonSilentButton.addEventListener("click", () => sendBlast(false));
+
+      if (silentButton) {
+        // The button is commented out until silent send is available.
+        silentButton.addEventListener("click", () => sendBlast(true));
+      }
+
+      renderAttachmentList();
+      updateRecipientCopy();
+      updateSendControls();
+      loadScript();
+    </script>
+  </body>
+</html>
