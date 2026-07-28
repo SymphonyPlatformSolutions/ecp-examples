@@ -340,7 +340,7 @@
   },
   {
     mode: "blast",
-    silent: false,
+    displayMode: "confirmation_dialog", // Use "none" for silent send.
     users: [],
     streamIds: ["{ROOM_STREAM_ID}"],
   }
@@ -350,9 +350,6 @@
               <button class="btn" id="blast" type="button" disabled>
                 Send non-silent blast
               </button>
-              <!--
-                Silent blast support is expected at the end of June.
-                Uncomment this button when it is available.
               <button
                 class="btn btn-secondary"
                 id="silent-blast"
@@ -361,11 +358,10 @@
               >
                 Send silent blast
               </button>
-              -->
             </div>
             <p class="availability-note">
-              Silent blast support is expected at the end of June; the code path
-              is present and the button is commented out for now.
+              Non-silent sends show a confirmation dialog. Silent sends use
+              <code>displayMode: "none"</code> and send without a dialog.
             </p>
             <div class="status" id="blast-status" role="status"></div>
           </section>
@@ -499,7 +495,11 @@
         }
 
         setSending(true);
-        setStatus("Sending blast...");
+        setStatus(
+          silent
+            ? "Sending blast without a confirmation dialog..."
+            : "Opening Symphony send dialog..."
+        );
 
         try {
           await window.symphony.sendMessage(
@@ -510,7 +510,7 @@
             },
             {
               mode: "blast",
-              silent,
+              displayMode: silent ? "none" : "confirmation_dialog",
               users: [],
               streamIds,
             }
@@ -564,7 +564,6 @@
 
       blastButton.addEventListener("click", () => sendBlast(false));
       if (silentBlastButton) {
-        // The button is commented out until silent send is available.
         silentBlastButton.addEventListener("click", () => sendBlast(true));
       }
 
