@@ -455,17 +455,13 @@
               <button class="btn" id="send-non-silent" type="button" disabled>
                 Send non-silent blast
               </button>
-              <!--
-                Silent blast support is expected at the end of June.
-                Uncomment this button when it is available.
-                <button class="btn btn-secondary" id="send-silent" type="button" disabled>
-                  Send silent blast
-                </button>
-              -->
+              <button class="btn btn-secondary" id="send-silent" type="button" disabled>
+                Send silent blast
+              </button>
             </div>
             <p class="availability-note">
-              Silent blast support is expected at the end of June; the code path
-              is present and the button is commented out for now.
+              Silent blast testing is enabled. The button becomes available when
+              the Symphony SDK is ready.
             </p>
             <div class="status" id="campaign-status" role="status"></div>
           </section>
@@ -780,7 +776,7 @@
 
         const options = {
           mode: "blast",
-          silent,
+          displayMode: silent ? "none" : "confirmation_dialog",
         };
 
         if (recipientType === "stream") {
@@ -812,7 +808,11 @@
         try {
           const message = await buildMessagePayload();
           const options = buildSendOptions(silent);
-          setStatus("Opening Symphony send dialog...");
+          setStatus(
+            silent
+              ? "Sending campaign without a confirmation dialog..."
+              : "Opening Symphony send dialog..."
+          );
 
           const sendPromise = Promise.resolve(
             window.symphony.sendMessage(message, options)
@@ -905,7 +905,6 @@
       sendNonSilentButton.addEventListener("click", () => sendBlast(false));
 
       if (silentButton) {
-        // The button is commented out until silent send is available.
         silentButton.addEventListener("click", () => sendBlast(true));
       }
 
