@@ -1,8 +1,10 @@
+import React, { useState, useEffect } from 'react';
 import { Menu, Search, TrendingDown, TrendingUp } from 'lucide-react';
 import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import MarketFeed from './MarketFeed';
 import MarketFlow from './MarketFlow';
+import InvestorRelations from './Investors';
 import logo from './img/marketflow-logo.png';
 import help_gif from './img/marketflow-help.gif';
 
@@ -39,6 +41,7 @@ const getNavItems = () => [
   { name: 'Market Feed', path: '/content/feed' },
   { name: 'News', path: '/content/news' },
   { name: 'Brokers', path: '/content/brokers' },
+  { name: 'Investor Relations', path: '/content/investor' },
   { name: 'Help', path: '/content/help' },
   { name: 'Clever Deal', path: '/' },
 ];
@@ -50,6 +53,7 @@ export const ContentDistribution = withTailwindCSS(() =>
       <Route path="feed" element={<Feed />} />
       <Route path="news" element={<News />} />
       <Route path="brokers" element={<Brokers />} />
+      <Route path="investor" element={<Investor />} />
       <Route path="help" element={<Help />} />
       <Route path="*" element={<NoMatch />} />
     </Routes>
@@ -288,6 +292,49 @@ function Brokers() {
       <p className="text-center text-2x1 text-gray-400 mt-6">
         <Link to="/content">Let's go back to the Home page</Link>
       </p>
+    </div>
+  );
+}
+
+function Investor() {
+  const location = useLocation();
+  const navItems = getNavItems();
+
+  return (
+    <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
+      <header className="bg-gray-800 p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <img src={logo} alt="Market Flow Logo" className="w-14 h-14 rounded-lg" />
+          <span className="text-2xl font-bold text-blue-500">Market Flow</span>
+          <nav className="hidden md:flex space-x-6">
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                className={`text-gray-300 hover:text-blue-400 transition-colors duration-200 ${location.pathname === item.path ? 'font-bold text-blue-400' : ''}`}
+                onClick={() => {
+                  window.location.href = item.path;
+                }}
+              >
+                {item.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input type="text" placeholder="Search" className="bg-gray-700 text-white rounded-full py-2 px-4 pl-10 w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+          <button className="bg-blue-600 rounded-full p-2 hover:bg-blue-700 transition-colors duration-200">
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+      <span className="text-sm text-gray-400 flex items-center"></span>
+      <p className="text-center text-2xl text-gray-400 mt-6">
+        Investor Relations
+      </p>
+        <InvestorRelations />
     </div>
   );
 }
