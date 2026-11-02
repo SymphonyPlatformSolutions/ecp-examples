@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ECP Mini Mode Demo</title>
+    <style>
+        body {
+            background: #fafafa;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .ecp-chat {
+            height: 800px;
+            width: 400px;
+            margin: 48px auto;
+            display: block;
+            vertical-align: top;
+            background: #232946;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px 0 rgba(60,60,60,0.18), 0 1.5px 6px 0 rgba(60,60,60,0.10);
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+        .theme-selector {
+            position: absolute;
+            top: 16px;
+            right: 32px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme selector dropdown -->
+    <div class="theme-selector">
+        <label for="theme-select">Theme:</label>
+        <select id="theme-select">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="custom">Custom</option>
+        </select>
+    </div>
+    <!-- Single ECP chat container -->
+    <div class="ecp-chat" id="chat-main"></div>
+    <!-- Load Symphony ECP SDK with Explicit rendering -->
+    <script type="text/javascript">
+        let currentTheme = 'dark';
+        window.onEcpSdkLoaded = () => {
+            window.symphony.render(document.getElementById('chat-main'), {
+                mode: currentTheme,
+                condensed: true,
+                symphonyLogo: true
+            });
+            console.log("Symphony SDK loaded and main chat rendered.");
+        };
+        document.getElementById('theme-select').addEventListener('change', function() {
+            const theme = this.value;
+            currentTheme = theme;
+            if (theme === 'dark' || theme === 'light') {
+                window.symphony.updateSettings({
+                    mode: theme,
+                    condensed: true,
+                    symphonyLogo: true
+                });
+            } else if (theme === 'custom') {
+                window.symphony.updateSettings({
+                    mode: 'dark',
+                    condensed: true,
+                    symphonyLogo: false
+                });
+                window.symphony.updateTheme({
+                    primary: "#ff00dd",
+                    secondary: "#ac0202",
+                    accent: "#F7CA3B",
+                    success: "#2EAA35",
+                    error: "#DE342E",
+                    background: "#ffb8b8",
+                    surface: "#ffe0e0",
+                    text: "#000000",
+                    textPrimary: "#FFFFFF",
+                    textSecondary: "#FFFFFF",
+                    textAccent: "#17181B",
+                    textSuccess: "#FFFFFF",
+                    textError: "#FFFFFF",
+                });
+            }
+        });
+    </script>
+    <script id="symphony-ecm-sdk" data-onload="onEcpSdkLoaded" render="explicit" data-mode="full" src="https://develop2.symphony.com/embed/sdk.js"></script>
+</body>
+</html>
